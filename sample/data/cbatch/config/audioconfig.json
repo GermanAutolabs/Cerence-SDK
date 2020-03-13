@@ -1,0 +1,28 @@
+{
+  "version": "AudioMgr 1.0",
+
+  "audio_scenario": [{
+      "name": "defaultScenario",
+      "audiopaths": [["file", "testRecognizer"]]
+    }
+  ],
+
+  "module_config": [{
+      "type": "AudioFromFile",
+      "name": "file",
+      "root_path": ".",
+	  "simulate_device": "true",
+      "audio_format": {
+        "uses": "16khz_1ch"
+      }
+    }
+  ],
+
+  "audio_format": [{
+      "name": "16khz_1ch",
+      "sample_rate": 16000,
+      "samples_per_channel": 1024,
+      "channel_count": 1
+    }
+  ]
+}

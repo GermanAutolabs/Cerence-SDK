@@ -1,0 +1,38 @@
+{
+   "version":"VoConHigh 5.0",
+   "application":[
+      {
+         "name":"DOMAIN_CNC",
+         "input":[
+            {
+               "type":"asr",
+               "asr":{
+                  "search":[
+                     {
+                        "name":"CNC_CTX",
+                        "type":"static",
+                        "static":{
+                           "file_name":"modelm_small_fmt2.fcf"
+                        },
+                        "vocon_parameters":{
+                           "LH_SEARCH_PARAM_TSILENCE":150
+                        }
+                     }
+                  ]
+               }
+            }
+         ],
+         "nlu":[
+            {
+               "type":"sem3",
+               "sem3":{
+                  "app":{
+                     "name":"MUSIC_APP",
+                     "file_name":"itn_enu_messaging_v2_0_v5.s3c"
+                  }
+               }
+            }
+         ]
+      }
+   ]
+}

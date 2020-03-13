@@ -1,0 +1,18 @@
+{
+    "version" : "VoConHigh 5.0",
+    "job" :
+  [
+        {
+          "name" : "batch_job_example",
+          "hrl_file_path": "call_nancy_brooks.hrl",
+          "sound_dir":  "../data/sound/enu_f16",
+          "audio_scenario": "defaultScenario",
+          "result_dir": ".",
+          "recognizer": "testRecognizer",
+          "asr_manager" : "testAsrManager",
+          "application": "DOMAIN_CNC",
+          "start_line": "0",
+          "num_of_lines_per_test":"6"
+        }
+    ]
+}

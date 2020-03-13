@@ -1,0 +1,7 @@
+{
+  "version" : "VoConHigh 5.0",
+  "asr_manager" : [{
+    "name": "testAsrManager",
+    "liquid_config_file_name": "liquid_config.json"
+  }
+]}
