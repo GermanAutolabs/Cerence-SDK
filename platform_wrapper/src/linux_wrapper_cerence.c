@@ -48,7 +48,7 @@ void liwr_recogResult(const char* result)
    result2 = malloc(sizeof(result));
    memcpy(result2,result,sizeof(result));
    printf("Cerence Recognizer result<%s>\n",result2);
-   handleIncomingEvents(result2);
+//   handleIncomingEvents(result2);
 //   parseResult(result2);
 
 }
@@ -61,20 +61,29 @@ void liwr_recogEvent(li_asr5_RecogEvent event)
 }
 
 
-void liwr_executeCommands(const char *command)
+void liwr_executeCommands(const char *CommandStr)
 {
- printf("Hymmer API commands to Excute");
-
- switch(command)
+ int result = 0;
+ printf("Hymmer API commands to Excute<%s>\n",CommandStr);
+ if(strcmp ("INIT_ASR",CommandStr) == 0)
  {
-    case 'startASR': 
-	   printf("Start ASR \n");
-           break;
-    case 'init':
-	   printf("Init Config for Cerence\n");
-	   break;
+   printf("Init the configuration\n");
+   result = liwr_initConfig();
+   if(result != 0)
+   {
+     liwr_startRecogniser();
+   }
 
  }
-	 
+ else if(strcmp ("START_ASR",CommandStr) == 0)
+ {
+   printf("Start the Recogniser\n");
 
+ }
+ else
+ {
+   printf("Wrong state\n");
+ }
+
+	 
 }

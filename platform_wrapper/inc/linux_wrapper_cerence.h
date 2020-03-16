@@ -58,3 +58,4 @@ void liwr_recogResult(const char *result);
 
 void liwr_recogEvent(li_asr5_RecogEvent event);
 
+void liwr_executeCommands(const char *CommandStr);
