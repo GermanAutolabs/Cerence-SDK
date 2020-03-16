@@ -931,12 +931,12 @@ nuance_common_ResultCode init_configuration(void)
   config->dccConfigs[0].name = DCC_NAME;
   config->dccConfigs[0].cop = COPFILE_NAME;
   config->nbrConfiguredDCCs = 1;
-  config->configDir = "../csdk_v2/sample/data/asr/config";
-  config->audioConfigDir = "../csdk_v2/sample/data/asr/config";
+  config->configDir = "../Cerence-V2-SDK/sample/data/asr/config";
+  config->audioConfigDir = "../Cerence-V2-SDK//sample/data/asr/config";
   config->audioList[nrElements] = "mic";
   config->dccConfigs[nrDccConfigs].name = "DCC_LOCAL_TITLE";
   config->dccConfigs[nrDccConfigs].source = NULL;
-  config->dccConfigs[nrDccConfigs].cop = "../csdk_v2/sample/data/asr/config/songs.cop";
+  config->dccConfigs[nrDccConfigs].cop = "../Cerence-V2-SDK//sample/data/asr/config/songs.cop";
   config->dccConfigs[nrDccConfigs].persistExistingContext = LH_FALSE;
   g_wuwApplication.name = config->applicationNames[0];
   return result;
