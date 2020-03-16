@@ -28,6 +28,20 @@ typedef enum
     LI_ASR5_RECOGNIZER_EXTERNAL_PROVIDER_FINISHED   /**< external provider finished processing audio. */
 } li_asr5_RecogEvent;
 
+
+/**
+ *  @brief  This enumeration type describes the types of results available in the Result API. <p>
+ */
+typedef enum
+{
+    LI_ASR5_RESULT_TYPE_ASR,                /**< ASR result. */
+    LI_ASR5_RESULT_TYPE_EXTERNAL,           /**< ASR External result. */
+    LI_ASR5_RESULT_TYPE_SEMANTIC,           /**< A Semantic result. */
+    LI_ASR5_RESULT_TYPE_POST_PROCESSOR,     /**< A Post processor result. */
+    LI_ASR5_RESULT_TYPE_EXTERNAL_PROVIDER   /**< A result from an external result provider plugin. */
+} li_asr5_ResultType;
+
+
 /**
  * @brief Initalize and pass the configuration  to Cerence API
  * 
@@ -49,7 +63,7 @@ int liwr_startRecogniser(void);
  * 
  */
 
-void liwr_recogResult(const char *result);
+void liwr_recogResult(const char *result , li_asr5_ResultType ResultType);
 
 /**
  * @brief Event of Recogniser state 

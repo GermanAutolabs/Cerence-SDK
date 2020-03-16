@@ -42,13 +42,13 @@ int liwr_startRecogniser(void)
     return result;
 }
 
-void liwr_recogResult(const char* result)
+void liwr_recogResult(const char* result ,li_asr5_ResultType ResultType)
 {
-
+   const char *kind = "ASR_RESULT";
    result2 = malloc(sizeof(result));
    memcpy(result2,result,sizeof(result));
    printf("Cerence Recognizer result<%s>\n",result2);
-//   handleIncomingEvents(result2);
+   handleIncomingEvents(kind,result2);
 //   parseResult(result2);
 
 }
