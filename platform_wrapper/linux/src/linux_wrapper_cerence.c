@@ -14,7 +14,7 @@
 
 
 char *result2;
-/*int main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   int result = 0;
   result = liwr_initConfig();
@@ -24,7 +24,7 @@ char *result2;
       liwr_startRecogniser();
   }
  return 0;
-}*/
+}
 
 
 int liwr_initConfig(void)
@@ -48,7 +48,7 @@ void liwr_recogResult(const char* result ,li_asr5_ResultType ResultType)
    result2 = malloc(sizeof(result));
    memcpy(result2,result,sizeof(result));
    printf("Cerence Recognizer result<%s>\n",result2);
-   handleIncomingEvents(kind,result2);
+//   handleIncomingEvents(kind,result2);
 //   parseResult(result2);
 
 }

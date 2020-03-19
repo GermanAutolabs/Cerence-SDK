@@ -28,11 +28,13 @@
 #include "IApplication.h"
 #include "IDynamicContentConsumer.h"
 #include "ResultCode.h"
+/* Utils header for Json Parser*/
 #include "cJSON.h"
-#include "mt_mutex.h"
-#include "mt_semaphore.h"
+
 
 /*Linux  Platform based */
+#include "mt_mutex.h"
+#include "mt_semaphore.h"
 #include <signal.h>
 #include <time.h>
 
@@ -62,8 +64,32 @@ nuance_common_ResultCode deleteTimer();
 /* -------------------------------------------------------------------------+
  |   Global Functions                                             |
  + -------------------------------------------------------------------------*/
+ /**
+  * @brief: Initialise the configuration for the ASR , Currently the configuration
+  *       are hardcorded.
+  * 
+  * @return nuance_common_ResultCode 
+  */
 nuance_common_ResultCode init_configuration(void);
+
+/**
+ * @brief : Thread Initialise like mutex and semaphore
+ * 
+ * @return nuance_common_ResultCode 
+ */
 nuance_common_ResultCode cerence_thread_init(void);
+
+/**
+ * @brief : View the configuration of the ASR
+ * 
+ * @return nuance_common_ResultCode 
+ */
 nuance_common_ResultCode cerence_configuration_view(void);
+
+/**
+ * @brief : Start ASR
+ * 
+ * @return nuance_common_ResultCode 
+ */
 nuance_common_ResultCode cerence_Start_Recognizer(void);
 

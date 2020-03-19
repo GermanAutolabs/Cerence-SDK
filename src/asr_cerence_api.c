@@ -1,7 +1,7 @@
 /**
  * @file asr_cerence_api.c
  * @author your name (vaibhav.pandey@germanautolabs.com)
- * @brief 
+ * @brief : The file is reference for Linux. 
  * @version 0.1
  * @date 2020-03-12
  * 
@@ -109,7 +109,6 @@ sConfigParameters* config;
  |   LOCAL FUNCTION PROTOTYPES                                              |
  + -------------------------------------------------------------------------*/
 static void disableErrorReportingPopups() {}
-//static void init_configuration(void);
 static void printUsage();
 static void pushEvent(ASR_EVENT event);
 static void popEvent(ASR_EVENT *event);
@@ -708,8 +707,7 @@ LH_S32 startDataPreparations(sConfigParameters *config)
 {
   nuance_common_ResultCode rc = NUANCE_COMMON_OK;
   size_t i = 0;
-  //for (i = 0; i < config->nbrConfiguredDCCs; ++i)
-  for (i = 0; i < 1; ++i)
+  for (i = 0; i < config->nbrConfiguredDCCs; ++i)
   {
     sDccConfig* dccConfig = &config->dccConfigs[i];
 
@@ -931,24 +929,25 @@ nuance_common_ResultCode init_configuration(void)
   config->dccConfigs[0].name = DCC_NAME;
   config->dccConfigs[0].cop = COPFILE_NAME;
   config->nbrConfiguredDCCs = 1;
-  config->configDir = "../Cerence-V2-SDK/sample/data/asr/config";
-  config->audioConfigDir = "../Cerence-V2-SDK//sample/data/asr/config";
+  config->configDir = "../../../data/asr/config";
+  config->audioConfigDir = "../../../data/asr/config";
   config->audioList[nrElements] = "mic";
   config->dccConfigs[nrDccConfigs].name = "DCC_LOCAL_TITLE";
   config->dccConfigs[nrDccConfigs].source = NULL;
-  config->dccConfigs[nrDccConfigs].cop = "../Cerence-V2-SDK//sample/data/asr/config/songs.cop";
+  config->dccConfigs[nrDccConfigs].cop = "../../../data/asr/config/songs.cop";
   config->dccConfigs[nrDccConfigs].persistExistingContext = LH_FALSE;
   g_wuwApplication.name = config->applicationNames[0];
   return result;
 
 }
+
+
 nuance_common_ResultCode cerence_thread_init(void) 
 {
   g_sem = malloc(mt_semaphore_getinstancesize());
   mt_semaphore_create(g_sem, 0, 5);
   g_mutex = malloc(mt_mutex_getinstancesize());
   mt_mutex_init(g_mutex);
-//  init_configuration();
   /* disables error reporting popups on platforms that need it */
   disableErrorReportingPopups();
 
