@@ -1,0 +1,205 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Overview</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="CERENCE SDK - OGG AUDIO CONTAINER USER’S GUIDE" href="../SDK_OggAudioContainer_UserGuide.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview</h1>
+<p>The following is an overview of the structure of the JSON configuration files.</p>
+<blockquote>
+<div><ul class="simple">
+<li>{ <a class="reference internal" href="#ioggunpackerconfig">IOggUnpackerConfig</a> }</li>
+<li><dl class="first docutils">
+<dt>{ <a class="reference internal" href="#ioggpackerconfig">IOggPackerConfig</a> }</dt>
+<dd><ul class="first last">
+<li>stream_id: int</li>
+<li>page_time: int</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="ioggunpackerconfig-the-ogg-container-unpacker-configuration">
+<span id="ioggunpackerconfig"></span><h1>IOggUnpackerConfig - The ‘OGG container’ unpacker configuration.</h1>
+<p>The ‘OGG container’ unpacker configuration.</p>
+<p>Currently there are no configuration parameters defined.</p>
+<p>This built-in ogg-container-unpacker implementation can be bound to an audio decoder module by setting the param “container_type” to the value “OGG”.</p>
+<p>It transforms audio data with the container “CONTAINER_OGG” into audio data with the container “CONTAINER_NONE”.</p>
+</div>
+<div class="section" id="ioggpackerconfig-the-ogg-container-packer-configuration">
+<span id="ioggpackerconfig"></span><h1>IOggPackerConfig - The ‘OGG container’ packer configuration.</h1>
+<p>The ‘OGG container’ packer configuration.</p>
+<p>This built-in ogg-container-packer implementation can be bound to an audio encoder module by setting the param “container_type” to the value “OGG”.</p>
+<p>It transforms audio data with the container “CONTAINER_NONE” into audio data with the container “CONTAINER_OGG”.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="22%" />
+<col width="8%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;stream_id&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>fixed id for the OGG stream.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;page_time&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>define the playtime in ms the data added to an OGG page has to cover.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ioggpackerconfig-stream-id">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;stream_id&quot;</span></code>:</dt>
+<dd><p class="first">fixed id for the OGG stream.</p>
+<p>This property defines a fixed stream id for the encoded OGG stream if set.</p>
+<p>Without this property a random number will be used, which is the recommended behavior.</p>
+<p>This property can be changed during runtime using the vh_callback mechanism.
+A changed property takes effect with the next scenario activation.</p>
+<p><strong>Example:</strong>
+“stream_id”: { “vh_callback”: { “name”: “(instance_name)_stream_id”, “type”: “integer” } },</p>
+<p>It is proposed to be expand/replace (instance_name) with the name property of the module, defined in the
+IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it. Setting the
+vh_callback default value makes the vh_callback to return always a valid string.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property stream_id is handled like not defined at all.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ioggpackerconfig-page-time">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;page_time&quot;</span></code>:</dt>
+<dd><p class="first">define the playtime in ms the data added to an OGG page has to cover.</p>
+<p>This property defines when an OGG page should be emitted.</p>
+<p>The defined value is transformed into a byte count which is required by the OGG interface.</p>
+<p>The OGG logic is as follows:
+An OGG page is emitted when at least four packets of audio data have been accumulated and
+the defined byte count is meet or exceeded.</p>
+<p>Without this property defined the internal defaults of the OGG library are active.
+For more details please have a look at the OGG documentation, of the method ogg_stream_pageout.</p>
+<p>This property can be changed during runtime using the vh_callback mechanism.
+A changed property takes effect with the next scenario activation.</p>
+<p><strong>Example:</strong>
+“page_time”: { “vh_callback”: { “name”: “(instance_name)_page_time”, “type”: “integer” } },</p>
+<p>It is proposed to be expand/replace (instance_name) with the name property of the module, defined in the
+IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it. Setting the
+vh_callback default value makes the vh_callback to return always a valid string.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property page_time is handled like not defined at all.</p>
+</dd>
+</dl>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_OggAudioContainer_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_OggAudioContainer_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a></li>
+<li><a class="reference internal" href="#ioggunpackerconfig-the-ogg-container-unpacker-configuration">IOggUnpackerConfig - The ‘OGG container’ unpacker configuration.</a></li>
+<li><a class="reference internal" href="#ioggpackerconfig-the-ogg-container-packer-configuration">IOggPackerConfig - The ‘OGG container’ packer configuration.</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_OggAudioContainer_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../SDK_OggAudioContainer_UserGuide.html" title="previous chapter">CERENCE SDK - OGG AUDIO CONTAINER USER’S GUIDE</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/audio_container_ogg_configuration_api_ref.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

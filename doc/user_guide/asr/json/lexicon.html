@@ -1,0 +1,480 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>LEXICON CONFIGURATION OPTIONS</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="lexicon-configuration-options">
+<span id="index-0"></span><h1>LEXICON CONFIGURATION OPTIONS</h1>
+<div class="section" id="overview">
+<h2>OVERVIEW</h2>
+<p>The lexicon specifies how phonemes are retrieved. It groups one or
+more transcription providers for transcription lookup.  The following
+section describe configurations for these providers.</p>
+</div>
+<div class="section" id="options">
+<h2>OPTIONS</h2>
+<p>Below are the elements that a lexicon may contains. It is important to
+note that all elements are optional.  A lexicon with only dictionaries
+or only a CLC is a valid lexicon. The lookup order is the following:</p>
+<img alt="../_images/lexicon_order.jpg" src="../_images/lexicon_order.jpg" />
+<div class="section" id="clc-common-linguistic-component">
+<h3>CLC (Common Linguistic Component):</h3>
+<p>Here is a lexicon configuration example with only CLC:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;lexicon&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ENU_LEXICON&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clc&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;dict&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span>
+          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;vh_callback&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;filepath&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;//home//usr/data/dict//enu_artist.dcb&quot;</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+         <span class="p">}</span>
+       <span class="p">],</span>
+      <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;clc_enu_cfg3_v6_0_2.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;LH_CLC_PARAM_NUMBER_OUTPUT_TRANSCRIPTIONS&quot;</span><span class="p">:</span> <span class="mi">5</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>Optional, it specify the name of the lexicon.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">clc</span></code></dt>
+<dd><p class="first">Optional block to specify the clc buffer file to use. It has the following possible keys:</p>
+<p><code class="docutils literal notranslate"><span class="pre">filename</span></code>: Mandatory key. It specify the clc buffer to use.</p>
+<p><code class="docutils literal notranslate"><span class="pre">dict,</span> <span class="pre">exception_dictionary,</span> <span class="pre">ruleset,</span> <span class="pre">vocon_parameters</span></code>: Optional keys. For more details see following sections.</p>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">id_dictionary</span></code>: Optional key. See the following sub section Identifier dictionary.</p>
+</dd>
+</dl>
+<div class="section" id="identifier-dictionary">
+<h4>Identifier dictionary</h4>
+<p>Phonetic transcriptions can be retrieved via identifiers using a so called identifier dictionary.
+An identifier dictionary can be loaded onto a CLC using the id_dictionary property.
+The following JSON shows the optional id_dictionary configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="o">...</span>
+  <span class="s2">&quot;clc&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="o">...</span>
+    <span class="s2">&quot;id_dictionary&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;foo_filename&gt;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;compatibility_string&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;foo_compatibility_string&gt;&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">filename</span></code>: Mandatory key, specifying the filename of the identifier buffer.</p>
+<p><code class="docutils literal notranslate"><span class="pre">compatibility_string</span></code>: Optional key. A string value to check the identifier buffer’s compatibility.
+This string can also be given via callback.</p>
+<p>When the key <code class="docutils literal notranslate"><span class="pre">id_dictionary</span></code> is specified, Cerence ASR looks up phonetic transcriptions via the transcription identifier first.
+If no transcriptions are found in the identifier dictionary, Cerence ASR falls back to retrieve transcriptions from the CLC.</p>
+</div>
+</div>
+<div class="section" id="user-dictionaries-before-clc">
+<h3>User Dictionaries before CLC:</h3>
+<p>It is possible to add a user_word_dictionary. To look up a transcription, the lexicon looks in the user word dictionary, and then the CLC.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  {
+      &quot;version&quot;: &quot;VoConHigh 5.0&quot;,
+      &quot;lexicon&quot;: {
+          &quot;name&quot;: &quot;ENU_LEXICON&quot;,
+          &quot;user_word_dictionary&quot; : &quot;userwords.dcb&quot;,
+          &quot;clc&quot;: {
+              &quot;filename&quot;: &quot;clc_enu_cfg3_v6_0_2.dat&quot;,
+              &quot;vocon_parameters&quot;: {
+                  &quot;LH_CLC_PARAM_NUMBER_OUTPUT_TRANSCRIPTIONS&quot;: 5
+              }
+          }
+      }
+  }
+
+``user_word_dictionary``
+Optional, may contain a user word dictionary that has been created in the &quot;usw&quot; folder specified in the asr_paths configuration file.
+
+Note: currently user_word_dictionary in lexicon doesn&#39;t support.
+</pre></div>
+</div>
+</div>
+<div class="section" id="clc-cache">
+<span id="index-1"></span><h3>CLC cache</h3>
+<p>Structured transcriptions (potentially used by all DCCs) can be cached via the so called CLC cache.
+A CLC cache can be configured like in the following JSON example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;lexicon&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LEX_ENU_WITH_CLC_CACHE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;output_languages&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod3_5500_enu_ml_car_f16_v1_0_0.dat&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;clc&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;filename&quot;</span> <span class="p">:</span> <span class="s2">&quot;clc_enu_mpthreevadml_v6_0_1.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;clc_cache&quot;</span> <span class="p">:</span> <span class="s2">&quot;clc_cache_enu_mpthreevadml.dat&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">clc_cache</span></code></dt>
+<dd><p class="first">Optional key containing a filename with an already existing CLC cache archive.
+When the file does not exist or the filename is an empty string an empty CLC cache is created.
+When the lexicon is destroyed the CLC cache is archived to the file any existing file is overwritten.
+When an empty string was given the CLC cache is not archived.
+The search path to the CLC cache archive must be configured in the asr_path as shown in the following JSON example:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;asr_paths&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;asr&quot;</span> <span class="p">:</span> <span class="s2">&quot;../../binary_sdk/dat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clc&quot;</span> <span class="p">:</span> <span class="s2">&quot;../data/clc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clc_cache&quot;</span> <span class="p">:</span> <span class="s2">&quot;./tmp_cache&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;../data/acmod&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>Furthermore the cache size can be configured with the ASR parameter <code class="docutils literal notranslate"><span class="pre">LH_CLC_PARAM_CACHE_SIZE</span></code>.
+By default the cache size is 1 MB.</p>
+<p>Remark: there is only one CLC cache for all domain categories.</p>
+</div>
+<div class="section" id="lex-cache">
+<span id="index-2"></span><h3>LEX cache</h3>
+<p>Non-Structured transcriptions (potentially used by all DCCs) can be cached via the so called LEX cache.
+If defined, to look up a transcription, the lexicon looks in LEX cache file, and then the CLC
+A LEX cache can be configured like in the following JSON example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> {
+     &quot;version&quot;: &quot;VoConHigh 5.0&quot;,
+     &quot;lexicon&quot;: {
+         &quot;name&quot;: &quot;ENU_LEXICON&quot;,
+         &quot;user_word_dictionary&quot; : &quot;userwords.dcb&quot;,
+         &quot;clc&quot;: {
+             &quot;filename&quot;: &quot;clc_enu_cfg3_v6_0_2.dat&quot;,
+             &quot;vocon_parameters&quot;: {
+                 &quot;LH_CLC_PARAM_NUMBER_OUTPUT_TRANSCRIPTIONS&quot;: 5
+             }
+         },
+        &quot;lex_cache&quot; : {
+          &quot;persist&quot; : true,
+          &quot;cache_word_size&quot; : 1000
+        }
+     }
+ }
+
+``lex_cache``
+Optional key containing filenames with an already existing LEX cache archive.
+When the file does not exist or the filename is an empty string an empty LEX cache is created.
+When the lexicon is destroyed the LEX cache is archived to the file any existing file is overwritten.
+The name pattern of LEX cache archive file is, &quot;lexicon name&quot;_&quot;dcc name&quot;_&quot;domain_catetory&quot;.lxc, take above
+json as an example, if a DCC named &quot;DCC_PHONE&quot; using lexicon &quot;ENU_LEXICON&quot; to do data preparation, and if
+the name of the domain category is &quot;contact&quot;, then the lex cache file would be, &quot;ENU_LEXICON_DCC_PHONE_contact.lxc&quot;.
+
+The max size of the cache file can be configured with &quot;cache_word_size&quot;, if this key is missing, or if value of this key is
+-1, there is no size limitation.
+
+The search path to the LEX cache archive must be configured in the asr_path as shown in the following JSON example::
+
+  {
+    &quot;version&quot; : &quot;VoConHigh 5.0&quot;,
+    &quot;asr_paths&quot; : {
+      &quot;asr&quot; : &quot;../../binary_sdk/dat&quot;,
+      &quot;clc&quot; : &quot;../data/clc&quot;,
+      &quot;lex_cache&quot; : &quot;./lex_cache&quot;,
+      &quot;acmod&quot; : &quot;../data/acmod&quot;
+    }
+  }
+</pre></div>
+</div>
+</div>
+<div class="section" id="output-language">
+<span id="index-3"></span><h3>Output language</h3>
+<p>It is possible to set the output languages. The output languages are either specified by the
+language strings (ex. “string”: [“ENU”, “FRF”, …]), or by specifying an
+acmod, so that the phonetics that are generated are
+compatible with the acmod.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lexicon&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ENU_LEXICON&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;output_languages&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;acmod&quot;</span><span class="p">:</span> <span class="s2">&quot;acmod4_900_enu_gen_car_f16_v1_0_0.dat&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;clc&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;clc_enu_cfg3_v6_0_2.dat&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;LH_CLC_PARAM_NUMBER_OUTPUT_TRANSCRIPTIONS&quot;</span><span class="p">:</span> <span class="mi">5</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is important to note that <em>output_languages</em> block is only used
+through <em>ILexicon</em> api. When the lexicon is used in a dynamic content
+consumer, the <em>output_language</em> block will be ignored and the output
+language will be set to match the acmod used in that dynamic content
+consumer.</p>
+</div>
+<div class="section" id="setting-dictionary-rules-on-the-clc">
+<h3>Setting dictionary/rules on the CLC</h3>
+<p>As mentioned before, there is also the option to set the dictionary directly on the CLC
+buffer and add specific rules:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lexicon&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ENU_LEXICON&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;clc&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;clc_enu_cfg3_v6_0_2.dat&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;LH_CLC_PARAM_NUMBER_OUTPUT_TRANSCRIPTIONS&quot;</span><span class="p">:</span> <span class="mi">5</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;dict&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+               <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;artist.dcb&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;lookup_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;LH_CLC_DCTLOOKUP_USE_LID&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+               <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;album.dcb&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;lookup_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;LH_CLC_DCTLOOKUP_IGNORE_LID&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+               <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+                 <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;title.dcb&quot;</span>
+              <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;exception_dictionary&quot;</span><span class="p">:</span> <span class="s2">&quot;acmod4_900_enu_gen_car_f16_v1_0_0.dat&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ruleset&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="s2">&quot;ruleset1.txt&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;ruleset2.txt&quot;</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If you configure one or more rulesets the <code class="docutils literal notranslate"><span class="pre">clc_ruleset</span></code> location
+should be specified in the asr_paths configuration file.</p>
+<p>Note that for the dictionary block, the <em>filename</em> is mandatory. The <em>lookup_strategy</em> is optional though.
+It is set to <em>LH_CLC_DCTLOOKUP_USE_LID</em> in case not specified.
+The other possible value is <em>LH_CLC_DCTLOOKUP_IGNORE_LID</em>. This make the lookup independent of the input language.</p>
+</div>
+</div>
+<div class="section" id="logging-transcriptions">
+<h2>LOGGING TRANSCRIPTIONS</h2>
+<p>The application can configure the logger to log the transcriptions.
+The module that logs the transcription is called <code class="docutils literal notranslate"><span class="pre">nuance.asr.LexiconLogger</span></code> and it uses
+the zone <code class="docutils literal notranslate"><span class="pre">LOG_INFO</span></code>.</p>
+<p>An example log configuration is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;logger&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;consumers&quot;</span> <span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span>        <span class="p">:</span> <span class="s2">&quot;text to file&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span>      <span class="p">:</span> <span class="s2">&quot;./LexiconLogger.log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;modules&quot;</span>     <span class="p">:</span> <span class="s2">&quot;nuance.asr.LexiconLogger&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;zones&quot;</span>       <span class="p">:</span> <span class="s2">&quot;LOG_INFO&quot;</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">nuance.asr.LexiconLogger</span></code> logs the data in table format. The first line contains the header of the table, each row
+contains one transcription.</p>
+<p>The columns are, in the order as they appear in the table:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">lexicon</span> <span class="pre">name</span></code></dt>
+<dd>The lexicon name as given in the json configuration. This can be empty if the lexicon has no name. E.g. when the
+lexicon is configured inside the dynamic content consumer.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">user</span> <span class="pre">name</span></code></dt>
+<dd>The name of the component that uses the lexicon, i.e. name of the Dynamic Content Consumer as given in the JSON configuration.
+This string will be empty if you use the ILexicon API.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">orthography</span></code></dt>
+<dd>The orthography of the word for which the lexicon will provide transcriptions</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">domain</span> <span class="pre">category</span></code></dt>
+<dd>The domain category used for the transcription look-up. For the dynamic content consumer this is configured in the JSON config.
+For the ILexicon API this is passed via the API.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">nbr/total</span> <span class="pre">of</span> <span class="pre">words</span></code></dt>
+<dd>The index of the current word and the total number of words the orthography is split into.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">word</span> <span class="pre">orthography</span></code></dt>
+<dd>A split orthography</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">normalized</span> <span class="pre">word</span> <span class="pre">orthography</span></code></dt>
+<dd>The normalized orthography as it is generated by the internal grapheme to phoneme engine (CLC).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">nbr/total</span> <span class="pre">of</span> <span class="pre">trans</span></code></dt>
+<dd>If there are multiple transcriptions, each transcription is logged in as separate row. This field contains the
+current transcription index and the total number of transcriptions.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">language</span> <span class="pre">Code</span></code></dt>
+<dd>The 3 letter language code that correspond to the output language of the generated phonetics. This language code
+is only filled when a transcription lookup is done for a fuzzy match context. For all other types of contexts this field
+is empty.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">LH_TRANSTYPE</span></code></dt>
+<dd><p class="first">The type of the transcription.
+Possible values are:</p>
+<dl class="last docutils">
+<dt>LH_TRANSTYPE_PHONETIC</dt>
+<dd>The transcription is a L&amp;H+ phonetic transcription. This is encoded in ASCII.</dd>
+<dt>LH_TRANSTYPE_USERWORD</dt>
+<dd>A transcription that is obtained from a user word training. The transcription data is binary data,
+the actual binary data will not be logged, instead of this the transcriptions column will contain
+the string: <code class="docutils literal notranslate"><span class="pre">`binary</span> <span class="pre">data</span></code>.
+This type of transcription is linked to a particular acoustic model.</dd>
+<dt>LH_TRANSTYPE_TEXT_STRING</dt>
+<dd>Orthographic text (can be used for “sounds like”, abbreviations, etc…)</dd>
+<dt>LH_TRANSTYPE_SPEECHUNITS</dt>
+<dd>Speech Unit transcriptions [Advanced Use only]. The transcription data is binary data,
+the actual binary data will not be logged, instead of this the transcriptions column will contain
+the string: <code class="docutils literal notranslate"><span class="pre">`binary</span> <span class="pre">data</span></code>.
+This type of transcription is linked to a particular acoustic model.</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">transcription</span></code></dt>
+<dd>The actual transcription. In cases where the transcription contains binary data, this field contains
+the string <code class="docutils literal notranslate"><span class="pre">binary</span> <span class="pre">data</span></code>.
+In case the transcription type is <code class="docutils literal notranslate"><span class="pre">LH_TRANSTYPE_PHONETIC</span></code> it contains the L&amp;H+ phonetic transcription.</dd>
+</dl>
+<p>An example of logged transcriptions is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lexicon</span> <span class="n">name</span>    <span class="o">|</span> <span class="n">user</span> <span class="n">name</span>        <span class="o">|</span> <span class="n">orthography</span> <span class="o">|</span> <span class="n">domain</span> <span class="n">category</span> <span class="o">|</span> <span class="n">nbr</span><span class="o">/</span><span class="n">total</span> <span class="n">of</span> <span class="n">words</span> <span class="o">|</span> <span class="n">word</span> <span class="n">orthography</span> <span class="o">|</span> <span class="n">normalized</span> <span class="n">word</span> <span class="n">orthography</span> <span class="o">|</span> <span class="n">nbr</span><span class="o">/</span><span class="n">total</span> <span class="n">of</span> <span class="n">trans</span> <span class="o">|</span> <span class="n">language</span> <span class="n">code</span> <span class="o">|</span> <span class="n">LH_TRANSTYPE</span>          <span class="o">|</span> <span class="n">transcription</span>
+<span class="n">LEX_ENU_WITH_TN</span> <span class="o">|</span> <span class="n">DCC_SLM_FM_MUSIC</span> <span class="o">|</span> <span class="n">Nirvana</span>     <span class="o">|</span> <span class="n">normal</span>          <span class="o">|</span> <span class="mi">1</span><span class="o">/</span><span class="mi">1</span>                <span class="o">|</span> <span class="n">Nirvana</span>          <span class="o">|</span> <span class="n">nirvana</span>                     <span class="o">|</span> <span class="mi">1</span><span class="o">/</span><span class="mi">1</span>                <span class="o">|</span>               <span class="o">|</span> <span class="n">LH_TRANSTYPE_PHONETIC</span> <span class="o">|</span> <span class="c1">#nIR+.&#39;vA.n$#</span>
+<span class="n">LEX_ENU_WITH_TN</span> <span class="o">|</span> <span class="n">DCC_SLM_FM_MUSIC</span> <span class="o">|</span> <span class="n">Punkstuff</span>   <span class="o">|</span> <span class="n">normal</span>          <span class="o">|</span> <span class="mi">1</span><span class="o">/</span><span class="mi">1</span>                <span class="o">|</span> <span class="n">Punkstuff</span>        <span class="o">|</span> <span class="n">punkstuff</span>                   <span class="o">|</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span>                <span class="o">|</span>               <span class="o">|</span> <span class="n">LH_TRANSTYPE_PHONETIC</span> <span class="o">|</span> <span class="c1">#p&#39;^nKkst^f#</span>
+<span class="n">LEX_ENU_WITH_TN</span> <span class="o">|</span> <span class="n">DCC_SLM_FM_MUSIC</span> <span class="o">|</span> <span class="n">Punkstuff</span>   <span class="o">|</span> <span class="n">normal</span>          <span class="o">|</span> <span class="mi">1</span><span class="o">/</span><span class="mi">1</span>                <span class="o">|</span> <span class="n">Punkstuff</span>        <span class="o">|</span> <span class="n">punkstuff</span>                   <span class="o">|</span> <span class="mi">2</span><span class="o">/</span><span class="mi">2</span>                <span class="o">|</span>               <span class="o">|</span> <span class="n">LH_TRANSTYPE_PHONETIC</span> <span class="o">|</span> <span class="c1">#p&#39;^nKkst$f#</span>
+<span class="n">LEX_ENU_WITH_TN</span> <span class="o">|</span> <span class="n">DCC_SLM_FM_MUSIC</span> <span class="o">|</span>  <span class="n">Pink</span> <span class="n">Floyd</span> <span class="o">|</span> <span class="n">normal</span>          <span class="o">|</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span>                <span class="o">|</span> <span class="n">Pink</span>             <span class="o">|</span> <span class="n">pink</span>                        <span class="o">|</span> <span class="mi">1</span><span class="o">/</span><span class="mi">1</span>                <span class="o">|</span>               <span class="o">|</span> <span class="n">LH_TRANSTYPE_PHONETIC</span> <span class="o">|</span> <span class="c1">#&#39;pInKk#</span>
+<span class="n">LEX_ENU_WITH_TN</span> <span class="o">|</span> <span class="n">DCC_SLM_FM_MUSIC</span> <span class="o">|</span>  <span class="n">Pink</span> <span class="n">Floyd</span> <span class="o">|</span> <span class="n">normal</span>          <span class="o">|</span> <span class="mi">2</span><span class="o">/</span><span class="mi">2</span>                <span class="o">|</span> <span class="n">Floyd</span>            <span class="o">|</span> <span class="n">floyd</span>                       <span class="o">|</span> <span class="mi">1</span><span class="o">/</span><span class="mi">1</span>                <span class="o">|</span>               <span class="o">|</span> <span class="n">LH_TRANSTYPE_PHONETIC</span> <span class="o">|</span> <span class="c1">#&#39;flO&amp;Id#</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">LEXICON CONFIGURATION OPTIONS</a><ul>
+<li><a class="reference internal" href="#overview">OVERVIEW</a></li>
+<li><a class="reference internal" href="#options">OPTIONS</a><ul>
+<li><a class="reference internal" href="#clc-common-linguistic-component">CLC (Common Linguistic Component):</a><ul>
+<li><a class="reference internal" href="#identifier-dictionary">Identifier dictionary</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-dictionaries-before-clc">User Dictionaries before CLC:</a></li>
+<li><a class="reference internal" href="#clc-cache">CLC cache</a></li>
+<li><a class="reference internal" href="#lex-cache">LEX cache</a></li>
+<li><a class="reference internal" href="#output-language">Output language</a></li>
+<li><a class="reference internal" href="#setting-dictionary-rules-on-the-clc">Setting dictionary/rules on the CLC</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging-transcriptions">LOGGING TRANSCRIPTIONS</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

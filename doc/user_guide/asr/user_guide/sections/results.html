@@ -1,0 +1,772 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Recognition Results</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="NLU applications" href="nlu_applications.html" />
+    <link rel="prev" title="Dynamic Content Consumers" href="dcc.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="recognition-results">
+<h1>Recognition Results</h1>
+<div class="section" id="result-types">
+<span id="result-formats"></span><h2>Result types</h2>
+<div class="section" id="result-events">
+<span id="index-0"></span><h3>Result events</h3>
+<p>The recognizer communicates its recognition results through a callback
+function, <code class="docutils literal notranslate"><span class="pre">onResult</span></code>, that is one member of the
+<code class="docutils literal notranslate"><span class="pre">IRecognizerListener</span></code> structure. Because the <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback
+is tied to the recognizer, it will handle all the results that any of
+the ASR applications used with that recognizer can return.</p>
+<p>All results are in JSON format, but depending on the type of ASR
+applications used with a recognizer, the structure of a result will be
+different. There are <a class="reference internal" href="#asr-result-structure"><span class="std std-ref">ASR results</span></a>,
+<a class="reference internal" href="#nlu-result-structure"><span class="std std-ref">NLU results</span></a>, and <a class="reference internal" href="#cloud-result-structure"><span class="std std-ref">Cloud results</span></a>.
+<a class="reference internal" href="#asr-result-structure"><span class="std std-ref">ASR results</span></a> can also
+be partial (intermediate), if Cerence ASR is configured to also provide
+partial results.</p>
+<p>Consequently, your <code class="docutils literal notranslate"><span class="pre">onResult</span></code> implementation should be capable of
+handling all the different types of results that you expect your ASR
+applications to return. In the following sections, the structure of
+each result type will be explained.</p>
+</div>
+<div class="section" id="asr-results">
+<span id="asr-result-structure"></span><span id="index-1"></span><h3>ASR results</h3>
+<p>An example result from an ASR recognition would look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">:</span> <span class="s1">&#39;RESULT_TYPE_ASR&#39;</span><span class="p">,</span>
+<span class="n">result</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;stable&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;NBest&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;beginTime&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;endTime&quot;</span><span class="p">:</span> <span class="mi">1940</span><span class="p">,</span>
+    <span class="s2">&quot;activeStartRules&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;SLM#START&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;hypotheses&quot;</span><span class="p">:</span> <span class="p">[{</span>
+            <span class="s2">&quot;startRule&quot;</span><span class="p">:</span> <span class="s2">&quot;SLM#START&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;beginTime&quot;</span><span class="p">:</span> <span class="mi">420</span><span class="p">,</span>
+            <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7133</span><span class="p">,</span>
+            <span class="s2">&quot;endTime&quot;</span><span class="p">:</span> <span class="mi">1940</span><span class="p">,</span>
+            <span class="s2">&quot;lmScore&quot;</span><span class="p">:</span> <span class="mi">2944</span><span class="p">,</span>
+            <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="mi">77454</span><span class="p">,</span>
+            <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                    <span class="s2">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;call&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;terminal&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;beginTime&quot;</span><span class="p">:</span> <span class="mi">440</span><span class="p">,</span>
+                    <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6498</span><span class="p">,</span>
+                    <span class="s2">&quot;endTime&quot;</span><span class="p">:</span> <span class="mi">770</span><span class="p">,</span>
+                    <span class="s2">&quot;lmScore&quot;</span><span class="p">:</span> <span class="mi">1149</span><span class="p">,</span>
+                    <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="mi">17030</span>
+                <span class="p">},</span> <span class="p">{</span>
+                    <span class="s2">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;nancy&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;terminal&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;beginTime&quot;</span><span class="p">:</span> <span class="mi">770</span><span class="p">,</span>
+                    <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7594</span><span class="p">,</span>
+                    <span class="s2">&quot;endTime&quot;</span><span class="p">:</span> <span class="mi">1220</span><span class="p">,</span>
+                    <span class="s2">&quot;lmScore&quot;</span><span class="p">:</span> <span class="mi">721</span><span class="p">,</span>
+                    <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="mi">22970</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+    <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is an NBest result that contains a single hypothesis.  At the top
+level, the result contains the start and the end timestamps of the
+audio for which this result contains hypotheses (<code class="docutils literal notranslate"><span class="pre">beginTime</span></code> and
+<code class="docutils literal notranslate"><span class="pre">endTime</span></code>). Also contained at the top level is the list of start
+rules, from all search contexts, that were active at the time the
+result was produced.</p>
+<p>Each hypothesis contains the context start rule that was actually used
+in producing this result. In the example, the <code class="docutils literal notranslate"><span class="pre">startRule</span></code> is
+<code class="docutils literal notranslate"><span class="pre">SLM#START</span></code>. This rule allows you, if you have a search space
+composed of several contexts (e.g. if you have several ASR
+applications active in parallel), to determine which context produced
+the hypothesis. In <code class="docutils literal notranslate"><span class="pre">SLM#START</span></code>, the context is called <code class="docutils literal notranslate"><span class="pre">SLM</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">START</span></code> is the start rule in that context.</p>
+<p id="index-2">A hypothesis also contains start and end timestamps, that further
+narrow the audio window to precisely the terminals in the
+hypothesis. The hypothesis also has an overall <code class="docutils literal notranslate"><span class="pre">confidence</span></code> that is
+calculated from the confidences of the individual terminals. The
+confidence is what you typically use to judge a hypothesis. In
+contrast to the other measures included, such as <code class="docutils literal notranslate"><span class="pre">score</span></code> and
+<code class="docutils literal notranslate"><span class="pre">lmscore</span></code>, the confidence is normalized across hypotheses, and can
+be used to compare several hypotheses against each other.</p>
+<p>Finally, a hypothesis contains an array of items. Items can be
+terminals (<code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;terminal&quot;</span></code>), but they can also be
+tags. Terminal items have an <code class="docutils literal notranslate"><span class="pre">orthography</span></code>, which is transcribed
+from a section of the audio stream.  Tags will contain nested items,
+such as other tags or terminals. The items thus define a tree-like
+structure of items recognized in the audio stream, or matched in the
+context (tags do not appear in the audio stream, but are always
+composed of other items that have been recognized in the audio
+stream).</p>
+</div>
+<div class="section" id="nlu-results">
+<span id="nlu-result-structure"></span><span id="index-3"></span><h3>NLU results</h3>
+<p>If you configure your ASR application with an <code class="docutils literal notranslate"><span class="pre">nlu</span></code> section, then
+every time a final ASR result is created, an NLU result is created as
+well. Your <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback will be called two times, first with
+the ASR result, and then with the corresponding NLU result. This works
+this way because an NLU result is always based on an ASR result that
+precedes it.</p>
+<p>This is what the NLU JSON result looks like:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;SemanticResult&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;versions&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;SemanticRepresentation&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.1&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;SemanticResult&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;3.0.0&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;SemanticSpecification&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;5.1&quot;</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;results&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;appName&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;probability&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>
+    <span class="nt">&quot;interpretations&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;b7512171-ac0a-4e6a-b8a6-17583b807ea6&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;probability&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>
+      <span class="nt">&quot;representation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;__ITN__&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;concept&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;topic&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;roles&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;FreeText&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;FreeText&quot;</span>
+              <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;terminalIndices&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+       <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}],</span>
+  <span class="nt">&quot;terminals&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;one\\number&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;beginTime&quot;</span><span class="p">:</span> <span class="mi">1450</span><span class="p">,</span>
+      <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6051</span><span class="p">,</span>
+      <span class="nt">&quot;endTime&quot;</span><span class="p">:</span> <span class="mi">2050</span><span class="p">,</span>
+      <span class="nt">&quot;score&quot;</span><span class="p">:</span> <span class="mi">40086</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;beginTime&quot;</span><span class="p">:</span> <span class="mi">2150</span><span class="p">,</span>
+      <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7205</span><span class="p">,</span>
+      <span class="nt">&quot;endTime&quot;</span><span class="p">:</span> <span class="mi">2610</span><span class="p">,</span>
+      <span class="nt">&quot;score&quot;</span><span class="p">:</span> <span class="mi">29246</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;three&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;beginTime&quot;</span><span class="p">:</span> <span class="mi">3060</span><span class="p">,</span>
+      <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7233</span><span class="p">,</span>
+      <span class="nt">&quot;endTime&quot;</span><span class="p">:</span> <span class="mi">3660</span><span class="p">,</span>
+      <span class="nt">&quot;score&quot;</span><span class="p">:</span> <span class="mi">38602</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The type will be <code class="docutils literal notranslate"><span class="pre">SemanticResult</span></code>. For ASR results, this is
+<code class="docutils literal notranslate"><span class="pre">NBest</span></code>. Note that the <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback in the
+<code class="docutils literal notranslate"><span class="pre">IRecognizerListener</span></code> has an argument called <code class="docutils literal notranslate"><span class="pre">resultType</span></code> of type
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_ResultType</span></code> which indicates the result type, so you
+don’t need to extract the <code class="docutils literal notranslate"><span class="pre">type</span></code> field in order to check for the
+result type.</p>
+<p>At the end of the JSON structure, there is a section called
+<code class="docutils literal notranslate"><span class="pre">terminals</span></code>. This section contains an array with all the terminals
+that appear in the ASR result on which this NLU result is based. The
+semantic interpretations refer to the terminals by index in this
+array, rather than repeating the full terminal structures. (See
+<code class="docutils literal notranslate"><span class="pre">terminalIndices</span></code> in the section <code class="docutils literal notranslate"><span class="pre">roles</span></code> of the JSON structure.)</p>
+<p>The section <code class="docutils literal notranslate"><span class="pre">result</span></code> will have the actual semantic interpretation(s)
+of the ASR result, in the <code class="docutils literal notranslate"><span class="pre">interpretations</span></code> array. Each JSON block
+in this array is an alternative interpretation of the ASR result.</p>
+</div>
+<div class="section" id="cloud-results">
+<span id="cloud-result-structure"></span><span id="index-4"></span><h3>Cloud results</h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;NMAS_PRFX_SESSION_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;2995007c-041f-4283-94af-821636402186&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;result_type&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_ASR_CMD&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;_status&quot;</span><span class="p">:</span> <span class="s2">&quot;result&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;audio_transfer_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;packages&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;20191121155833289&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">640</span>
+      <span class="p">},{</span>
+        <span class="nt">&quot;time&quot;</span><span class="p">:</span> <span class="s2">&quot;20191121155833307&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;bytes&quot;</span><span class="p">:</span> <span class="mi">640</span>
+      <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="nt">&quot;audio_id&quot;</span><span class="p">:</span> <span class="mi">986581</span><span class="p">,</span>
+    <span class="nt">&quot;end_time&quot;</span><span class="p">:</span> <span class="s2">&quot;20191121155833233&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;nss_server&quot;</span><span class="p">:</span> <span class="s2">&quot;nss-server:1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;start_time&quot;</span><span class="p">:</span> <span class="s2">&quot;20191121155833141&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;final_response&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nt">&quot;words&quot;</span><span class="p">:</span> <span class="p">[</span>
+     <span class="p">[{</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="s2">&quot;0.999&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello\\*no-space-before&quot;</span>
+      <span class="p">},{</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="s2">&quot;0.977&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;Dragon&quot;</span>
+     <span class="p">}],</span>
+     <span class="p">[{</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello\\*no-space-before&quot;</span>
+      <span class="p">},{</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="s2">&quot;0.0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;dragon&quot;</span>
+      <span class="p">}]</span>
+  <span class="p">],</span>
+  <span class="nt">&quot;transcriptions&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;Hello Auto&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;Hello auto&quot;</span>
+  <span class="p">],</span>
+  <span class="nt">&quot;_transportProtocol&quot;</span><span class="p">:</span> <span class="s2">&quot;HTTP&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;_statusCode&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+  <span class="nt">&quot;confidences&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="mi">927</span><span class="p">,</span>
+      <span class="mi">0</span>
+  <span class="p">],</span>
+  <span class="nt">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;cadence_regulatable_result&quot;</span><span class="p">:</span> <span class="s2">&quot;completeRecognition&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;NMAS_PRFX_TRANSACTION_ID&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;status_code&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+  <span class="nt">&quot;result_format&quot;</span><span class="p">:</span> <span class="s2">&quot;rec_text_results&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The key <code class="docutils literal notranslate"><span class="pre">final_response</span></code> indicates that this is a final
+response.</p>
+<p>The key <code class="docutils literal notranslate"><span class="pre">words</span></code> has the detailed recognition results, as a
+JSON array of JSON arrays. Each “innermost” array has the list of
+words for that interpretation. The <code class="docutils literal notranslate"><span class="pre">transcriptions</span></code> array has the
+transcription of the interpretations, in the same order as the
+<code class="docutils literal notranslate"><span class="pre">words</span></code> array. The <code class="docutils literal notranslate"><span class="pre">confidences</span></code> array again has the confidences
+for each interpretation in the <code class="docutils literal notranslate"><span class="pre">words</span></code> and <code class="docutils literal notranslate"><span class="pre">transcriptions</span></code> arrays.</p>
+<p>The value for the key <code class="docutils literal notranslate"><span class="pre">words</span></code> is an array of arrays. Each “inner”
+array is a hypothesis; it contains a JSON block for each word that
+lists the confidence and the recognized word:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span>
+  <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="s2">&quot;0.999&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello\\*no-space-before&quot;</span>
+<span class="p">},{</span>
+  <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="s2">&quot;0.977&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;Dragon&quot;</span>
+<span class="p">}]</span>
+</pre></div>
+</div>
+<p>(Note the <code class="docutils literal notranslate"><span class="pre">\\*</span></code> which precedes “no-space-before”. The word
+transcriptions can contain directives, for example for use by TTS
+systems.)</p>
+<p>The value for the <code class="docutils literal notranslate"><span class="pre">transcriptions</span></code> key contains an array of strings,
+which are the textual representations of the hypotheses listed in the
+<code class="docutils literal notranslate"><span class="pre">words</span></code> key.</p>
+</div>
+</div>
+<div class="section" id="partial-vs-final-results">
+<span id="partial-results"></span><h2>Partial vs. final results</h2>
+<span class="target" id="index-5"></span><p>(For partial results from the cloud, see <a class="reference internal" href="remote_applications.html#cloud-intermediate-results"><span class="std std-ref">here</span></a>.)</p>
+<p>Cerence ASR is designed to run as a stream-based recognizer. ASR used to
+be used for relatively short data entry sessions, such as command
+entry after a button push (“push-to-talk”) or after detecting a
+wake-up-word. For such short entries, and when there is a relatively
+well-defined set of possible phrases to be recognized, it makes sense
+to wait for the end of the utterance, and produce a single recognition
+result at the end of the input.</p>
+<p>However, use cases for voice data entry are expanding, and also on
+embedded platforms, voice recognition is more and more often used for
+tasks such as message dictation, or one-shot entry of complex input
+such as a route navigation destination. In these cases, the input may
+be very long, and it becomes important for the system to be able to
+show progress to the user. This serves several purposes:</p>
+<ul class="simple">
+<li>it is an indication for the user that the system is actually still
+listening. Long periods of inactivity may cause the user to doubt
+whether the system is still listening.</li>
+<li>if the system can show the user what it has recognized up to then,
+this allows the user to review what they have said up that point.</li>
+<li>additionally it gives an indication to the user of the accuracy of
+the recognized speech, which gives the user the opportunity to
+evaluate if it makes sense to continue speaking.</li>
+</ul>
+<p>Cerence ASR enables these scenarios by optionally providing partial
+recognition results to the system.</p>
+<div class="section" id="configuring-the-engine-for-partial-results">
+<h3>Configuring the engine for partial results</h3>
+<p>By default, Cerence ASR will only return final results. If you want to
+receive partial results, you have to configure Cerence ASR to do by setting
+the parameter <code class="docutils literal notranslate"><span class="pre">LH_SEARCH_PARAM_STREAM_RESULT_MODE</span></code> to <code class="docutils literal notranslate"><span class="pre">1</span></code> or <code class="docutils literal notranslate"><span class="pre">2</span></code>.
+This parameter should be set in the search configuration of an ASR
+application, as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;application&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;APP_CNC&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;asr&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CNC_CTX&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;static&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;modelm_small_fmt2.fcf&quot;</span>
+          <span class="p">},</span>
+          <span class="s2">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+             <span class="s2">&quot;LH_SEARCH_PARAM_STREAM_RESULT_MODE&quot;</span><span class="p">:</span> <span class="mi">1</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}]</span>
+</pre></div>
+</div>
+<p>The allowed values of <code class="docutils literal notranslate"><span class="pre">LH_SEARCH_PARAM_STREAM_RESULT_MODE</span></code> are
+these:</p>
+<ul class="simple">
+<li>0 (<code class="docutils literal notranslate"><span class="pre">LH_SEARCH_STREAM_RESULT_DISABLED</span></code>)</li>
+<li>1 (<code class="docutils literal notranslate"><span class="pre">LH_SEARCH_STREAM_RESULT_INTERMEDIATE</span></code>)</li>
+<li>2 (<code class="docutils literal notranslate"><span class="pre">LH_SEARCH_STREAM_RESULT_STRIPPED_INTERMEDIATE</span></code>)</li>
+</ul>
+<p id="index-6">When using <code class="docutils literal notranslate"><span class="pre">LH_SEARCH_STREAM_RESULT_INTERMEDIATE</span></code>, the intermediate
+results will contain both stable words and non-stable words. Stable
+words are words that the recognizer will not change any more as
+recognition continues. Non-stable words are included in an
+intermediate result as a “current best guess” hypothesis, and they may
+change as recognition continues and the recognizer finds better
+results for those words.</p>
+<p>If you don’t want to have the stable part of the recognition result to
+be repeated in each intermediate result, you can use the
+<code class="docutils literal notranslate"><span class="pre">LH_SEARCH_STREAM_RESULT_STRIPPED_INTERMEDIATE</span></code> result mode. In this
+mode, only new stable words and non-stable words will be included in
+the results. Previously stable parts of the result are not repeated.</p>
+</div>
+<div class="section" id="partial-result-contents">
+<span id="index-7"></span><h3>Partial result contents</h3>
+<p>First of all, if a result is non-final, this will be indicated in the
+<code class="docutils literal notranslate"><span class="pre">isFinal</span></code> parameter of the <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback. This is the API
+definition of the <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback in the <code class="docutils literal notranslate"><span class="pre">IRecognizerListener</span></code>
+interface:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">typedef</span> <span class="n">void</span><span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IRecognizerListener_onResult</span><span class="p">)</span> <span class="p">(</span><span class="n">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">result</span><span class="p">,</span> <span class="n">nuance_asr5_ResultType</span> <span class="n">resultType</span><span class="p">,</span> <span class="n">LH_BOOL</span> <span class="n">isFinal</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When this callback function is called by the recognizer, the final
+argument, <code class="docutils literal notranslate"><span class="pre">isFinal</span></code> indicates whether the result is a final result
+or not.</p>
+<p>This is an example of a partial result (note that all non-relevant key-value pairs have been removed for clarity):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;unstable&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;hypotheses&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;startRule&quot;</span><span class="p">:</span> <span class="s2">&quot;SLM#START&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">5330</span><span class="p">,</span>
+    <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;one</span><span class="se">\\</span><span class="s2">number&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6051</span><span class="p">,</span>
+        <span class="s2">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7205</span><span class="p">,</span>
+        <span class="s2">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;three&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7233</span><span class="p">,</span>
+        <span class="s2">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The result has a <code class="docutils literal notranslate"><span class="pre">status</span></code> keyword: if it has the value <code class="docutils literal notranslate"><span class="pre">unstable</span></code>,
+the result is partial, and has terminals that are not stable. For a
+final result, <code class="docutils literal notranslate"><span class="pre">status</span></code> will have the value <code class="docutils literal notranslate"><span class="pre">stable</span></code>.</p>
+<p>In the NBest result, every terminal will have, next to a
+<code class="docutils literal notranslate"><span class="pre">confidence</span></code> value, also a <code class="docutils literal notranslate"><span class="pre">stability</span></code> value that indicates
+whether the engine may still replace the terminal with a different
+one. Stabilized terminals will have a stability value of 10000; if the
+value is lower, the terminal is not stable and may be replaced in
+subsequent partial or final results.</p>
+<p>So, in the example above, <code class="docutils literal notranslate"><span class="pre">one</span></code> is stable, and <code class="docutils literal notranslate"><span class="pre">two</span></code> and <code class="docutils literal notranslate"><span class="pre">three</span></code>
+are not (yet) stable, even if they have high confidence values.</p>
+<p>The rule of thumb when using partial results, is that the final
+utterance is the sequence of terminals that have, in any of the
+partial results, reached a stable state.</p>
+</div>
+<div class="section" id="intermediate-vs-stripped-intermediate-results">
+<span id="index-8"></span><h3>Intermediate vs. stripped-intermediate results</h3>
+<p id="index-9">The table below shows two subsequent partial results and the final
+result, using the <code class="docutils literal notranslate"><span class="pre">LH_SEARCH_STREAM_RESULT_INTERMEDIATE</span></code> result
+mode:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="34%" />
+<col width="5%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Partial result 1:</th>
+<th class="head">Partial result 2:</th>
+<th class="head" colspan="2">Final result:</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;unstable&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;hypotheses&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;startRule&quot;</span><span class="p">:</span> <span class="s2">&quot;SLM#START&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">5330</span><span class="p">,</span>
+      <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;one&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6051</span><span class="p">,</span>
+          <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7205</span><span class="p">,</span>
+          <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;three&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7233</span><span class="p">,</span>
+          <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;unstable&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;hypotheses&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;startRule&quot;</span><span class="p">:</span> <span class="s2">&quot;SLM#START&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6109</span><span class="p">,</span>
+      <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;one&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6051</span><span class="p">,</span>
+          <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7205</span><span class="p">,</span>
+          <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;three&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7233</span><span class="p">,</span>
+          <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;four&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6974</span><span class="p">,</span>
+          <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td colspan="2"><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;stable&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;hypotheses&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;startRule&quot;</span><span class="p">:</span> <span class="s2">&quot;SLM#START&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6561</span><span class="p">,</span>
+    <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;for&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6974</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;five&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6469</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The first two have status <code class="docutils literal notranslate"><span class="pre">unstable</span></code>, to indicate that they contain
+unstable terminals. The final result has status <code class="docutils literal notranslate"><span class="pre">stable</span></code>, it has no
+unstable terminals.</p>
+<p>In the second result, the entry for terminal <code class="docutils literal notranslate"><span class="pre">one</span></code> is repeated: it
+is identical to the entry in the first result (notably, it was already
+stable in the first result, and is repeated as-is in the second one.)
+The entries for the second and third terminals, <code class="docutils literal notranslate"><span class="pre">two</span></code> and <code class="docutils literal notranslate"><span class="pre">three</span></code>,
+have a stability value of 5000 in the first result. In the second one,
+the terminal for <code class="docutils literal notranslate"><span class="pre">two</span></code> has stability 10000, while <code class="docutils literal notranslate"><span class="pre">three</span></code> still
+has 5000. These two terminals have stabilized between the first and
+second intermediate results.</p>
+<p>In the final result, we see that terminal <code class="docutils literal notranslate"><span class="pre">four</span></code> was replaced with
+<code class="docutils literal notranslate"><span class="pre">for</span></code>, and terminal <code class="docutils literal notranslate"><span class="pre">five</span></code> was added, both with value 10000 for stability.</p>
+<p>Applying the rule of thumb mentioned above, concatenating the stable
+terminals, yields <code class="docutils literal notranslate"><span class="pre">one</span> <span class="pre">two</span> <span class="pre">for</span> <span class="pre">five</span></code>, and that is the final
+recognition result from this session.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p id="index-10">The following table shows two subsequent partial results and the final
+result, using the <code class="docutils literal notranslate"><span class="pre">LH_SEARCH_STREAM_RESULT_STRIPPED_INTERMEDIATE</span></code> result mode:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="34%" />
+<col width="35%" />
+<col width="31%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Partial result 1:</th>
+<th class="head">Partial result 2:</th>
+<th class="head">Final result:</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;unstable&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;hypotheses&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;startRule&quot;</span><span class="p">:</span> <span class="s2">&quot;SLM#START&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6109</span><span class="p">,</span>
+    <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;one&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6229</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6960</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;three&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7383</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;four&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6849</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;unstable&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;hypotheses&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;startRule&quot;</span><span class="p">:</span> <span class="s2">&quot;UNKNOWN#UNKNOWN&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6945</span><span class="p">,</span>
+    <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;two&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6960</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;three&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7383</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;four&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6849</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+   <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;stable&quot;</span><span class="p">,</span>
+   <span class="nt">&quot;hypotheses&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;startRule&quot;</span><span class="p">:</span> <span class="s2">&quot;SLM#START&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6762</span><span class="p">,</span>
+    <span class="nt">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;three&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">7383</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;four&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6849</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;five&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;confidence&quot;</span><span class="p">:</span> <span class="mi">6815</span><span class="p">,</span>
+        <span class="nt">&quot;stability&quot;</span><span class="p">:</span> <span class="mi">10000</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>In these results you can see that stabilized terminals (<code class="docutils literal notranslate"><span class="pre">one</span></code> in
+partial result 1, and <code class="docutils literal notranslate"><span class="pre">two</span></code> in partial result 2) are <em>not</em> repeated
+in subsequent intermediate results. Terminals will only be repeated if
+their stability value changes.</p>
+<p>Again, applying the rule of thumb mentioned above, we concatenate the
+stable terminals to get <code class="docutils literal notranslate"><span class="pre">one</span> <span class="pre">two</span> <span class="pre">three</span> <span class="pre">four</span> <span class="pre">five</span></code>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Recognition Results</a><ul>
+<li><a class="reference internal" href="#result-types">Result types</a><ul>
+<li><a class="reference internal" href="#result-events">Result events</a></li>
+<li><a class="reference internal" href="#asr-results">ASR results</a></li>
+<li><a class="reference internal" href="#nlu-results">NLU results</a></li>
+<li><a class="reference internal" href="#cloud-results">Cloud results</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#partial-vs-final-results">Partial vs. final results</a><ul>
+<li><a class="reference internal" href="#configuring-the-engine-for-partial-results">Configuring the engine for partial results</a></li>
+<li><a class="reference internal" href="#partial-result-contents">Partial result contents</a></li>
+<li><a class="reference internal" href="#intermediate-vs-stripped-intermediate-results">Intermediate vs. stripped-intermediate results</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="../chapters/using_the_csdk_ddfw.html">Using Cerence ASR</a><ul>
+      <li>Previous: <a href="dcc.html" title="previous chapter">Dynamic Content Consumers</a></li>
+      <li>Next: <a href="nlu_applications.html" title="next chapter">NLU applications</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,1783 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Overview</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Advanced Prompter API Functions" href="prompter_advanced_usage.html" />
+    <link rel="prev" title="Configuration" href="prompter_configuration.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview</h1>
+<p>The following is an overview of the structure of the JSON configuration files.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>{ <a class="reference internal" href="#itoplevelprompterconfig">ITopLevelPrompterConfig</a> }</dt>
+<dd><ul class="first last">
+<li>version: String</li>
+<li>label: String</li>
+<li><dl class="first docutils">
+<dt>prompter_global: { <a class="reference internal" href="#iprompterglobalconfig">IPrompterGlobalConfig</a> }</dt>
+<dd><ul class="first last">
+<li>prompt_history_max_count: int</li>
+<li>prompt_history_text_max_length: int</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>voice_data_path: [ { <a class="reference internal" href="#ivoicedatapath">IVoiceDataPath</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>vocalizer_path: Path</li>
+<li>scan_result_storage_path: Path</li>
+<li>scan_result_storage_tag: String</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>prompter: [ { <a class="reference internal" href="#iprompterconfig">IPrompterConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>default_usecase: String</li>
+<li>default_audio_scenario: String</li>
+<li>default_root_path: Path</li>
+<li><em>type</em>: String</li>
+<li><dl class="first docutils">
+<dt><em>cloud</em>: { <a class="reference internal" href="#icloudprompterconfig">ICloudPrompterConfig</a> }</dt>
+<dd><ul class="first last">
+<li>esc_replacement: String</li>
+<li>email_parser_configs_root_path: Path</li>
+<li>otd_files_root_path: Path</li>
+<li>cloud_services_name: String</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>local</em>: { <a class="reference internal" href="#ilocalprompter">ILocalPrompter</a> }</dt>
+<dd><ul class="first last">
+<li>voice_data_path: { <a class="reference internal" href="#ivoicedatapath">IVoiceDataPath</a> }</li>
+<li>email_parser_configs_root_path: Path</li>
+<li>otd_files_root_path: Path</li>
+<li>otd_audio_files_root_path: Path</li>
+<li>tuning_files_root_path: Path</li>
+<li>samples_per_channel: int</li>
+<li>tts_engine_lib: String</li>
+<li>audio_file_max_play_time: int</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>usecase: [ { <a class="reference internal" href="#iprompterusecaseconfig">IPrompterUseCaseConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li><em>type</em>: String</li>
+<li><dl class="first docutils">
+<dt><em>cloud</em>: { <a class="reference internal" href="#icloudusecase">ICloudUseCase</a> }</dt>
+<dd><ul class="first last">
+<li>email_parser_config: String</li>
+<li>otd_file: String</li>
+<li>cloud_command: { <a class="reference internal" href="#icloudcommandconfig">ICloudCommandConfig</a> }</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>local</em>: { <a class="reference internal" href="#ilocalusecase">ILocalUseCase</a> }</dt>
+<dd><ul class="first last">
+<li>email_parser_config: String</li>
+<li><dl class="first docutils">
+<dt>tuning_files: [ { <a class="reference internal" href="#ituningfile">ITuningFile</a> } ]</dt>
+<dd><ul class="first last">
+<li>file_path: String</li>
+<li>name: String</li>
+<li><em>type</em>: String</li>
+<li><dl class="first docutils">
+<dt><em>apdb</em>: { <a class="reference internal" href="#iactivepromptdb">IActivePromptDb</a> }</dt>
+<dd><ul class="first last">
+<li>mode: <a class="reference internal" href="#activepromptdbmode">ActivePromptDbMode</a></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><em>tmpl</em>: { <a class="reference internal" href="#iprompttemplate">IPromptTemplate</a> }</li>
+<li><dl class="first docutils">
+<dt><em>dict</em>: { <a class="reference internal" href="#iuserdictionary">IUserDictionary</a> }</dt>
+<dd><ul class="first last">
+<li>mode: <a class="reference internal" href="#userdictmode">UserDictMode</a></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><em>rule</em>: { <a class="reference internal" href="#iuserrule">IUserRule</a> }</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li>otd_file: String</li>
+<li>otd_audio_files_path: String</li>
+<li>active_prompt_domain: String</li>
+<li>text_normalization_type: String</li>
+<li>enabled_markers: String</li>
+<li>voice_config: { <a class="reference internal" href="#ivoiceconfig">IVoiceConfig</a> }</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>voice_config: [ { <a class="reference internal" href="#ivoiceconfig">IVoiceConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>voice: String</li>
+<li>operating_point: String</li>
+<li>vop_version: String</li>
+<li>language: String</li>
+<li>frequency: int</li>
+<li>volume: int</li>
+<li>speechrate: int</li>
+<li>pitch: int</li>
+<li>timbre: int</li>
+<li>waitfactor: int</li>
+<li>readmode: <a class="reference internal" href="#readmode">READMODE</a></li>
+<li>initmode: <a class="reference internal" href="#initmode">INITMODE</a></li>
+<li>textmode: <a class="reference internal" href="#textmode">TEXTMODE</a></li>
+<li>max_input_length: int</li>
+<li>lidscope: <a class="reference internal" href="#lidscope">LIDSCOPE</a></li>
+<li>lidvoiceswitch: <a class="reference internal" href="#lidvoiceswitch">LIDVOICESWITCH</a></li>
+<li>extraesctn: String</li>
+<li>extraesclang: String</li>
+<li>lidmode: <a class="reference internal" href="#lidmode">LIDMODE</a></li>
+<li>lidlanguages: String</li>
+<li>final_silence_disabled: bool</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>cloud_command: [ { <a class="reference internal" href="#icloudcommandconfig">ICloudCommandConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>command: String</li>
+<li>dictionary: { <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> }</li>
+<li>timeout: int</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="itoplevelprompterconfig-the-top-level-configuration-of-the-prompter-component">
+<span id="itoplevelprompterconfig"></span><h1>ITopLevelPrompterConfig - The top-level configuration of the prompter component.</h1>
+<p>The top-level configuration of the prompter component.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="35%" />
+<col width="7%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The version key, fixed to “Prompter 1.0”.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>Label describing the content / version of the JSON file.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;prompter_global&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iprompterglobalconfig">IPrompterGlobalConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The top-level prompter global configuration.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;voice_data_path&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ivoicedatapath">IVoiceDataPath</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The configuration of voice data path objects.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iprompterconfig">IPrompterConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The prompter configuration.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iprompterusecaseconfig">IPrompterUseCaseConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The configuration of the prompter use cases.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ivoiceconfig">IVoiceConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The configuration of the prompter voices.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudcommandconfig">ICloudCommandConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The configuration of the prompter cloud command.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="itoplevelprompterconfig-version">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;</span></code>:</dt>
+<dd><p class="first">The version key, fixed to “Prompter 1.0”.</p>
+<p class="last">Each JSON configuration file for <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> must contain a <code class="docutils literal notranslate"><span class="pre">&quot;version&quot;</span></code> property.
+Otherwise the creation of the <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> fails and returns an error.
+The version allows to place different types of JSON configuration files in the same directory.
+The prompter configuration files will not conflict with configuration files used for a different component than prompter.</p>
+</dd>
+</dl>
+<dl class="docutils" id="itoplevelprompterconfig-label">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;</span></code>:</dt>
+<dd>Label describing the content / version of the JSON file.</dd>
+</dl>
+<dl class="docutils" id="itoplevelprompterconfig-prompter-global">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;prompter_global&quot;</span></code>:</dt>
+<dd><p class="first">The top-level prompter global configuration.</p>
+<p class="last">The JSON configuration may contain a <code class="docutils literal notranslate"><span class="pre">&quot;prompter_global&quot;</span></code> object,
+that defines settings relevant to all prompter instances that are defined
+in the <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> list.</p>
+</dd>
+</dl>
+<dl class="docutils" id="itoplevelprompterconfig-voice-data-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;voice_data_path&quot;</span></code>:</dt>
+<dd><p class="first">The configuration of voice data path objects.</p>
+<p>The JSON configuration must consist of one or more <code class="docutils literal notranslate"><span class="pre">&quot;voice_data_path&quot;</span></code> object(s)
+if <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> objects of type “local” are defined.</p>
+<p class="last">For details see section <a class="reference internal" href="#ivoicedatapath">IVoiceDataPath</a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="itoplevelprompterconfig-prompter">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code>:</dt>
+<dd><p class="first">The prompter configuration.</p>
+<p>The JSON configuration must contain of one or more <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> object(s).
+They can be of different types, like for instance “local” or “cloud”.</p>
+<p class="last">For details see section <a class="reference internal" href="#iprompterconfig">IPrompterConfig</a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="itoplevelprompterconfig-usecase">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code>:</dt>
+<dd><p class="first">The configuration of the prompter use cases.</p>
+<p>The JSON configuration must contain of one or more <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> object(s)
+They can be of different types, like for instance “local” or “cloud”.</p>
+<p class="last">For details see section <a class="reference internal" href="#iprompterusecaseconfig">IPrompterUseCaseConfig</a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="itoplevelprompterconfig-voice-config">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code>:</dt>
+<dd><p class="first">The configuration of the prompter voices.</p>
+<p>The JSON configuration must contain of one or more <code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code> object(s)
+if <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> objects of type “local” are defined.</p>
+<p class="last">For details see section <a class="reference internal" href="#ivoiceconfig">IVoiceConfig</a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="itoplevelprompterconfig-cloud-command">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;</span></code>:</dt>
+<dd><p class="first">The configuration of the prompter cloud command.</p>
+<p>The JSON configuration must contain of one or more <code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;</span></code> object(s)
+if <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> objects of type “cloud” are defined.</p>
+<p class="last">For details see section <a class="reference internal" href="#icloudcommandconfig">ICloudCommandConfig</a>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">
+<span id="iuserjsonconfig"></span><h1>IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</h1>
+<p>Defines a verbatim block of json that is used by VoCon High as is.</p>
+<p>This is for example used to pass json configuration block on to VoCon Hybrid that need to configured
+by users of Vocon High. The Connection Info object in ASR is an example of this.</p>
+<p>This object lists not specific attributes because any valid json object can be used here, so the number, types
+and names of attributes are not limited.</p>
+</div>
+<div class="section" id="iprompterconfig-the-configuration-of-the-iprompter-instance-s">
+<span id="iprompterconfig"></span><h1>IPrompterConfig - The configuration of the IPrompter instance(s).</h1>
+<dl class="docutils">
+<dt>Sub types:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;local&quot;</span></code>, see <a class="reference internal" href="#ilocalprompter">ILocalPrompter</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;cloud&quot;</span></code>, see <a class="reference internal" href="#icloudprompterconfig">ICloudPrompterConfig</a></li>
+</ul>
+</dd>
+</dl>
+<p>The configuration of the IPrompter instance(s).</p>
+<p>The JSON configuration must contain at least one <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> object. Each must be named uniquely.
+Each <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> object represents the configuration of a <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="15%" />
+<col width="4%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;local&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code></td>
+<td>yes</td>
+<td>Select the sub-type.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;local&quot;</span></code>:</td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ilocalprompter">ILocalPrompter</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;local&quot;</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code>:</td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudprompterconfig">ICloudPrompterConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The reference name of the prompter instance.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;default_usecase&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The name of the usecase that must be loaded by default at creation time of the IPrompter instance.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;default_audio_scenario&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The name of the audio scenario the prompter activates by default while playing a prompt.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;default_root_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>no</td>
+<td>An absolute or relative path that is by default prepended to all file paths of extra resources (email_parser_config, otd_file, tuning_files, …) configured in any usecase.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iprompterconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The reference name of the prompter instance.</p>
+<p class="last">This property contains the name of the prompter instance and must be passed to the nuance.prompter.IPrompter.create()
+as <code class="docutils literal notranslate"><span class="pre">name</span></code> argument.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iprompterconfig-default-usecase">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;default_usecase&quot;</span></code>:</dt>
+<dd><p class="first">The name of the usecase that must be loaded by default at creation time of the IPrompter instance.</p>
+<p>If omitted a usecase has to be activated at a later point at run-time with an API call.</p>
+<p class="last">Note that the type of the referenced usecase must match to the type of the prompter (e.g. “local” or “cloud”).</p>
+</dd>
+</dl>
+<dl class="docutils" id="iprompterconfig-default-audio-scenario">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;default_audio_scenario&quot;</span></code>:</dt>
+<dd><p class="first">The name of the audio scenario the prompter activates by default while playing a prompt.</p>
+<p class="last">This property enables the prompter’s ability to take over activation of the
+default audio scenario while playing a prompt. The property contains the name
+of a prompting audio scenario, that is defined separately in the audio configuration.
+The default audio scenario is utilized when no audio scenario is active at the moment
+when the prompter starts to play a prompt. In this case the prompter automatically
+activates the default audio scenario and keeps it activated as long as the prompt is
+being played (i.e. if the prompt is completed, paused or aborted, the scenario is
+automatically deactivated again).</p>
+</dd>
+</dl>
+<dl class="docutils" id="iprompterconfig-default-root-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;default_root_path&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path that is by default prepended to all file paths of extra resources (email_parser_config, otd_file, tuning_files, …) configured in any usecase.</p>
+<p>The relative path is considered to be in relation to the JSON configuration directory. The default_root_path is not prepended
+to the file path of an extra resource if one of these conditions are met:</p>
+<ul class="last simple">
+<li>the default_root_path is not configured</li>
+<li>the file path of the extra resource configured in a usecase is absolute</li>
+<li>a specialized root path is configured that overrides the default_root_path for a specific category of resources (e.g. email_parser_configs_root_path)</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="ilocalprompter-the-configuration-of-the-local-iprompter-class">
+<span id="ilocalprompter"></span><h1>ILocalPrompter - The configuration of the local IPrompter class.</h1>
+<p>Super type: <a class="reference internal" href="#iprompterconfig">IPrompterConfig</a></p>
+<p>The configuration of the local IPrompter class.</p>
+<p>This JSON object configures the local type of an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code>.
+A local type of a prompter represents a Cerence TTS Embedded engine,
+which is able to convert written text into audio data with the
+following format:</p>
+<ul class="simple">
+<li>“encoding”: “ENCODING_PCM_16BIT”</li>
+<li>“sample_rate”: 22050</li>
+<li>“samples_per_channel”: 512</li>
+<li>“buffer_count”: 1</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="10%" />
+<col width="10%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;voice_data_path&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ivoicedatapath">IVoiceDataPath</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>yes</td>
+<td>The definition of the voice data path object.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;email_parser_configs_root_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>no</td>
+<td>An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">email_parser_config</span></code> file path configured in any usecase. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;otd_files_root_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>no</td>
+<td>An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">otd_file</span></code> path configured in any usecase. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;otd_audio_files_root_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>no</td>
+<td>An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">otd_audio_files_path</span></code> configured in any usecase. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;tuning_files_root_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>no</td>
+<td>An absolute or relative path that is by default prepended to a <code class="docutils literal notranslate"><span class="pre">tuning_files</span></code> path configured in any usecase.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;samples_per_channel&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 512</td>
+<td>Defines the number of samples per channel.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;tts_engine_lib&quot;:</span></code> </td>
+<td>String</td>
+<td>no, default value is “ve”</td>
+<td>The Text-To-Speech core engine library the prompter instance will use.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;audio_file_max_play_time&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 1200000</td>
+<td>Defines the maximum play time of an encoded audio file inserted to the prompt text with the TTS control sequence <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;\audio=&quot;path&quot;\</span></code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ilocalprompter-voice-data-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;voice_data_path&quot;</span></code>:</dt>
+<dd><p class="first">The definition of the voice data path object.</p>
+<p class="last">This key contains an object, that defines paths related to a certain voice data installation. Ideally the targeted object is defined with the <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> key at top-level and included here via the <code class="docutils literal notranslate"><span class="pre">&quot;uses&quot;</span></code> key.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalprompter-email-parser-configs-root-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;email_parser_configs_root_path&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">email_parser_config</span></code> file path configured in any usecase. This configuration option is intended for CDFW applications only.</p>
+<p class="last">The relative path is considered to be in relation to the JSON configuration directory. This property overrules the <code class="docutils literal notranslate"><span class="pre">default_root_path</span></code>
+specifically for all defined <code class="docutils literal notranslate"><span class="pre">email_parser_config</span></code> paths. An absolute file path defined in <code class="docutils literal notranslate"><span class="pre">email_parser_config</span></code> is not supplemented with
+the <code class="docutils literal notranslate"><span class="pre">email_parser_configs_root_path</span></code>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalprompter-otd-files-root-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;otd_files_root_path&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">otd_file</span></code> path configured in any usecase. This configuration option is intended for CDFW applications only.</p>
+<p class="last">The relative path is considered to be in relation to the JSON configuration directory. This property overrules the <code class="docutils literal notranslate"><span class="pre">default_root_path</span></code>
+specifically for all defined <code class="docutils literal notranslate"><span class="pre">otd_file</span></code> paths. An absolute file path defined in <code class="docutils literal notranslate"><span class="pre">otd_file</span></code> is not supplemented with
+the <code class="docutils literal notranslate"><span class="pre">otd_files_root_path</span></code>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalprompter-otd-audio-files-root-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;otd_audio_files_root_path&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">otd_audio_files_path</span></code> configured in any usecase. This configuration option is intended for CDFW applications only.</p>
+<p class="last">The relative path is considered to be in relation to the JSON configuration directory. This property overrules the <code class="docutils literal notranslate"><span class="pre">default_root_path</span></code>
+specifically for all defined <code class="docutils literal notranslate"><span class="pre">otd_audio_files_path</span></code>. An absolute file path defined in <code class="docutils literal notranslate"><span class="pre">otd_audio_files_path</span></code> is not supplemented with
+the <code class="docutils literal notranslate"><span class="pre">otd_audio_files_root_path</span></code>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalprompter-tuning-files-root-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;tuning_files_root_path&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path that is by default prepended to a <code class="docutils literal notranslate"><span class="pre">tuning_files</span></code> path configured in any usecase.</p>
+<p class="last">The relative path is considered to be in relation to the JSON configuration directory. This property overrules the <code class="docutils literal notranslate"><span class="pre">default_root_path</span></code>
+specifically for all defined <code class="docutils literal notranslate"><span class="pre">tuning_files</span></code> paths. An absolute file path defined in <code class="docutils literal notranslate"><span class="pre">tuning_files</span></code> is not supplemented with
+the <code class="docutils literal notranslate"><span class="pre">tuning_files_root_path</span></code>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalprompter-samples-per-channel">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;samples_per_channel&quot;</span></code>:</dt>
+<dd><p class="first">Defines the number of samples per channel.</p>
+<p class="last">This number influences the audio format of the data the prompter produces. Note that the output module
+that receives the prompter’s data (e.g. AudioOutput) must configure the same value in its audio format.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalprompter-tts-engine-lib">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;tts_engine_lib&quot;</span></code>:</dt>
+<dd><p class="first">The Text-To-Speech core engine library the prompter instance will use.</p>
+<p>The property defines the file name of the TTS library the prompter instance will use
+for embedded TTS processing. The name must be in the format <code class="docutils literal notranslate"><span class="pre">&quot;ve[_major_minor]&quot;</span></code>
+e.g. <code class="docutils literal notranslate"><span class="pre">&quot;ve&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;ve_3_2&quot;</span></code> and must not include platform-specific prefixes
+(like “lib”) or suffixes (like “dll”, “so”) or file path information.
+Any name value that does not match that format will lead to an error.</p>
+<p>By default the prompter uses the TTS library named <code class="docutils literal notranslate"><span class="pre">&quot;ve&quot;</span></code> which corresponds to a
+Cerence TTS Embedded version that is greater or equal than the latest offered Cerence TTS Embedded version, and which is typically
+part of a standard delivery package.</p>
+<p>Cerence TTS Embedded versions that are older than the latest offered version are supported under
+following circumstances:</p>
+<ul class="simple">
+<li>The library version must be greater or equal than <code class="docutils literal notranslate"><span class="pre">2.0</span></code> .</li>
+<li>The library file name must be in the above described naming format.</li>
+<li>The library file must be available at the expected location in the file system.</li>
+</ul>
+<p>If it is required that a prompter instance uses an older Cerence TTS Embedded version, the relevant
+Cerence TTS Embedded library name must be extended with version information in the above described format.
+E.g. if the version of the older library is <code class="docutils literal notranslate"><span class="pre">3.2</span></code>, the library must be named
+<code class="docutils literal notranslate"><span class="pre">&lt;prefix&gt;ve_3_2.&lt;suffix&gt;</span></code> and the value of the <code class="docutils literal notranslate"><span class="pre">&quot;tts_engine_lib&quot;</span></code>
+property must be defined identically to the library part name <code class="docutils literal notranslate"><span class="pre">&quot;ve_3_2&quot;</span></code>.
+Note, that the prompter checks during loading of the Cerence TTS Embedded library if the passed version
+information matches. In case of a mismatch the creation of the prompter instance fails.</p>
+<p>Examples showing how to use an older Cerence TTS Embedded version <code class="docutils literal notranslate"><span class="pre">3.2</span></code> on different platforms:</p>
+<ul class="last simple">
+<li>On Windows: Cerence TTS Embedded library is named <code class="docutils literal notranslate"><span class="pre">ve_3_2.dll</span></code> and the property defined to <code class="docutils literal notranslate"><span class="pre">&quot;tts_engine_lib&quot;:</span> <span class="pre">&quot;ve_3_2&quot;</span></code></li>
+<li>On Linux: Cerence TTS Embedded library is named <code class="docutils literal notranslate"><span class="pre">ve_3_2.so</span></code> and the property defined to <code class="docutils literal notranslate"><span class="pre">&quot;tts_engine_lib&quot;:</span> <span class="pre">&quot;ve_3_2&quot;</span></code></li>
+<li>On Android: Cerence TTS Embedded library is named <code class="docutils literal notranslate"><span class="pre">libve_3_2.so</span></code> and the property defined to <code class="docutils literal notranslate"><span class="pre">&quot;tts_engine_lib&quot;:</span> <span class="pre">&quot;ve_3_2&quot;</span></code></li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalprompter-audio-file-max-play-time">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;audio_file_max_play_time&quot;</span></code>:</dt>
+<dd><p class="first">Defines the maximum play time of an encoded audio file inserted to the prompt text with the TTS control sequence <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;\audio=&quot;path&quot;\</span></code>.</p>
+<p>The time value is given in milliseconds and must be in the range <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">..</span> <span class="pre">1200000</span></code> ms.
+By default the value is set to the maximum (<code class="docutils literal notranslate"><span class="pre">1200000</span></code> ms), which corresponds to 20 minutes of play time.
+This Json key affects audio files that are encoded (e.g. with <code class="docutils literal notranslate"><span class="pre">Ogg/Opus,</span> <span class="pre">24kHz</span></code>).</p>
+<p class="last">Playbacks of encoded audio files with higher play times are faded out right before reaching the defined <code class="docutils literal notranslate"><span class="pre">&quot;audio_file_max_play_time&quot;</span></code>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="icloudprompterconfig-the-configuration-of-the-cloud-iprompter-class">
+<span id="icloudprompterconfig"></span><h1>ICloudPrompterConfig - The configuration of the cloud IPrompter class</h1>
+<p>Super type: <a class="reference internal" href="#iprompterconfig">IPrompterConfig</a></p>
+<p>The configuration of the cloud IPrompter class</p>
+<p>This JSON object configures the cloud type of an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code>.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="10%" />
+<col width="9%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;esc_replacement&quot;:</span></code> </td>
+<td>String</td>
+<td>no, default value is “\!”</td>
+<td>A string replacing each <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;</span></code> character (ASCII 0x1B) occurring in a prompt input text.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;email_parser_configs_root_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>no</td>
+<td>An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">email_parser_config</span></code> file path configured in any usecase. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;otd_files_root_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>no</td>
+<td>An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">otd_file</span></code> path configured in any usecase. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud_services_name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the CloudServices configuration to use for cloud prompting.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudprompterconfig-esc-replacement">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;esc_replacement&quot;</span></code>:</dt>
+<dd><p class="first">A string replacing each <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;</span></code> character (ASCII 0x1B) occurring in a prompt input text.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;</span></code> is the character indicating a Cerence TTS native control sequence. However, <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;</span></code> is not a valid character in TTS input texts
+sent to Cerence Cloud.</p>
+<p class="last">The TTS of Cerence Cloud supports an alternative escape sequence that is by default <code class="docutils literal notranslate"><span class="pre">\\!</span></code> (ASCII 0x5C, 0x21)
+and which is also the default value of this property.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudprompterconfig-email-parser-configs-root-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;email_parser_configs_root_path&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">email_parser_config</span></code> file path configured in any usecase. This configuration option is intended for CDFW applications only.</p>
+<p class="last">The relative path is considered to be in relation to the JSON configuration directory. This property overrules the <code class="docutils literal notranslate"><span class="pre">default_root_path</span></code>
+specifically for all defined <code class="docutils literal notranslate"><span class="pre">email_parser_config</span></code> paths. An absolute file path defined in <code class="docutils literal notranslate"><span class="pre">email_parser_config</span></code> is not supplemented with
+the <code class="docutils literal notranslate"><span class="pre">email_parser_configs_root_path</span></code>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudprompterconfig-otd-files-root-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;otd_files_root_path&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path that is by default prepended to an <code class="docutils literal notranslate"><span class="pre">otd_file</span></code> path configured in any usecase. This configuration option is intended for CDFW applications only.</p>
+<p class="last">The relative path is considered to be in relation to the JSON configuration directory. This property overrules the <code class="docutils literal notranslate"><span class="pre">default_root_path</span></code>
+specifically for all defined <code class="docutils literal notranslate"><span class="pre">otd_file</span></code> paths. An absolute file path defined in <code class="docutils literal notranslate"><span class="pre">otd_file</span></code> is not supplemented with
+the <code class="docutils literal notranslate"><span class="pre">otd_files_root_path</span></code>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudprompterconfig-cloud-services-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;cloud_services_name&quot;</span></code>:</dt>
+<dd>The name of the CloudServices configuration to use for cloud prompting.</dd>
+</dl>
+</div>
+<div class="section" id="iprompterglobalconfig-the-configuration-of-prompter-global-settings">
+<span id="iprompterglobalconfig"></span><h1>IPrompterGlobalConfig - The configuration of prompter global settings.</h1>
+<p>The configuration of prompter global settings.</p>
+<p>The JSON configuration may consist of a <code class="docutils literal notranslate"><span class="pre">&quot;prompter_global&quot;</span></code> object. The settings
+are relevant for all <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instances.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="12%" />
+<col width="10%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;prompt_history_max_count&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 4</td>
+<td>The maximum count of last prompts stored in the global prompt history. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;prompt_history_text_max_length&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 256</td>
+<td>The maximum length of the prompt texts that are stored in the global prompt history. This configuration option is intended for CDFW applications only.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iprompterglobalconfig-prompt-history-max-count">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;prompt_history_max_count&quot;</span></code>:</dt>
+<dd><p class="first">The maximum count of last prompts stored in the global prompt history. This configuration option is intended for CDFW applications only.</p>
+<p>All prompter instances store various details (like input texts, text formats, activated use cases, etc ..)
+of lately played prompts in a global prompt history. Each item of the history contains the details
+of one prompt. The Diagnosis run-time API provides calls to obtain the content of the history for
+diagnosis purposes.</p>
+<p class="last">This property defines the maximum count the global prompt history may store. When a new item is being added
+to the global prompt history while the maximum count is exceeded, the oldest item is removed before (ring buffering).
+Setting the value to 0 disables the global prompt history.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iprompterglobalconfig-prompt-history-text-max-length">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;prompt_history_text_max_length&quot;</span></code>:</dt>
+<dd><p class="first">The maximum length of the prompt texts that are stored in the global prompt history. This configuration option is intended for CDFW applications only.</p>
+<p class="last">See also property <code class="docutils literal notranslate"><span class="pre">prompt_history_max_count</span></code>. This property defines the maximum
+length of the prompt texts, that are stored in the global prompt history. If a text exceeds the
+maximum length, only the first characters of the defined length are stored in the
+global prompt history. As an indication that a text exceeded the maximum length, an info
+is placed in the end of the stored prompt text (for example: “… Text too long!”).</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="iprompterusecaseconfig-the-prompter-use-case-configuration">
+<span id="iprompterusecaseconfig"></span><h1>IPrompterUseCaseConfig - The prompter use case configuration.</h1>
+<dl class="docutils">
+<dt>Sub types:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;local&quot;</span></code>, see <a class="reference internal" href="#ilocalusecase">ILocalUseCase</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;cloud&quot;</span></code>, see <a class="reference internal" href="#icloudusecase">ICloudUseCase</a></li>
+</ul>
+</dd>
+</dl>
+<p>The prompter use case configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="32%" />
+<col width="8%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;local&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code></td>
+<td>yes</td>
+<td>Select the sub-type.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;local&quot;</span></code>:</td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ilocalusecase">ILocalUseCase</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;local&quot;</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code>:</td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudusecase">ICloudUseCase</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The unique name of the usecase.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iprompterusecaseconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The unique name of the usecase.</p>
+<p class="last">The name of a certain usecase can be referenced in the <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> object as <code class="docutils literal notranslate"><span class="pre">&quot;default_usecase&quot;</span></code>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="ilocalusecase-the-configuration-of-the-local-prompter-usecase">
+<span id="ilocalusecase"></span><h1>ILocalUseCase - The configuration of the local prompter usecase.</h1>
+<p>Super type: <a class="reference internal" href="#iprompterusecaseconfig">IPrompterUseCaseConfig</a></p>
+<p>The configuration of the local prompter usecase.</p>
+<p>The local type of a prompter usecase can be activated on a local type of
+an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance. The JSON configuration must contain one or more <code class="docutils literal notranslate"><span class="pre">local</span> <span class="pre">&quot;usecase&quot;</span></code> object(s).
+Each usecase name has to be unique. A usecase must at least reference a <code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code> object, but may have
+additional application-specific data like exception tuning files, text normalization rules or active prompt databases.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="16%" />
+<col width="4%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;email_parser_config&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The absolute or relative path to the configuration file for email preprocessor core engine. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;tuning_files&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ituningfile">ITuningFile</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>A list of tuning files to be loaded when activating the usecase.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;otd_file&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The absolute or relative path to an OTD concepts file. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;otd_audio_files_path&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The absolute or relative path to the location where audio files are stored used in OTD concepts. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;active_prompt_domain&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The name of an active prompt domain.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;text_normalization_type&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The text normalization type (TN type).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;enabled_markers&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The selection of enabled marker types.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ivoiceconfig">IVoiceConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>yes</td>
+<td>The voice configuration.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ilocalusecase-email-parser-config">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;email_parser_config&quot;</span></code>:</dt>
+<dd><p class="first">The absolute or relative path to the configuration file for email preprocessor core engine. This configuration option is intended for CDFW applications only.</p>
+<p class="last">Relative path is considered to be relative to the JSON configuration directory. The content of the file is used
+by the email preprocessor core engine to parse XML tags that encapsulate the email content and to convert that
+input to the form more appropriate for audio synthesis by the text-to-speech engine.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalusecase-tuning-files">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;tuning_files&quot;</span></code>:</dt>
+<dd><p class="first">A list of tuning files to be loaded when activating the usecase.</p>
+<p>The list of <code class="docutils literal notranslate"><span class="pre">tuningFiles</span></code> specifies tuning files to be loaded when activating the usecase.
+The order of the list elements is crucial as per tuning file type, more recently loaded data
+has precedence over previously loaded data. The tuning file at list index 0 is loaded first.</p>
+<p>Out of the above precedence rules for each tuning file type, there is an exception for prompt template,
+which only loads the first template it encounters, and subsequent templates will fail to be loaded.
+It is recommended to define at maximum one prompt template per usecase.</p>
+<p>Note that prompt template has the highest precedence, and all user rules have precedence over all user dictionaries,
+and all user dictionaries have precedence over all active prompt databases.</p>
+<p class="last">During activation of the usecase it is checked if any tuning files are already loaded from another
+usecase. If yes, it is ensured that obsoleted tuning files are unloaded before start loading (obsolete may
+also mean that a required tuning file is already loaded but with a different mode). The prompter avoids
+to unload and reload required tuning files as long as the given order specified in the <code class="docutils literal notranslate"><span class="pre">tuningFiles</span></code>
+can be preserved per tuning file type. In general it is a good practice to preserve the list order of the
+<code class="docutils literal notranslate"><span class="pre">tuningFile</span></code> amongst the available usecases as much as possible to keep reloadings at a minimum.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalusecase-otd-file">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;otd_file&quot;</span></code>:</dt>
+<dd><p class="first">The absolute or relative path to an OTD concepts file. This configuration option is intended for CDFW applications only.</p>
+<p class="last">Relative path is considered to be relative to the JSON configuration directory. An OTD file contains
+a database holding prompter concepts. The prompter runtime API provides methods to access the database
+and lookup for an individual prompter concepts.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalusecase-otd-audio-files-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;otd_audio_files_path&quot;</span></code>:</dt>
+<dd><p class="first">The absolute or relative path to the location where audio files are stored used in OTD concepts. This configuration option is intended for CDFW applications only.</p>
+<p class="last">Relative path is considered to be relative to the JSON configuration directory. A prompter concept may contain
+audio files names to be played. If configured, the OTD audio file path is prepended to an audio file name.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalusecase-active-prompt-domain">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;active_prompt_domain&quot;</span></code>:</dt>
+<dd><p class="first">The name of an active prompt domain.</p>
+<p class="last">It activates implicit matching for the given active prompt domain.
+The active prompt database(s) to load for the given domain can be achieved with the <code class="docutils literal notranslate"><span class="pre">&quot;tuning_files&quot;</span></code> list.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalusecase-text-normalization-type">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;text_normalization_type&quot;</span></code>:</dt>
+<dd><p class="first">The text normalization type (TN type).</p>
+<p class="last">It configures the engine to normalize the text to prompt with given TN type.
+There are basic TN types like “spell”, “address” or “sms” as described in the <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation (chapter “Guiding text normalization”).
+The loading of tuning files that define additional user specific TN types can be achieved with the <code class="docutils literal notranslate"><span class="pre">&quot;tuning_files&quot;</span></code> list.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalusecase-enabled-markers">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;enabled_markers&quot;</span></code>:</dt>
+<dd><p class="first">The selection of enabled marker types.</p>
+<p class="last">The string is a comma separated list of marker type names that need to be enabled.
+Possible marker types are <code class="docutils literal notranslate"><span class="pre">textunit,bookmark,word,lipinfo</span></code>.
+An enabled marker causes the prompter to send corresponding marker events to the <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPromptListener</span></code> interface.
+If nothing is defined or the string is empty, then no marker events are sent.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ilocalusecase-voice-config">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code>:</dt>
+<dd><p class="first">The voice configuration.</p>
+<p class="last">This object contains data to configure the local TTS.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="icloudusecase-the-configuration-of-the-cloud-prompter-usecase">
+<span id="icloudusecase"></span><h1>ICloudUseCase - The configuration of the cloud prompter usecase.</h1>
+<p>Super type: <a class="reference internal" href="#iprompterusecaseconfig">IPrompterUseCaseConfig</a></p>
+<p>The configuration of the cloud prompter usecase.</p>
+<p>The cloud type of a prompter usecase can be activated on a cloud type of
+an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance. The JSON configuration must contain one or
+more <code class="docutils literal notranslate"><span class="pre">cloud</span> <span class="pre">&quot;usecase&quot;</span></code> object(s).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="15%" />
+<col width="4%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;email_parser_config&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The absolute or relative path to the configuration file for email preprocessor core engine. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;otd_file&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The absolute or relative path to an OTD concepts file. This configuration option is intended for CDFW applications only.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudcommandconfig">ICloudCommandConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>yes</td>
+<td>The configuration of the cloud command.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudusecase-email-parser-config">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;email_parser_config&quot;</span></code>:</dt>
+<dd><p class="first">The absolute or relative path to the configuration file for email preprocessor core engine. This configuration option is intended for CDFW applications only.</p>
+<p>Relative path is considered to be relative to the JSON configuration directory. The content of the file is used
+by the email preprocessor core engine to parse XML tags that encapsulate the email content and to convert that
+input to the form more appropriate for audio synthesis by the text-to-speech engine.</p>
+<p class="last">Note that the email is preprocessed locally while the resulting email text is synthesized in the cloud.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudusecase-otd-file">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;otd_file&quot;</span></code>:</dt>
+<dd><p class="first">The absolute or relative path to an OTD concepts file. This configuration option is intended for CDFW applications only.</p>
+<p>Relative path is considered to be relative to the JSON configuration directory. An OTD file contains
+a database holding prompter concepts. The prompter runtime API provides methods to access the database
+and lookup for an individual prompter concept.</p>
+<p class="last">OTD concept strings containing instructions for playing audio files are not applicable with Cerence Cloud TTS.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudusecase-cloud-command">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;</span></code>:</dt>
+<dd><p class="first">The configuration of the cloud command.</p>
+<p class="last">This object contains data needed to form a cloud command
+that can be executed by the cloud service.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="ivoiceconfig-the-prompter-voice-configuration">
+<span id="ivoiceconfig"></span><h1>IVoiceConfig - The prompter voice configuration.</h1>
+<p>The prompter voice configuration.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> object of type “local” must contain a <code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code> object. A voice_config defines
+all configuration properties for a specific voice, like language, voice name, voice operating point, frequency,
+volume, speed, etc. A valid voice_config must define at least a name, a voice, the voice operating point and
+the language.</p>
+<p>The property list below explains in short the types of the properties and possible values that can
+be set in the <code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code> object. If optional properties are left out from the voice_config the
+default values are be assigned.</p>
+<p>See also in the <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation (description of enumeration type
+“VE_PARAMID” in chapter “Text-to-Speech Function Reference”) to get more details about
+the voice_config parameters.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="25%" />
+<col width="6%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The unique name of the voice_config.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;voice&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the voice.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;operating_point&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the voice operating point.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;vop_version&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The version of the voice operating point.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;language&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The language code of the language to use.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;frequency&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>The sample rate.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;volume&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>The volume (0..100).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;speechrate&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>The speech rate (50..400).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;pitch&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>The pitch (50..200).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;timbre&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>The timbre (50..200).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;waitfactor&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>The wait factor (0..9).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;readmode&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> READMODE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no</td>
+<td>The read mode.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;initmode&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> INITMODE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no</td>
+<td>The init mode.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;textmode&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> TEXTMODE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no</td>
+<td>The text mode.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;max_input_length&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>The maximum input length.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;lidscope&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> LIDSCOPE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no</td>
+<td>The scope for language identification.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;lidvoiceswitch&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> LIDVOICESWITCH <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no</td>
+<td>The setting to enable/disable switching of language during language identification.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;extraesctn&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The additional text normalization types.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;extraesclang&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The comma separated list of language codes.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;lidmode&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> LIDMODE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no</td>
+<td>The mode of the language identification.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;lidlanguages&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The comma separated list of language codes.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;final_silence_disabled&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code></td>
+<td>no</td>
+<td>Disables the final silence.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ivoiceconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd>The unique name of the voice_config.</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-voice">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;voice&quot;</span></code>:</dt>
+<dd>The name of the voice.</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-operating-point">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;operating_point&quot;</span></code>:</dt>
+<dd><p class="first">The name of the voice operating point.</p>
+<p class="last">(e.g. <code class="docutils literal notranslate"><span class="pre">&quot;premium-high&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;embedded-high&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;embedded-pro&quot;</span></code> or
+<code class="docutils literal notranslate"><span class="pre">&quot;embedded-compact&quot;</span></code>)</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-vop-version">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;vop_version&quot;</span></code>:</dt>
+<dd><p class="first">The version of the voice operating point.</p>
+<p class="last">(e.g. “1.0.2”)
+The version number of the voice operating point as found in the broker header file (*.hdr file).</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-language">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;language&quot;</span></code>:</dt>
+<dd><p class="first">The language code of the language to use.</p>
+<p class="last">(examples: <code class="docutils literal notranslate"><span class="pre">&quot;enu&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ged&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;eng&quot;</span></code> etc.)</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-frequency">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;frequency&quot;</span></code>:</dt>
+<dd><p class="first">The sample rate.</p>
+<p class="last">Possible values in kHz are 8, 11, 16 or 22.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-volume">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;volume&quot;</span></code>:</dt>
+<dd><p class="first">The volume (0..100).</p>
+<p>Volume level on a 0 to 100 scale. For each 10 points on the scale the volume changes by 3 dB.</p>
+<p class="last">Default value: 80</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-speechrate">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;speechrate&quot;</span></code>:</dt>
+<dd><p class="first">The speech rate (50..400).</p>
+<p>Speech rate level, which is a scale factor (in %) on the default speech rate of the current voice.
+The valid range is [50..400], with 50 having the voice speak 2x slower, and 400 having the voice speak 4x faster.</p>
+<p class="last">Default value: 100 (%)</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-pitch">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;pitch&quot;</span></code>:</dt>
+<dd><p class="first">The pitch (50..200).</p>
+<p>Pitch level, a scale factor (in %) on the inherent pitch of the current voice. The range is [50..200];
+with value 50 the voice speaks one octave lower (pitch :2), with value 200 the voice speaks one octave higher (pitch x2).</p>
+<p class="last">Default value: 100 (%)</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-timbre">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;timbre&quot;</span></code>:</dt>
+<dd><p class="first">The timbre (50..200).</p>
+<p>Timbre level, a scale factor (in %) on the timbre of the current speaker. The range is [50..200];
+For value higher than 100 [100..200] the voice sounds younger; reversely, values lesser than 100 [50..100] make the voice sound older.</p>
+<p class="last">Default value: 100 (%)</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-waitfactor">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;waitfactor&quot;</span></code>:</dt>
+<dd><p class="first">The wait factor (0..9).</p>
+<p>Wait period inserted between two text units (e.g. sentences), on a scale from 0 to 9. Each unit is equivalent to 200ms of silence.</p>
+<p class="last">Default value: 1</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-readmode">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;readmode&quot;</span></code>:</dt>
+<dd><p class="first">The read mode.</p>
+<p>Default value: READMODE_SENT, to read sentence by sentence.</p>
+<blockquote class="last">
+<div><p id="readmode"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> READMODE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+Describes different read modes for the TTS system.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;sent&quot;</span></code>: Read sentence-by-sentence.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;char&quot;</span></code>: Read character-by-character.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;word&quot;</span></code>: Read word-by-word.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;line&quot;</span></code>: Read line-by-line.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-initmode">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;initmode&quot;</span></code>:</dt>
+<dd><p class="first">The init mode.</p>
+<p>Default value: INITMODE_LOAD_ONCE_OPEN_ALL</p>
+<blockquote class="last">
+<div><p id="initmode"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> INITMODE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+Describes possible TTS initialization modes.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;once_open_all&quot;</span></code>: Load and open all modules once.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;open_all_each_time&quot;</span></code>: Load and open all modules for each speak request.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-textmode">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;textmode&quot;</span></code>:</dt>
+<dd><p class="first">The text mode.</p>
+<p>Text processing mode for the prompt input text passed. When setting the value to TEXTMODE_SMS,
+additional text processing will be enabled for better processing of SMS input.</p>
+<p>Default value: TEXTMODE_STANDARD</p>
+<blockquote class="last">
+<div><p id="textmode"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> TEXTMODE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+Describes the text processing mode for the prompt input text.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;standard&quot;</span></code>: Regular input text.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;sms&quot;</span></code>: SMS input text.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-max-input-length">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;max_input_length&quot;</span></code>:</dt>
+<dd><p class="first">The maximum input length.</p>
+<p>Maximum length (in characters) for a single sentence. Values between 25 and 2500 are supported.
+Text fragments that are larger than this size and do not contain regular end-of-sentence punctuation,
+will be cut at or below this size and spoken as 2 or more separate sentences.</p>
+<p class="last">Default value: 250</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-lidscope">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;lidscope&quot;</span></code>:</dt>
+<dd><p class="first">The scope for language identification.</p>
+<p>Defines the parts of the input text for which Cerence TTS Embedded will identify the language
+of the text (and not expect that it’s identical to the native language of the current voice).</p>
+<p>Default value: LIDSCOPE_USERDEFINED</p>
+<blockquote class="last">
+<div><p id="lidscope"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> LIDSCOPE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+Defines the parts of the input text for which the Cerence TTS Embedded will identify the language of the text.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>: LID is deactivated for the entire input text.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;userdefined&quot;</span></code>: LID is activated for tagged fragments.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;message&quot;</span></code>: LID is activated for the entire input text. IMPORTANT NOTE: The value may not be used with Cerence TTS versions &gt;= 3.0.3 which do not support this value anymore!</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-lidvoiceswitch">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;lidvoiceswitch&quot;</span></code>:</dt>
+<dd><p class="first">The setting to enable/disable switching of language during language identification.</p>
+<p>Defines whether Cerence TTS Embedded switches the voice when it detects foreign input, i.e. the language identification
+is activated and identifies the language of the text as differet from the native language of the voice.</p>
+<p>Default value: LIDVOICESWITCH_OFF</p>
+<blockquote class="last">
+<div><p id="lidvoiceswitch"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> LIDVOICESWITCH <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+Defines if the Cerence TTS Embedded has to switch the voice when it detects foreign input.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;off&quot;</span></code>: Keep the current voice to read foreign input.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;on&quot;</span></code>: Switch to a voice that has the foreign language as its native language.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-extraesctn">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;extraesctn&quot;</span></code>:</dt>
+<dd><p class="first">The additional text normalization types.</p>
+<p class="last">Defines the additional tn types that may appear in the prompt input text. The value is a comma-separated list of types as used in &lt;ESC&gt;tn=&lt;type&gt;.
+If the current voice supports one or more of these additional types, it will load the language data of concern.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-extraesclang">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;extraesclang&quot;</span></code>:</dt>
+<dd><p class="first">The comma separated list of language codes.</p>
+<p class="last">Defines the foreign languages that may appear in the prompt input text. The value is a comma-separated list of 3-letterlanguage codes, e.g. “eng,frf,spe,iti”.
+If the current voice supports one or more of these languages as foreign languages, it will load the foreign language data of concern.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-lidmode">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;lidmode&quot;</span></code>:</dt>
+<dd><p class="first">The mode of the language identification.</p>
+<p>Defines the operating mode of the language identification (LID).</p>
+<p>Default value: LIDMODE_MEMORY_BIASED</p>
+<blockquote class="last">
+<div><p id="lidmode"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> LIDMODE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+Describes operating modes of the language identification.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;memory_biased&quot;</span></code>: LID takes the detected language of preceding sentence into account to determine the language of the current sentence.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;forced_choice&quot;</span></code>: LID only considers the current sentence to determine its language.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-lidlanguages">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;lidlanguages&quot;</span></code>:</dt>
+<dd><p class="first">The comma separated list of language codes.</p>
+<p class="last">Restricts the language identification (LID) to a subset of the supported foreign languages.
+The value is a comma-separated list of 3-letter language codes, e.g. “eng,frf,spe,iti”.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoiceconfig-final-silence-disabled">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;final_silence_disabled&quot;</span></code>:</dt>
+<dd><p class="first">Disables the final silence.</p>
+<p>Disables the synthesis of the wait factor silence after the final sentence. Set to true to disable.</p>
+<p>Note: The functionality of this key is supported with Cerence TTS Embedded versions &gt;= 2.2.0.</p>
+<p class="last">Default value: false</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="ituningfile-the-prompter-tuning-file">
+<span id="ituningfile"></span><h1>ITuningFile - The prompter tuning file.</h1>
+<dl class="docutils">
+<dt>Sub types:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;rule&quot;</span></code>, see <a class="reference internal" href="#iuserrule">IUserRule</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;dict&quot;</span></code>, see <a class="reference internal" href="#iuserdictionary">IUserDictionary</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;apdb&quot;</span></code>, see <a class="reference internal" href="#iactivepromptdb">IActivePromptDb</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;tmpl&quot;</span></code>, see <a class="reference internal" href="#iprompttemplate">IPromptTemplate</a></li>
+</ul>
+</dd>
+</dl>
+<p>The prompter tuning file.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="42%" />
+<col width="7%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;rule&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;dict&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;apdb&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;tmpl&quot;</span></code></td>
+<td>yes</td>
+<td>Select the sub-type.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;rule&quot;</span></code>:</td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iuserrule">IUserRule</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;rule&quot;</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;dict&quot;</span></code>:</td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iuserdictionary">IUserDictionary</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;dict&quot;</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;apdb&quot;</span></code>:</td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iactivepromptdb">IActivePromptDb</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;apdb&quot;</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;tmpl&quot;</span></code>:</td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iprompttemplate">IPromptTemplate</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;tmpl&quot;</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;file_path&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The absolute or relative path to the tuning file.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The reference name of the tuning file.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ituningfile-file-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;file_path&quot;</span></code>:</dt>
+<dd><p class="first">The absolute or relative path to the tuning file.</p>
+<p class="last">If the property a tuning_files_root_path is not configured, the a filePath is considered to be relative to the JSON configuration directory. Otherwise the a filePath is considered
+to be relative to the given a tuning_files_root_path. No relation at all is made if the given a filePath is absolute.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ituningfile-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The reference name of the tuning file.</p>
+<p class="last">This property is optional and may be used to reference it via <code class="docutils literal notranslate"><span class="pre">uses</span></code> in other parts of the configuration.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="iuserrule-the-user-rule">
+<span id="iuserrule"></span><h1>IUserRule - The user rule.</h1>
+<p>Super type: <a class="reference internal" href="#ituningfile">ITuningFile</a></p>
+<p>The user rule.</p>
+<p>An introduction to user rules is given in the <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation (chapter “User Rulesets”).</p>
+</div>
+<div class="section" id="iuserdictionary-the-user-dictionary">
+<span id="iuserdictionary"></span><h1>IUserDictionary - The user dictionary.</h1>
+<p>Super type: <a class="reference internal" href="#ituningfile">ITuningFile</a></p>
+<p>The user dictionary.</p>
+<p>An introduction to user dictionaries is given in the <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation (chapter “User Dictionaries”).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="31%" />
+<col width="11%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;mode&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> UserDictMode <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no</td>
+<td>The mode of the user dictionary.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iuserdictionary-mode">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;mode&quot;</span></code>:</dt>
+<dd><p class="first">The mode of the user dictionary.</p>
+<blockquote class="last">
+<div><p id="userdictmode"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> UserDictMode <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;langoverwriting&quot;</span></code>: The language overwriting mode.   This value enables the language overwriting mode.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+</div>
+<div class="section" id="iactivepromptdb-the-active-prompt-database">
+<span id="iactivepromptdb"></span><h1>IActivePromptDb - The active prompt database.</h1>
+<p>Super type: <a class="reference internal" href="#ituningfile">ITuningFile</a></p>
+<p>The active prompt database.</p>
+<p>An introduction to active prompt databases is given in the <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation (chapter “ActivePrompts”).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="29%" />
+<col width="10%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;mode&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> ActivePromptDbMode <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no</td>
+<td>The mode of the active prompt database.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iactivepromptdb-mode">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;mode&quot;</span></code>:</dt>
+<dd><p class="first">The mode of the active prompt database.</p>
+<blockquote class="last">
+<div><p id="activepromptdbmode"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> ActivePromptDbMode <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;automatic&quot;</span></code>: The automatic mode.   This value enables the automatic mode.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+</div>
+<div class="section" id="iprompttemplate-the-prompt-template">
+<span id="iprompttemplate"></span><h1>IPromptTemplate - The prompt template.</h1>
+<p>Super type: <a class="reference internal" href="#ituningfile">ITuningFile</a></p>
+<p>The prompt template.</p>
+<p>Template based prompt matching is a text-to-text transformation mechanism executed before the “User Rulesets”.
+In contrast to the other tuning file types, only one prompt template can be loaded at a time. Therefore it is good practice to define at maximum only one prompt template per usecase.</p>
+<p>Note, that the binary format is supported only to achieve most efficient loading at run-time.
+An introduction to prompt templates is given in the <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation (chapter “Prompt Templates”).</p>
+</div>
+<div class="section" id="icloudcommandconfig-the-cloud-command">
+<span id="icloudcommandconfig"></span><h1>ICloudCommandConfig - The cloud command.</h1>
+<p>The cloud command.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> object of type “cloud” must contain a <code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;</span></code> object.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="23%" />
+<col width="20%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The reference name of the cloud command.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;command&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the cloud command.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>yes</td>
+<td>Command dictionary.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;timeout&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 30000</td>
+<td>Defines the cloud command timeout in milliseconds.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudcommandconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The reference name of the cloud command.</p>
+<p class="last">This property may be used to reference it via <code class="docutils literal notranslate"><span class="pre">uses</span></code> in other parts of the configuration.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudcommandconfig-command">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;command&quot;</span></code>:</dt>
+<dd><p class="first">The name of the cloud command.</p>
+<p class="last">This property describes the command name sent to the cloud.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudcommandconfig-dictionary">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;</span></code>:</dt>
+<dd><p class="first">Command dictionary.</p>
+<p>The command dictionary contains the parameters of the cloud command. These parameters define e.g.
+the TTS-voice and/or the TTS-language.</p>
+<p class="last">Note, that this <code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;</span></code> key is of type <code class="docutils literal notranslate"><span class="pre">IUserJsonConfig</span></code>, which allows
+the usage of the <code class="docutils literal notranslate"><span class="pre">&quot;vh_callback&quot;</span></code> mechanism.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudcommandconfig-timeout">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;timeout&quot;</span></code>:</dt>
+<dd><p class="first">Defines the cloud command timeout in milliseconds.</p>
+<p class="last">Time the client waits for a server response.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="ivoicedatapath-the-prompter-voice-data-path">
+<span id="ivoicedatapath"></span><h1>IVoiceDataPath - The prompter voice data path.</h1>
+<p>The prompter voice data path.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> definition is required in combination with “local” <code class="docutils literal notranslate"><span class="pre">prompter</span></code> objects defining prompter instances which use the “Vocalizer Embedded” engine for text-to-speech conversion.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> object is used to define paths related to a voice data installation which contains a certain set of so called “Vocalizer Embedded voice packs”.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> object defines a unique name, which serves as an identifier that can be used for referencing from within <code class="docutils literal notranslate"><span class="pre">prompter</span></code> objects.</p>
+<p>By referencing the identical <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> in multiple <code class="docutils literal notranslate"><span class="pre">prompter</span></code> objects, lower memory consumption and less file accesses can be achieved. E.i. when the same voice is activated on multiple prompter instances, the voice is loaded only once into the memory. Therefore the recommended way is to define one common <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> referenced in all “local” <code class="docutils literal notranslate"><span class="pre">prompter</span></code> objects.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="15%" />
+<col width="5%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The unique name of the <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> object.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;vocalizer_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>yes</td>
+<td>The absolute or relative path to the installation directory where all “Vocalizer Embedded voice packs” are located.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;scan_result_storage_path&quot;:</span></code> </td>
+<td>Path</td>
+<td>no</td>
+<td>The absolute or relative path to a directory where the results of the scanned <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> are stored persistently.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;scan_result_storage_tag&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The tag which is associated with the persistently stored scan results.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ivoicedatapath-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The unique name of the <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> object.</p>
+<p class="last">This is used to reference it with the <code class="docutils literal notranslate"><span class="pre">uses</span></code> key from within <code class="docutils literal notranslate"><span class="pre">prompter</span></code> objects.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoicedatapath-vocalizer-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;vocalizer_path&quot;</span></code>:</dt>
+<dd><p class="first">The absolute or relative path to the installation directory where all “Vocalizer Embedded voice packs” are located.</p>
+<p>Under the <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> all common (language independent) data files and all language-/voice-specific data files (originating from the voice packs) are located.</p>
+<p>The relative path is considered to be in relation to the JSON configuration directory.</p>
+<p>When a prompter instance is created, the defined <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> is scanned entirely in a recursive manner in order to make an inventory of all available voice data files. During the scan all files ending with <code class="docutils literal notranslate"><span class="pre">\*.hdr</span></code> (so called “Vocalizer Embedded pipeline broker header files”) are accessed. If multiple prompter instances share the same <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> object, the <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> is scanned one-time, when the first prompter instance is created.</p>
+<p class="last">Please have a look to <code class="docutils literal notranslate"><span class="pre">scan_result_storage_path</span></code> which can be used to store the results of the scan persistently.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoicedatapath-scan-result-storage-path">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;scan_result_storage_path&quot;</span></code>:</dt>
+<dd><p class="first">The absolute or relative path to a directory where the results of the scanned <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> are stored persistently.</p>
+<p>This key is used to reduce the time needed to create prompter instances e.g. at system start-up.</p>
+<p>Please refer also to the description of <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code>. If <code class="docutils literal notranslate"><span class="pre">scan_result_storage_path</span></code> is defined, the results of the scanned <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> are stored persistently into cache files that are named “&lt;unique_prefix&gt;_brokerdatafile.bin” and “&lt;unique_prefix&gt;_lwlistfile.bin” (unique_prefix relates to the name of the associated <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> object). At all subsequent system start-ups the scanning of <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> is omitted and the former scan results from the cache files are used.</p>
+<p>Note: If the voice data content under the <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> has changed, the stored cache files must be deleted manually in order to renew the cache files at next system start-up. As an alternative to avoid manual deletion of the cache files the key <code class="docutils literal notranslate"><span class="pre">scan_result_storage_tag</span></code> can be utilized to control renewal of the cache files.</p>
+<p>A relative <code class="docutils literal notranslate"><span class="pre">scan_result_storage_path</span></code> is considered to be in relation to the JSON configuration directory.</p>
+<p class="last">If the defined path does not exist at initial scan, the path is automatically created. If path creation fails, this feature is treated as disabled.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ivoicedatapath-scan-result-storage-tag">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;scan_result_storage_tag&quot;</span></code>:</dt>
+<dd><p class="first">The tag which is associated with the persistently stored scan results.</p>
+<p>This optional key is taken into use only if the <code class="docutils literal notranslate"><span class="pre">scan_result_storage_path</span></code> is defined.
+Therefore please also refer to the description of <code class="docutils literal notranslate"><span class="pre">scan_result_storage_path</span></code>.</p>
+<p>Use this key to control renewal of perstistently stored scan results, e.g. when the voice data content
+under the <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> has changed.</p>
+<p>At the point when the results of the scanned <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> are stored persistently into cache files
+in the <code class="docutils literal notranslate"><span class="pre">scan_result_storage_path</span></code>, the stored results are tagged with the <code class="docutils literal notranslate"><span class="pre">scan_result_storage_tag</span></code> value.
+The value of the tag is written to an additional cache file named “&lt;unique_prefix&gt;_tag.bin”
+(unique_prefix relates to the name of the associated <code class="docutils literal notranslate"><span class="pre">voice_data_path</span></code> object).</p>
+<p class="last">At subsequent system start-ups the value of <code class="docutils literal notranslate"><span class="pre">scan_result_storage_tag</span></code> is compared with the persistently stored tag value.
+In case of a mismatch, the <code class="docutils literal notranslate"><span class="pre">vocalizer_path</span></code> is re-scanned and the scan results in <code class="docutils literal notranslate"><span class="pre">scan_result_storage_path</span></code> are renewed
+and tagged with the new <code class="docutils literal notranslate"><span class="pre">scan_result_storage_tag</span></code> value.</p>
+</dd>
+</dl>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Prompter_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Prompter_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a></li>
+<li><a class="reference internal" href="#itoplevelprompterconfig-the-top-level-configuration-of-the-prompter-component">ITopLevelPrompterConfig - The top-level configuration of the prompter component.</a></li>
+<li><a class="reference internal" href="#iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</a></li>
+<li><a class="reference internal" href="#iprompterconfig-the-configuration-of-the-iprompter-instance-s">IPrompterConfig - The configuration of the IPrompter instance(s).</a></li>
+<li><a class="reference internal" href="#ilocalprompter-the-configuration-of-the-local-iprompter-class">ILocalPrompter - The configuration of the local IPrompter class.</a></li>
+<li><a class="reference internal" href="#icloudprompterconfig-the-configuration-of-the-cloud-iprompter-class">ICloudPrompterConfig - The configuration of the cloud IPrompter class</a></li>
+<li><a class="reference internal" href="#iprompterglobalconfig-the-configuration-of-prompter-global-settings">IPrompterGlobalConfig - The configuration of prompter global settings.</a></li>
+<li><a class="reference internal" href="#iprompterusecaseconfig-the-prompter-use-case-configuration">IPrompterUseCaseConfig - The prompter use case configuration.</a></li>
+<li><a class="reference internal" href="#ilocalusecase-the-configuration-of-the-local-prompter-usecase">ILocalUseCase - The configuration of the local prompter usecase.</a></li>
+<li><a class="reference internal" href="#icloudusecase-the-configuration-of-the-cloud-prompter-usecase">ICloudUseCase - The configuration of the cloud prompter usecase.</a></li>
+<li><a class="reference internal" href="#ivoiceconfig-the-prompter-voice-configuration">IVoiceConfig - The prompter voice configuration.</a></li>
+<li><a class="reference internal" href="#ituningfile-the-prompter-tuning-file">ITuningFile - The prompter tuning file.</a></li>
+<li><a class="reference internal" href="#iuserrule-the-user-rule">IUserRule - The user rule.</a></li>
+<li><a class="reference internal" href="#iuserdictionary-the-user-dictionary">IUserDictionary - The user dictionary.</a></li>
+<li><a class="reference internal" href="#iactivepromptdb-the-active-prompt-database">IActivePromptDb - The active prompt database.</a></li>
+<li><a class="reference internal" href="#iprompttemplate-the-prompt-template">IPromptTemplate - The prompt template.</a></li>
+<li><a class="reference internal" href="#icloudcommandconfig-the-cloud-command">ICloudCommandConfig - The cloud command.</a></li>
+<li><a class="reference internal" href="#ivoicedatapath-the-prompter-voice-data-path">IVoiceDataPath - The prompter voice data path.</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Prompter_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="prompter_configuration.html">Configuration</a><ul>
+      <li>Previous: <a href="prompter_configuration.html" title="previous chapter">Configuration</a></li>
+      <li>Next: <a href="prompter_advanced_usage.html" title="next chapter">Advanced Prompter <abbr title="Application Programming Interface">API</abbr> Functions</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/prompter_configuration_api_ref.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

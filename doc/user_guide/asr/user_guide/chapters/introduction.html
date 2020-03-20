@@ -1,0 +1,562 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Welcome to Cerence ASR</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Using Cerence ASR" href="using_the_csdk_ddfw.html" />
+    <link rel="prev" title="CERENCE SDK - CERENCE ASR USER’S GUIDE" href="../../SDK_Asr5_UserGuide.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-cerence-asr">
+<h1>Welcome to Cerence ASR</h1>
+<p>Welcome to the Cerence ASR SDK. This SDK is part of the Cerence SDK, which
+bundles SDKs of several Cerence embedded technologies into a single uniform SDK.</p>
+<p>In this document we will introduce Cerence ASR. We will explain its
+novel concepts and design principles. For users coming from earlier
+versions of Cerence ASR (VoCon 4), we will explain what has changed
+and we will give an introduction to migration from VoCon 4 to Cerence
+ASR. We also show where to find tooling and data for Cerence ASR.</p>
+<p>Cerence ASR is an Automatic Speech Recognition (ASR) engine and a
+Natural Language Understanding (NLU) engine. Cerence ASR is specially
+designed to enable fast-track development of embedded speech
+applications. Among its uses, Cerence ASR is suitable for automotive dash
+board applications (OEM and aftermarket), personal navigation devices,
+cell phones and industrial applications like warehouse
+automation. Cerence ASR scales from applications that require a limited
+number of voice commands to applications that accept voice-destination
+entry of hundreds-of-thousands of streets, allow dictation of text
+messages. Moreover, Cerence ASR also supports server-side recognition
+features to be integrated smoothly with embedded ASR features.</p>
+<div class="section" id="cerence-asr-concepts">
+<span id="index-0"></span><h2>Cerence ASR Concepts</h2>
+<p>Cerence ASR is a set of runtime libraries which allow a developer to
+integrate speech recognition (ASR) into their applications.</p>
+<p>The Cerence ASR API consist of a few dozen API calls and callback functions. It
+comes with several language bindings, with the primary API being a C API. The
+Cerence ASR API is a higher level API than the API of previous versions and present
+a complete break with the earlier. As the power of embedded platforms has
+increased dramatically in the last decade, it is no longer needed to resort to
+highly tuned a complex software solution to fit complex speech recognition tasks
+to the platform.</p>
+<p>The Cerence ASR API is largely an asynchronous API. The underlying speech
+recognizer is multi-threaded and can use multiple CPU cores.</p>
+<p>Cerence ASR configuration is largely done through files which use the JSON format.</p>
+<div class="section" id="stream-based-recognition">
+<span id="index-1"></span><h3>Stream-based recognition</h3>
+<p>The Cerence ASR system is built around the concept of <strong>stream
+based recognition</strong>. This means that audio input is treated as a
+potentially endless stream of audio. This presents a significant
+paradigm shift from earlier Cerence ASR/VoCon versions which were
+utterance based. The ASR system can now be seen as a processor which
+looks at an audio stream and returns a <em>stream of events</em> with
+information about the audio stream, especially what we think was
+spoken. All results are returned as a message block. This block is
+mostly in readable text using the JSON format.</p>
+<p>Streaming recognition means that Cerence ASR is a one-pass recognition
+system. The use of a single pass reduces latency considerably.</p>
+<p>Cerence ASR also introduces the possibility to separate the recognition contexts in
+two parts. There is an acoustic model dependent part which contains the
+vocabulary of an application. This part is still referred to as the recognition
+context. And there a separate language language model which models how the words
+in the vocabulary can be combined. It is still possible to combine both of these
+functions into one recognition context.</p>
+<p>Cerence ASR is seamlessly integrated with the Speech Signal
+Enhancement (SSE) module through the audio pipeline of the Cerence
+SDK. The integration with the SSE module improves performance of the
+signal processing system of the ASR further.</p>
+<p>Cerence ASR also includes an NLU system which can be used to extract meaning from
+words recognized by the ASR system. If needed, the ASR and NLU system can be
+used separately, which represents a further change w.r.t. to earlier VoCon
+versions.</p>
+<p>Last but not least the Cerence ASR system continues to provide integration between
+local speech recognition and speech recognition in the cloud (NCS). Through a
+plug-in interface, it is also possible to provide integration with a 3rd party
+cloud recognition system.</p>
+</div>
+<div class="section" id="asynchronous-processing-a-mind-shift">
+<h3>Asynchronous processing: a mind shift</h3>
+<p>Cerence ASR is designed to provide responsive speech recognition. This
+requirement motived the shift from a synchronous API to a largely asynchronous
+API.</p>
+<p>To avoid blockage of applications and to keep memory consumption within bounds
+the Cerence ASR recognizer will discard information if results cannot be provided in
+time. As soon as the recognizer is more than 5 seconds behind real-time it drops
+audio. The value of 5 seconds can be adjusted at the cost of more memory usage.</p>
+<p>Cerence ASR will also start recognition even if not all resources are available.
+Note however that if resources do not become available in time, then they will
+be ignored.</p>
+<p>Asynchronous programming also means that configurations can be changed during
+speech recognition. There is no need to stop audio or a recognizer to switch
+models. In fact stopping audio would be simply incorrect because the application
+will lose audio.</p>
+<p>Due to streaming and on-the-fly reconfiguration, tasks which were special to
+earlier VoCon versions, like Wake up word recognition are not special anymore.
+They become a task like any other.</p>
+<p>The use of timing in results becomes important for applications. applications
+should be aware to which segment of input audio an event corresponds.
+Applications should be prepared to discard results which apply to time
+segments for which already a decision was taken.</p>
+</div>
+<div class="section" id="configuration-over-implementation">
+<h3>Configuration over Implementation</h3>
+<p>In Cerence ASR, most configuration happens through configuration files that are read
+into the engine, rather than by programming an API. The API has been kept small
+on purpose to enable fast-track integration and modification of the speech
+recognition setup.</p>
+<p>Configuration files are written in <a class="reference external" href="http://www.json.org/">JavaScript Object Notation (JSON)</a>. The content of these configuration
+files is specified in <a class="reference internal" href="../external/configuration.html#vocon5-json-configuration"><span class="std std-ref">Cerence ASR JSON configuration reference</span></a>.</p>
+<p>The Cerence SDK consists of libraries, tools, documentation and sample code.
+The Cerence ASR API comes with several programming language bindings. Some
+bindings are not available on all platforms; please consult the general
+Cerence SDK documentation for information. Available bindings include:</p>
+<ul class="simple">
+<li>C</li>
+<li>Java</li>
+<li>Objective-C</li>
+</ul>
+<p>For the rest of this document, we will just refer to all of these as <code class="docutils literal notranslate"><span class="pre">the</span> <span class="pre">API</span></code>.
+If examples are given for a specific language binding, it will be
+mentioned there and then.</p>
+<p>To build applications based on Cerence ASR, you will need access
+to the Cerence ASR libraries (provided with this SDK) and a set of
+configuration files, all placed into a common directory. The
+samples presented later on in this document provide a good
+starting point for this.</p>
+<p>How the API is used to setup recognition is shown in detail in the
+section <a class="reference internal" href="../sections/c_api.html#c-api"><span class="std std-ref">C API</span></a> later on in this document, and in the
+<a class="reference internal" href="tools_and_sample_code.html#sdk-samples"><span class="std std-ref">SDK samples</span></a>. Details on the definition and syntax of
+configuration files are provided in
+<a class="reference internal" href="../external/configuration.html#vocon5-json-configuration"><span class="std std-ref">Cerence ASR JSON configuration reference</span></a>.</p>
+</div>
+</div>
+<div class="section" id="cerence-asr-packages">
+<h2>Cerence ASR Packages</h2>
+<p>The Cerence SDK consists of 3 parts:</p>
+<ul class="simple">
+<li>A Runtime Development Package, which is covered by this manual.
+This package is available for multiple platforms and has more language
+bindings. Details are covered in the <a class="reference internal" href="using_the_csdk_ddfw.html#using-vocon5"><span class="std std-ref">Using Cerence ASR</span></a>.</li>
+<li>The Cerence ASR Tools Package.
+Tools are delivered in a separate installation package. This package can be
+updated independently of the runtime package.</li>
+<li>Cerence ASR Data Installer Package.
+Data required for speech recognition is installed through separate
+installers. Each language has one or more installers. Data is shared between
+the runtime package and the tools package. Tools and runtime package come
+<strong>without</strong> data. <a class="footnote-reference" href="#id2" id="id1">[1]</a></li>
+</ul>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>The runtime SDK has a simple sample with some data included.
+This data is meant for the sample only and should not be used for development</td></tr>
+</tbody>
+</table>
+<p>Most developers will require all 3 packages, but it is possible to install them
+separately. If, for example, one has a server dedicated to data production for applications,
+then it may for example be useful to install just the Cerence tools without runtime SDK.</p>
+<div class="section" id="tools-package">
+<h3>Tools package</h3>
+<p>Refer to the <a class="reference external" href="../../../../../../../tools/vocon_v5_1_0/doc/vocon/sdk/index.html" title="(in VoCon Application Development Tools v5.1)"><code class="xref any docutils literal notranslate"><span class="pre">VoCon</span> <span class="pre">Tools</span> <span class="pre">Documentation</span></code></a>.
+This link is available only if you installed the tools package.</p>
+</div>
+<div class="section" id="data-installers">
+<h3>Data installers</h3>
+<p>The Cerence data installers come in three flavors. Not all flavors are available
+for all languages. Contact your Cerence commercial contact for detailed info on
+which data is currently available for a language. The contact should also be
+able to provide you with a roadmap for new data buffers. The three flavors are:</p>
+<ul>
+<li><p class="first">A <strong>base data installer</strong> contains:</p>
+<ul class="simple">
+<li>An acoustic model, the acoustic model provides the possibility to recognize
+speech for particular languages. There is one acoustic model per language.</li>
+<li>A buffer to configure generation of phonetic transcriptions for <em>general</em>
+vocabulary. (CLC)</li>
+<li>A second buffer and a CLC buffer to configure
+generation of phonetic transcriptions for the <em>music</em> and <em>name</em> domains.</li>
+</ul>
+<p>This installer is available for all users which have purchased support for a
+particular language.</p>
+</li>
+<li><p class="first">A <strong>message dictation installer</strong> <a class="footnote-reference" href="#id4" id="id3">[2]</a> which contains data to configure VoCon for
+recognition of texting messages:</p>
+<ul class="simple">
+<li>A messaging dictation context buffer, which contains the vocabulary
+that can be used in messaging.</li>
+<li>A messaging dictation Language model buffer, which describes the
+syntax of text messages.</li>
+<li>A messaging dictation ITN buffer, which helps to format the recognition
+output. Formatting means converting <em>twenty five dollars</em> into <em>$25</em> for
+example.</li>
+</ul>
+<p>This installer is not part of the basic offering.</p>
+</li>
+<li><p class="first">A <strong>VoCon Music Premium 2.0</strong> (VMP) data installer which contains data to help speech
+recognition of entries from a GraceNote® music database. This package contains:</p>
+<ul class="simple">
+<li>A binary dictionary with VMP 2.0 data which helps generation of phonetic
+transcriptions for a particular language.</li>
+</ul>
+<p>This installer is not part of the basic offering.</p>
+</li>
+</ul>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>For the Cerence ASR v.5.1 SDK these installers will not be immediately available.
+It is planned to provide these installers in a follow up release.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="migration-from-vocon-4">
+<h2>Migration from VoCon 4</h2>
+<p>The shift from a low-level API programmatic API to a higher level API with
+configuration files means that users of older VoCon versions have to rework the
+integration of speech into their application.</p>
+<p>It is also the case that numerous technologically outdated options and
+features in VoCon 4.x have been removed from Cerence ASR.</p>
+<p>Data formalisms, on the other hand, have remained compatible in Cerence ASR to a large
+extent. Apart from recognition contexts.</p>
+<p>Configuration of cloud recognition tasks remains the same as the Cerence Cloud
+Services add-on of VoCon 4.</p>
+<p>We will describe these aspects in more detail in the next sections.</p>
+<div class="section" id="new-audio-integration">
+<h3>New audio integration</h3>
+<p>The audio integration of Cerence ASR is now part of the common audio framework of
+Cerence SDK.</p>
+</div>
+<div class="section" id="passing-results-from-asr-to-nlu">
+<h3>Passing results from ASR to NLU</h3>
+<p>In Cerence ASR the application needs to pass results from ASR to NLU.</p>
+</div>
+<div class="section" id="input-data-formats">
+<h3>Input data Formats</h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Input format</th>
+<th class="head">Can be used in Cerence ASR?</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>BNF+ grammar</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>SLM ARPABO format file</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>Phonetic transcription</td>
+<td>yes, but see comments on <code class="docutils literal notranslate"><span class="pre">#</span></code> around transcriptions.</td>
+</tr>
+<tr class="row-odd"><td>Text dictionary</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>CLC RETTT rules</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p><span class="target" id="table-1">Table 1</span>: <em>Most VoCon input formalisms remain usable in Cerence ASR</em></p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The of the <code class="docutils literal notranslate"><span class="pre">#</span></code> character around transcriptions in dictionaries
+should be abandoned for Cerence ASR. This creates consistency with
+the Vocalizer product and simplifies transcription developement
+and logistics. Not removing these transcription may lead to
+performance degradation.</p>
+</div>
+</div>
+<div class="section" id="binary-data-compatibility">
+<h3>Binary data compatibility</h3>
+<p>There is partial binary data compatibility between VoCon 4.13 and Cerence ASR.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Buffer type</th>
+<th class="head">Compatible with Cerence ASR?</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Acoustic model</td>
+<td>yes, but only <code class="docutils literal notranslate"><span class="pre">acmod6</span></code> remains supported.</td>
+</tr>
+<tr class="row-odd"><td>CLC buffer</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>VMP 2.0 dictionaries</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>Context</td>
+<td><strong>no, recompilation of all grammars and SLMs is required.</strong></td>
+</tr>
+<tr class="row-even"><td>Binary dictionary</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>Compressed dictionary</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p><span class="target" id="table-2">Table 2</span>: <em>Which binary buffer formats remain usable in Cerence ASR</em></p>
+</div>
+<div class="section" id="mapping-between-vocon-4-features-and-cerence-asr">
+<h3>Mapping between VoCon 4 features and Cerence ASR</h3>
+<p>For reference we have created a list of VoCon 4 concepts and features and have
+linked them to their corresponding Cerence ASR concepts.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="38%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VoCon 4 concept</th>
+<th class="head">Cerence ASR concept</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ASR Context + Sem3 (NLU) Context</td>
+<td>Application</td>
+</tr>
+<tr class="row-odd"><td>Context creation, configuration</td>
+<td>JSON configuration.</td>
+</tr>
+<tr class="row-even"><td>Gate recognizer</td>
+<td>Not a special case, use the normal recognition process.</td>
+</tr>
+<tr class="row-odd"><td>List Context</td>
+<td>Dynamic Content Consumer (DCC) or on-the-fly compilation of BNF+ grammars</td>
+</tr>
+<tr class="row-even"><td>Sem3 Result API</td>
+<td>Semantic result unfolding with a Lua script <a class="reference internal" href="advanced_topics.html#sem3-result-unfolding"><span class="std std-ref">Semantic result unfolding</span></a></td>
+</tr>
+<tr class="row-odd"><td>Gram2 BNF+/SLM creation with CLC</td>
+<td>Dynamic Content Consumer (DCC)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="dropped-features">
+<h3>Dropped features</h3>
+<p>In this section we list a number of VoCon 4.x features which are no longer available as of Cerence ASR.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VoCon 4 feature</th>
+<th class="head">Replacement</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Acoustic models generation 3,4 and 5</td>
+<td>Use <code class="docutils literal notranslate"><span class="pre">acmod6</span></code>.</td>
+</tr>
+<tr class="row-odd"><td>Extra event results (DP)</td>
+<td><em>None</em>. Applications should rely on confidence only</td>
+</tr>
+<tr class="row-even"><td>List contexts</td>
+<td>Use Dynamic Content Consumer (DCC) with COP files or on-the-fly compilation of BNF+ grammars</td>
+</tr>
+<tr class="row-odd"><td>Exception dictionaries and word-models.</td>
+<td>None. Recognition is entirely phonetic now.</td>
+</tr>
+<tr class="row-even"><td>Old semantic post-processor.</td>
+<td>Use <code class="docutils literal notranslate"><span class="pre">sem3</span></code> rule-based NLU.</td>
+</tr>
+<tr class="row-odd"><td>LexChain in the pronunciation component.</td>
+<td>Use CLC and DCC.</td>
+</tr>
+<tr class="row-even"><td>Speaker adaptation</td>
+<td><em>None</em>. Use <code class="docutils literal notranslate"><span class="pre">acmod6</span></code>. Without adaptation, <code class="docutils literal notranslate"><span class="pre">acmod6</span></code> still outperforms <code class="docutils literal notranslate"><span class="pre">acmod5</span></code> with adaptation.</td>
+</tr>
+<tr class="row-odd"><td>All search types except FST DP</td>
+<td>Use FST search</td>
+</tr>
+<tr class="row-even"><td>Backwards search with FST</td>
+<td>Use forward FST search</td>
+</tr>
+<tr class="row-odd"><td>Fuzzy match recognition in ASR</td>
+<td>Use fuzzy match with NLU component <a class="reference internal" href="#fm" id="id5">[FM]</a></td>
+</tr>
+<tr class="row-even"><td>VMP 1 (Id based trans lookup)</td>
+<td>Use VMP 2.0</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="fm" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[FM]</a></td><td>This feature is only available through Cerence Professional Services</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="changed-features">
+<h3>Changed features</h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="39%" />
+<col width="61%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">VoCon 4 feature</th>
+<th class="head">Replacement</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Spelling context.</td>
+<td>Use an SLM consisting of spelled letters for recognition of letters.Spelling can integrated into a slot.</td>
+</tr>
+<tr class="row-odd"><td>User word training</td>
+<td>Not yet available but planned.</td>
+</tr>
+<tr class="row-even"><td>Spell post-processor (match against list)</td>
+<td>Not yet available but planned.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The spelling post-processor (letter match) and user word training components are
+not yet available for Cerence ASR. They are planned for an upcoming release.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Cerence ASR</a><ul>
+<li><a class="reference internal" href="#cerence-asr-concepts">Cerence ASR Concepts</a><ul>
+<li><a class="reference internal" href="#stream-based-recognition">Stream-based recognition</a></li>
+<li><a class="reference internal" href="#asynchronous-processing-a-mind-shift">Asynchronous processing: a mind shift</a></li>
+<li><a class="reference internal" href="#configuration-over-implementation">Configuration over Implementation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cerence-asr-packages">Cerence ASR Packages</a><ul>
+<li><a class="reference internal" href="#tools-package">Tools package</a></li>
+<li><a class="reference internal" href="#data-installers">Data installers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#migration-from-vocon-4">Migration from VoCon 4</a><ul>
+<li><a class="reference internal" href="#new-audio-integration">New audio integration</a></li>
+<li><a class="reference internal" href="#passing-results-from-asr-to-nlu">Passing results from ASR to NLU</a></li>
+<li><a class="reference internal" href="#input-data-formats">Input data Formats</a></li>
+<li><a class="reference internal" href="#binary-data-compatibility">Binary data compatibility</a></li>
+<li><a class="reference internal" href="#mapping-between-vocon-4-features-and-cerence-asr">Mapping between VoCon 4 features and Cerence ASR</a></li>
+<li><a class="reference internal" href="#dropped-features">Dropped features</a></li>
+<li><a class="reference internal" href="#changed-features">Changed features</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../../SDK_Asr5_UserGuide.html" title="previous chapter">CERENCE SDK - CERENCE ASR USER’S GUIDE</a></li>
+      <li>Next: <a href="using_the_csdk_ddfw.html" title="next chapter">Using Cerence ASR</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

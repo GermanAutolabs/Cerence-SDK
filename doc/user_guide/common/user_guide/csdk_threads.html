@@ -1,0 +1,624 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>SDK Threads</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Configuration Parameters" href="common_configuration.html" />
+    <link rel="prev" title="Logging System Overview" href="logging_intro.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="sdk-threads">
+<span id="threading"></span><h1><a class="reference internal" href="#sdk-threads">SDK Threads</a></h1>
+<p>The SDK uses several threads to do its tasks. This chapter will give an overview which Threads are started,
+how they are named and how long they are living.</p>
+<div class="section" id="started-threads">
+<h2>Started threads</h2>
+<p>DragonDrive uses the StarRec PAL platform abstraction layer,
+which starts the following threads:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>AudioIn_Thread</td>
+<td>reads audio data from the device
+and passes it to DD audio</td>
+</tr>
+<tr class="row-odd"><td>AudioOut_Thread</td>
+<td>gets audio data from DD audio
+and writes it to the device</td>
+</tr>
+<tr class="row-even"><td>timerThread</td>
+<td>started by the StarRec_PAL_Timer module;
+used by NMSP for timeout handling</td>
+</tr>
+</tbody>
+</table>
+<p>In addition, DragonDrive starts the threads listed below.
+&lt;name&gt; expands to the instance name used to create the module hosting the thread.
+That name is either passed as a parameter of the create calls during runtime,
+or it is defined in the audio json configuration as the parameter name for modules created in the background by the audio manager.</p>
+<p>Find below the list of the threads:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ASR5_Worker&lt;nbr&gt;</td>
+<td>VoCon core engine worker thread;
+These threads do the actual work of the speech recognition system.</td>
+</tr>
+<tr class="row-odd"><td>ASR5_Dispatcher</td>
+<td>VoCon core engine dispatcher thread;
+This is a special thread which helps orchestrate work in the recognition system.</td>
+</tr>
+<tr class="row-even"><td>ASR5_FatalListener</td>
+<td>VoCon core engine fatal errors listener thread;
+Catches fatal errors and acts on them.</td>
+</tr>
+<tr class="row-odd"><td>ASR5_CFG</td>
+<td>VoCon High worker thread;
+This thread does the configuration work (including delayed search loading) for setting applications to the engine.
+It shall have the same priority as the other ASR5 thread, i.e. ASR5_Worker&lt;nbr&gt;.</td>
+</tr>
+<tr class="row-even"><td>ASR5_CLOUD</td>
+<td>Vocon High Worker Thread;
+This thread does the configuration work for Cloud input of the application.
+It shall have the same priority as the other ASR5 thread, i.e. ASR5_Worker&lt;nbr&gt;.</td>
+</tr>
+<tr class="row-odd"><td>DCC_CREATION_&lt;nbr&gt;</td>
+<td>worker thread for creation of an IDynamicContentConsumer (DCC) instance;
+this thread is used for DCC creation only,
+actual data preparation is done in a different thread.
+The maximum number of threads for DDC creation can be be defined in the
+recognizer JSON configuration (under “thread_pool”:”dcc_creation”).
+This configuration is optional. By default, one single thread for DCC
+instance creation will be started with the name DCC_CREATION_0.
+If “max_number” is configured to a value greater than 1 then additional
+threads will be started with names DCC_CREATION_1, DCC_CREATION_2, ..
+If only 1 thread is used then tasks for creating several DCCs will be
+done sequentially.</td>
+</tr>
+<tr class="row-even"><td>DCC_NORMAL_&lt;nbr&gt;</td>
+<td>worker thread for an IDynamicContentConsumer (DCC) instance
+that is configured in JSON with “thread_priority”: “NORMAL”;
+this thread executes all asynchronous data handling operations of that
+DCC instance, like g2p conversion, …
+The maximum number of DCC threads in this pool can be be defined in the
+recognizer JSON configuration (under “thread_pool”:”dcc_data_preparation”:”normal_priority”).
+This configuration is optional. By default, one single thread for DCC
+processing will be started with the name DCC_NORMAL_0.
+If “max_number” is configured to a value greater than 1 then additional
+threads will be started with names DCC_NORMAL_1, DCC_NORMAL_2, ..
+If only 1 thread is used then data preparation tasks from several DCCs
+with “thread_priority”: “NORMAL” will be done sequentially.</td>
+</tr>
+<tr class="row-odd"><td>DCC_LOW_&lt;nbr&gt;</td>
+<td>worker thread for an IDynamicContentConsumer (DCC) instance
+that is configured in JSON with “thread_priority”: “LOW”;
+this thread executes all asynchronous data handling operations of that
+DCC instance, like g2p conversion, …
+The maximum number of DCC threads in this pool can be be defined in the
+recognizer JSON configuration (under “thread_pool”:”dcc_data_preparation”:”low_priority”).
+If only 1 thread is used then data preparation tasks from several DCCs
+with “thread_priority”: “LOW” will be done sequentially.</td>
+</tr>
+<tr class="row-even"><td>TTS_&lt;name&gt;</td>
+<td>worker thread for an IPrompter instance;
+does text-to-speech synthesis, and passes
+the audio data to the audio backbone</td>
+</tr>
+<tr class="row-odd"><td>TTSD_&lt;name&gt;</td>
+<td>worker thread for an IPrompter instance that dispatches events
+form the prompter core engine</td>
+</tr>
+<tr class="row-even"><td>VE_Search</td>
+<td>thread opened on demand by Vocalizer Embedded library during synthesis
+with a BET5-based voice; note that the multi-threading performed for this
+task can benefit most from multi-core support, otherwise it may
+not show too much difference in the performance</td>
+</tr>
+<tr class="row-odd"><td>VBE_&lt;name&gt;</td>
+<td>worker thread for an IBiometry instance;
+executes all asynchronous operations of that engine,
+like enrollment, identification, load, save</td>
+</tr>
+<tr class="row-even"><td>LID_&lt;name&gt;</td>
+<td>worker thread for an ILid instance;
+executes all asynchronous operations of that instance,
+like performing of language identifications</td>
+</tr>
+<tr class="row-odd"><td>Logger</td>
+<td>dispatches log messages to log consumers;
+needed to decouple components from slow
+log consumers</td>
+</tr>
+<tr class="row-even"><td>LOG_SOCKET</td>
+<td>this thread is only used if there is a log consumer configured
+to send output to the connected client over the TCP/IP socket
+(SOCKET keyword in json configuration); thread waits for the
+connection request, accepts it depending on the configuration
+and sends log content to the client socket.</td>
+</tr>
+<tr class="row-odd"><td>AUDIO_MAIN</td>
+<td>this is the central worker thread of the audio backbone;
+all audio-modules which do not have a dedicated worker-
+thread are running in the context of this thread.
+Please be aware that the Audio adapters are opened in the context of this thread.
+If that triggers the creation of unnamed threads,
+they will inherit the name of the creator and are then also named “AUDIO_MAIN”.
+Therefore it is recommended to use adapers and audio drivers which name the
+started threads explicitly.</td>
+</tr>
+<tr class="row-even"><td>AFF_&lt;name&gt;</td>
+<td>each IAudioFromFile instance
+creates a thread with this name, which
+reads the audio data from file, and passes
+it to the audio backbone.
+The prompter may create internally an IAudioFromFile instance
+which creates the thread <code class="docutils literal notranslate"><span class="pre">AFF_INT_tts_aff</span></code>.</td>
+</tr>
+<tr class="row-odd"><td>AIOS_&lt;name&gt;</td>
+<td>each IAudioInputOutputSimulator instance
+creates a thread with this name, which
+reads the audio data from file, and passes
+it to the audio backbone.</td>
+</tr>
+<tr class="row-even"><td>ATF_&lt;name&gt;</td>
+<td>worker thread of an IAudioToFile instance,
+that reads audio data from the audio
+backbone and writes it into a file</td>
+</tr>
+<tr class="row-odd"><td>CSH_&lt;name&gt;</td>
+<td>worker thread for each cloud-commander, cloud-prompter, remote usecase or dynamic content consumer that has a HTTP query configured.
+In case of prompter &lt;name&gt; is the instance name of the prompter, else the configured cloud_services name.</td>
+</tr>
+<tr class="row-even"><td>CSNT_&lt;name&gt;</td>
+<td>transmit thread for each cloud-commander, cloud-prompter, remote usecase or dynamic content consumer that has a NSMP query configured.
+In case of prompter &lt;name&gt; is the instance name of the prompter, else the configured cloud_services name.</td>
+</tr>
+<tr class="row-odd"><td>CSNR_&lt;name&gt;</td>
+<td>receive thread for each cloud-commander, cloud-prompter, remote usecase or dynamic content consumer that has a NSMP query configured.
+In case of prompter &lt;name&gt; is the instance name of the prompter, else the configured cloud_services name.</td>
+</tr>
+<tr class="row-even"><td>CSH_&lt;name&gt;L</td>
+<td>worker thread for each cloudservices instance of type HTTP that is configured for cloud-logging.</td>
+</tr>
+<tr class="row-odd"><td>CSNT_&lt;name&gt;L</td>
+<td>transmit thread for each cloudservices instance of type NMSP that is configured for cloud-logging.</td>
+</tr>
+<tr class="row-even"><td>CSNR_&lt;name&gt;L</td>
+<td>receive thread for each cloudservices instance of type NMSP that is configured for cloud-logging.</td>
+</tr>
+<tr class="row-odd"><td>CURL_DNS_RESOLVER</td>
+<td>thread created on demand by cloud_services(curl) to perform dns lookup.
+Curl does not set thread name when creating the thread and fallback to platform specific defaut thread name.
+Posix platform: inherit the program/instance name
+Windows platform: default to ThreadProc callback function name which is “getaddrinfo_thread”</td>
+</tr>
+<tr class="row-even"><td>AI_Cloud_Upl</td>
+<td>thread for uploading AI user selection events to the Cerence cloud.</td>
+</tr>
+<tr class="row-odd"><td>AI_COP_Upd_&lt;id&gt;</td>
+<td>thread for updating (contact) entities based on COP file input, e.g. ADB or call logs.</td>
+</tr>
+<tr class="row-even"><td>TileProvider</td>
+<td>thread of the TileProvider module in the Multimodal component
+which handles requests for getting or updating PIO details, or 3d models</td>
+</tr>
+<tr class="row-odd"><td>threads of SignalFusion <a class="footnote-reference" href="#id3" id="id1">[1]</a></td>
+<td>threads of the SignalFusion module in the Multimodal component,
+the creation of the threads is not yet realized with the StarRec PAL platform abstraction layer</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="thread-life-time">
+<h2>Thread life-time</h2>
+<p>DragonDrive does <em>not</em> use global initializers to start threads, i.e. as long as no API function is called, no internal
+thread is started automatically. The following table lists all threads and specifies the API function which starts it.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="25%" />
+<col width="28%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">number of threads</th>
+<th class="head">started</th>
+<th class="head">stopped</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>AudioIn_Thread</td>
+<td>one per (active) input device</td>
+<td>when device is opened,
+i.e. scenario activation</td>
+<td>when device is closed,
+i.e. scenario deactivation</td>
+</tr>
+<tr class="row-odd"><td>AudioOut_Thread</td>
+<td>one per (active) output device</td>
+<td>when device is opened,
+i.e. scenario activation</td>
+<td>when device is closed,
+i.e. scenario deactivation</td>
+</tr>
+<tr class="row-even"><td>timerThread</td>
+<td>1</td>
+<td>IRecognizer.create()</td>
+<td>IRecognizer.destroy()</td>
+</tr>
+<tr class="row-odd"><td>ASR5_Worker&lt;nbr&gt;</td>
+<td>depends on the liquid framework
+configuration</td>
+<td>IAsrManager.create()</td>
+<td>IAsrManager.destroy()</td>
+</tr>
+<tr class="row-even"><td>ASR5_Dispatcher</td>
+<td>1</td>
+<td>IAsrManager.create()</td>
+<td>IAsrManager.destroy()</td>
+</tr>
+<tr class="row-odd"><td>ASR5_FatalListener</td>
+<td>1</td>
+<td>IAsrManager.create()</td>
+<td>IAsrManager.destroy()</td>
+</tr>
+<tr class="row-even"><td>ASR5_CFG</td>
+<td>1</td>
+<td>IAsrManager.create()</td>
+<td>IAsrManager.destroy()</td>
+</tr>
+<tr class="row-odd"><td>ASR5_CLOUD</td>
+<td>1</td>
+<td>IApplicaiton.create()
+when create the 1st applicaiton with cloud
+input</td>
+<td>IAsrManager.destroy()</td>
+</tr>
+<tr class="row-even"><td>DCC_CREATION_&lt;nbr&gt;</td>
+<td>1 by default
+more can be configured in JSON
+configuration of recognizer under
+“thread_pool”:”“dcc_creation”</td>
+<td>IDynamicContentConsumer.create()</td>
+<td>IDynamicContentConsumer.destroy()</td>
+</tr>
+<tr class="row-odd"><td>DCC_NORMAL_&lt;nbr&gt;</td>
+<td>1 by default
+more can be configured in JSON
+configuration of recognizer under
+“thread_pool”:”dcc_data_preparation”:
+“normal_priority”</td>
+<td>IDynamicContentConsumer.startDataPreparation
+and/or IDynamicContentConsumer.deleteAll</td>
+<td>IDynamicContentConsumer.destroy()</td>
+</tr>
+<tr class="row-even"><td>DCC_LOW_&lt;nbr&gt;</td>
+<td>1 by default if DCC is configured
+as “thread_priority”: “LOW”
+more can be configured in JSON
+configuration of recognizer under
+“thread_pool”:”dcc_data_preparation”:
+“low_priority”</td>
+<td>IDynamicContentConsumer.startDataPreparation
+and/or IDynamicContentConsumer.deleteAll</td>
+<td>IDynamicContentConsumer.destroy()</td>
+</tr>
+<tr class="row-odd"><td>TTS_&lt;name&gt;</td>
+<td>one per IPrompter object</td>
+<td>IPrompter.create()</td>
+<td>IPrompter.destroy()</td>
+</tr>
+<tr class="row-even"><td>TTSD_&lt;name&gt;</td>
+<td>one per IPrompter object</td>
+<td>IPrompter.create()</td>
+<td>IPrompter.destroy()</td>
+</tr>
+<tr class="row-odd"><td>VE_Search</td>
+<td>one per IPrompter object</td>
+<td>On demand by the Vocalizer
+Embedded library when prompting
+with a BET5-based voice</td>
+<td>After prompting with a
+BET5-based voice completed</td>
+</tr>
+<tr class="row-even"><td>VBE_&lt;name&gt;</td>
+<td>one per IBiometry object</td>
+<td>IBiometry.create()</td>
+<td>IBiometry.destroy()</td>
+</tr>
+<tr class="row-odd"><td>LID_&lt;name&gt;</td>
+<td>one per ILid object</td>
+<td>ILid.create()</td>
+<td>ILid.destroy()</td>
+</tr>
+<tr class="row-even"><td>Logger</td>
+<td>1</td>
+<td>first time IConfiguration.create()
+with logger JSON configuration is called</td>
+<td>-</td>
+</tr>
+<tr class="row-odd"><td>LOG_SOCKET</td>
+<td>one per socket log consumer</td>
+<td>after IConfiguration.create() if logger
+JSON configuration contains log consumer
+with the SOCKET output definition</td>
+<td>-</td>
+</tr>
+<tr class="row-even"><td>AUDIO_MAIN</td>
+<td>1</td>
+<td>creation of the AudioManager on
+startup of the CommonService</td>
+<td>deletion of the AudioManager during
+shutdown of the CommonService</td>
+</tr>
+<tr class="row-odd"><td>AFF_&lt;name&gt;</td>
+<td>one per IAudioFromFile object</td>
+<td>each time a new IAudioFromFile
+object is created by
+IAudioManager.prepare/activateScenario()</td>
+<td>IAudioManager.destroy()</td>
+</tr>
+<tr class="row-even"><td>AIOS_&lt;name&gt;</td>
+<td>one per IAudioInputOutputSimulator
+object</td>
+<td>IAudioInputOutputSimulator.create()</td>
+<td>IAudioInputOutputSimulator.destroy()</td>
+</tr>
+<tr class="row-odd"><td>ATF_&lt;name&gt;</td>
+<td>one per IAudioToFile object</td>
+<td>IAudioToFile.create()</td>
+<td>IAudioToFile.destroy()</td>
+</tr>
+<tr class="row-even"><td>CSH_&lt;name&gt;</td>
+<td>one per &lt;name&gt;, taken from a
+pool, all queries / dynamic content
+consumers / cloud commanders with the
+same name using HTTPshare the same
+thread. One per IPrompter object.</td>
+<td>IUsecase.create()
+IRecognizer.createDynamicContentConsumer()
+IPrompter.create()</td>
+<td>IUseCase.destroy()
+IDynamicContentConsumer.destroy()
+IPrompter.destroy()</td>
+</tr>
+<tr class="row-odd"><td>CSNT_&lt;name&gt;</td>
+<td>one per &lt;name&gt;, taken from a
+pool, all queries / dynamic content
+consumers / cloud commanders with the
+same name using NMSP share the same
+thread. One per IPrompter object.</td>
+<td>IUseCase.create()
+IRecognizer.createDynamicContentConsumer()
+IPrompter.create()
+ICloudCommander.createWithCloudManager()</td>
+<td>IUseCase.destroy()
+IDynamicContentConsumer.destroy()
+IPrompter.destroy()
+ICloudCommander.destroy()</td>
+</tr>
+<tr class="row-even"><td>CSNR_&lt;name&gt;</td>
+<td>one per &lt;name&gt;, taken from a
+pool, all queries / dynamic content
+consumers /cloud commanders with the
+same name using NMSP share the same
+thread. One per IPrompter object.</td>
+<td>IUseCase.create()
+IRecognizer.createDynamicContentConsumer()
+IPrompter.create()
+ICloudCommander.createWithCloudManager()</td>
+<td>IUseCase.destroy()
+IDynamicContentConsumer.destroy()
+IPrompter.destroy()
+ICloudCommander.destroy()</td>
+</tr>
+<tr class="row-odd"><td>CURL_DNS_RESOLVER</td>
+<td>one per cloud-commander worker thread</td>
+<td>On demand by cloud_services(curl) when a
+dns lookup needs to be performed</td>
+<td>Once the dns lookup is done</td>
+</tr>
+<tr class="row-even"><td>AI_Cloud_Upl</td>
+<td>one per AI manager instance (only one
+is recommended)</td>
+<td>IAiManager.create()</td>
+<td>IAiManager.destroy()</td>
+</tr>
+<tr class="row-odd"><td>AI_COP_Upd_&lt;id&gt;</td>
+<td>one per user &lt;id&gt;</td>
+<td>IAiManager.createUser()</td>
+<td>IUser.destroy()</td>
+</tr>
+<tr class="row-even"><td>TileProvider</td>
+<td>One per IMultimodal instance</td>
+<td>IMultimodal.create()</td>
+<td>IMultimodal.destroy()</td>
+</tr>
+<tr class="row-odd"><td>threads of SignalFusion <a class="footnote-reference" href="#id3" id="id2">[1]</a></td>
+<td>The threads exist as long as the
+IMultimodal instance exists</td>
+<td>IMultimodal.create()</td>
+<td>IMultimodal.destroy()</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> A name pattern for the threads is not yet available and the priorities for the threads are not yet configurable with the CSDK configuration API.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="thread-priority-categorization">
+<h1>Thread priority categorization</h1>
+<p>The threads used by SDK can be categorized in three groups.</p>
+<p>There are threads with direct access to the audio hardware, which have to run in real time to avoid audio-drops.</p>
+<p>The second group is also necessary for the audio-transport, but is decoupled from the hardware.
+These threads do not have strict real time requirements, but should be able to process real time audio on average.</p>
+<p>All other threads do not have any constraints other than improving performance.
+The given categorization is only a recommendation which should help to adapt the thread priorities.
+The exact priority values depend on the used hardware, the operating-system and additional software running on the same system.
+This fine-tuning has to be done by the system integrator.</p>
+<p><strong>Real time:</strong></p>
+<ul class="simple">
+<li>AudioIn_Thread</li>
+<li>AudioOut_Thread</li>
+<li>AFF_*</li>
+<li>AUDIO_MAIN</li>
+</ul>
+<p><strong>Above standard:</strong></p>
+<ul class="simple">
+<li>ATF_*</li>
+<li>TTS_*</li>
+<li>TTSD_*</li>
+<li>VE_Search</li>
+<li>ASR5_*</li>
+<li>VBE_*</li>
+<li>LID_*</li>
+</ul>
+<p><strong>Standard:</strong></p>
+<ul class="simple">
+<li>timerThread</li>
+<li>DCC_CREATION_*</li>
+<li>DCC_NORMAL_*</li>
+<li>DCC_LOW_*</li>
+<li>LOG_SOCKET</li>
+<li>Logger</li>
+<li>CSNT_*</li>
+<li>CSNR_*</li>
+<li>CSH_*</li>
+</ul>
+</div>
+<div class="section" id="setting-thread-priorities">
+<h1>Setting thread priorities</h1>
+<p>Thread priorities can be set in the <code class="docutils literal notranslate"><span class="pre">&quot;thread_parameters&quot;</span></code> object of the <a class="reference internal" href="../SDK_Common_UserGuide.html#json-configuration-of-common-component"><span class="std std-ref">JSON Configuration of Common Component</span></a>.
+It is the responsibility of application developers and system integrators to adjust thread priorities to ensure proper performance of SDK component.
+The recommendations given in section <a class="reference internal" href="#thread-priority-categorization">Thread priority categorization</a> need to be taken into account.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is important to understand that the default thread configurations cannot guarantee optimal performance on specific target devices and should thus always be
+reviewed critically and adapted to the project-specific target system if needed on the basis of the overall threading model of the system in which the application will run.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Common_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Common_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SDK Threads</a><ul>
+<li><a class="reference internal" href="#started-threads">Started threads</a></li>
+<li><a class="reference internal" href="#thread-life-time">Thread life-time</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#thread-priority-categorization">Thread priority categorization</a></li>
+<li><a class="reference internal" href="#setting-thread-priorities">Setting thread priorities</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Common_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="logging_intro.html" title="previous chapter">Logging System Overview</a></li>
+      <li>Next: <a href="common_configuration.html" title="next chapter">Configuration Parameters</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/csdk_threads.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

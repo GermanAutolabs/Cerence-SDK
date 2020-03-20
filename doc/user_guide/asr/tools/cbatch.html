@@ -1,0 +1,271 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>cbatch tool</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="cbatch-tool">
+<h1>cbatch tool</h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">cbatch</span></code> tool is a tool to perform recognition on a set of
+previously recorded utterances, and to compare the recognition results
+with reference sentences that describe what the speaker actually said.
+Both ASR and SEM3 results are recorded for comparison.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cbatch</span></code> is intended to help developers tune the recognition
+engine towards better performance in their
+applications. <code class="docutils literal notranslate"><span class="pre">cbatch</span></code> also reports on recognition speed. To
+achieve this, the developer can use the rich set of options provided
+by <code class="docutils literal notranslate"><span class="pre">cbatch</span></code>.</p>
+<div class="section" id="getting-started-with-cbatch">
+<h2>Getting started with <code class="docutils literal notranslate"><span class="pre">cbatch</span></code></h2>
+<p>In order to start using <code class="docutils literal notranslate"><span class="pre">cbatch</span></code>, you need 3 types of files:</p>
+<ul>
+<li><p class="first">The full Cerence ASR setup that is to be tested. This is a
+directory structure with a set of JSON configuration files. See
+section <a class="reference internal" href="../user_guide/sections/non_functional_aspects.html#json-typical-configuration"><span class="std std-ref">Typical configuration</span></a> for an explanation of a
+typical Cerence ASR configuration setup.</p>
+<p>A set of audio files, which contain user utterances.</p>
+</li>
+<li><p class="first">One or more HRL (hash reference list) files. These files map the
+audio files to the written versions of what is said in the audio
+files. The textual description is called the “reference”. HRL
+files can contain additional meta-information about the audio,
+such as a speaker identification, gender information, etc.</p>
+<p>Refer to the section on <a class="reference internal" href="../user_guide/chapters/references.html#hrl-file"><span class="std std-ref">HRL files</span></a> for more
+detailed information.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="cbatch-configuration-file">
+<span id="vocon-batch-config-file"></span><h2><code class="docutils literal notranslate"><span class="pre">cbatch</span></code> configuration file</h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">cbatch</span></code> configuration file should be added to the ASR
+configuration directory, so that it will be read as part of the
+overall configuration when <code class="docutils literal notranslate"><span class="pre">cbatch</span></code> starts up. The file has the
+following structure:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;job&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;batch_job_example&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;hrl_file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;call_nancy_brooks.hrl&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sound_dir&quot;</span><span class="p">:</span>  <span class="s2">&quot;sound/enu_f16&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;audio_scenario&quot;</span><span class="p">:</span> <span class="s2">&quot;defaultScenario&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;result_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;_cfg/res&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;recognizer&quot;</span><span class="p">:</span> <span class="s2">&quot;testRecognizer&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;asr_manager&quot;</span> <span class="p">:</span> <span class="s2">&quot;testAsrManager&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="s2">&quot;DOMAIN_CNC&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;start_line&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;num_of_lines_per_test&quot;</span><span class="p">:</span><span class="s2">&quot;6&quot;</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">job</span></code> key contains an array of JSON dictionaries, where each
+dictionary describes a job to perform. All jobs are performed
+sequentially.</p>
+<p>Each job is configured as follows:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">name</span></code> - the batch_job name. This name should be unique.</li>
+<li><code class="docutils literal notranslate"><span class="pre">sound_dir</span></code> - the directory which contains the audio files for
+this job.</li>
+<li><code class="docutils literal notranslate"><span class="pre">hrl_file_path</span></code> - the HRL file which contains the mapping of the
+audio files in <code class="docutils literal notranslate"><span class="pre">sound_dir</span></code> to reference transcriptions for this job.</li>
+<li><code class="docutils literal notranslate"><span class="pre">audio_scenario</span></code> - this is the name of the audio scenario to be
+used in this job. The audio scenario should be defined in the ASR
+configuration, typically in a file called <code class="docutils literal notranslate"><span class="pre">audioconfig.json</span></code>. Note
+that this must always be a file-input type of audio scenario.</li>
+<li><code class="docutils literal notranslate"><span class="pre">recognizer</span></code> - the recognizer to use in this job. The recognizer
+must be defined in the Cerence ASR configuration, and must also be the
+destination for the audio scenario configured in
+<code class="docutils literal notranslate"><span class="pre">audio_scenario</span></code>. Typically, the recognizer is defined in a file
+called <code class="docutils literal notranslate"><span class="pre">recognizer.json</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">asr_manager</span></code> - the name of the ASR manager configuration to
+use. The ASR manager must be defined in the ASR configuration;
+typically, it is defined in a file called <code class="docutils literal notranslate"><span class="pre">asr_manager.json</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">application</span></code> - the application name to use for the job, as
+configured in the Cerence ASR configuration. Note that you specify a
+single application here; <code class="docutils literal notranslate"><span class="pre">cbatch</span></code> is not intended to simulate
+dialog flows. (<a class="reference internal" href="recog_test_sample.html#recog-test-sample"><span class="std std-ref">recog_test</span></a> is better suited for these
+use cases.)</li>
+<li><code class="docutils literal notranslate"><span class="pre">result_dir</span></code> - this is the directory where the match file (RES) is
+written. This option is ignored if the command-line option
+<code class="docutils literal notranslate"><span class="pre">–resultFilepath</span></code> is also used.</li>
+<li><code class="docutils literal notranslate"><span class="pre">result_file_path</span></code> - this is the full path (directory + name) of
+the output match file (RES). This option takes precedence over
+<code class="docutils literal notranslate"><span class="pre">–resultDir</span></code> if both options are specified.</li>
+<li><code class="docutils literal notranslate"><span class="pre">start_line</span></code> - this key is optional. It can be used to specify
+that the job should start from a different line in the HRL file than
+the first one.</li>
+<li><code class="docutils literal notranslate"><span class="pre">num_of_lines_per_test</span></code> - this key is optional. It specifies the
+maximum number of utterances from the HRL file that should be
+recognized. The default value is set to 2**32.</li>
+</ul>
+<p>Here is an example of a batch job configuration file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;job&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;batch_job_example&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;hrl_file_path&quot;</span><span class="p">:</span> <span class="s2">&quot;call_nancy_brooks.hrl&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sound_dir&quot;</span><span class="p">:</span>  <span class="s2">&quot;sound/enu_f16&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;audio_scenario&quot;</span><span class="p">:</span> <span class="s2">&quot;defaultScenario&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;result_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;../../../../../test_data/cbatch_test/robot/config/_cfg/res&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;recognizer&quot;</span><span class="p">:</span> <span class="s2">&quot;testRecognizer&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;asr_manager&quot;</span> <span class="p">:</span> <span class="s2">&quot;testAsrManager&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="s2">&quot;DOMAIN_CNC&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;start_line&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;num_of_lines_per_test&quot;</span><span class="p">:</span><span class="s2">&quot;6&quot;</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-cbatch">
+<h2>Running <code class="docutils literal notranslate"><span class="pre">cbatch</span></code></h2>
+<div class="section" id="path">
+<h3>Path</h3>
+<p><code class="docutils literal notranslate"><span class="pre">cbatch</span></code> is run from the command-line, and has DLL dependencies
+on the Cerence ASR libraries; you should make sure that the Cerence ASR DLLs can
+be found in the path.  If you installed the CSDK in the default
+location, the command for extending the path looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">set</span> <span class="n">PATH</span><span class="o">=%</span><span class="n">PATH</span><span class="o">%</span><span class="p">;</span><span class="n">c</span><span class="p">:</span>\<span class="n">ProgramData</span>\<span class="n">cerence</span>\<span class="n">csdk</span>\<span class="n">csdk_v2</span>\<span class="n">lib</span>
+</pre></div>
+</div>
+<p>You can of course add the ASR library path to the path via the
+Windows control panel. That way, you don’t have to set the path again
+in every console window where you want to run <code class="docutils literal notranslate"><span class="pre">cbatch</span></code>.</p>
+</div>
+<div class="section" id="options">
+<h3>Options</h3>
+<p><code class="docutils literal notranslate"><span class="pre">cbatch</span></code> requires two arguments to run:</p>
+<ul>
+<li><p class="first">“configDir”</p>
+<p>This is the directory where the Cerence ASR configuration is located (JSON
+files, and binary data files)</p>
+</li>
+<li><p class="first">“batchJob”</p>
+<p>This is the name of the batch job that you want to run, as
+specified in the <code class="docutils literal notranslate"><span class="pre">name</span></code> key of the <code class="docutils literal notranslate"><span class="pre">jobs</span></code> configuration.
+batch_job specifies all batch related inputs. See section
+<a class="reference internal" href="#vocon-batch-config-file"><span class="std std-ref">cbatch configuration file</span></a> for more information.</p>
+</li>
+</ul>
+<p>Following is an example how to run batch tool:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cbatch</span><span class="o">.</span><span class="n">exe</span> <span class="o">--</span><span class="n">configDir</span><span class="o">=./</span><span class="n">config</span> <span class="o">--</span><span class="n">batchJob</span><span class="o">=</span><span class="n">batch_job_example</span>
+</pre></div>
+</div>
+<p>After a successful run, the results will be written as it has been confiugred in the batch job configuration into the match file (RES).</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">cbatch tool</a><ul>
+<li><a class="reference internal" href="#getting-started-with-cbatch">Getting started with <code class="docutils literal notranslate"><span class="pre">cbatch</span></code></a></li>
+<li><a class="reference internal" href="#cbatch-configuration-file"><code class="docutils literal notranslate"><span class="pre">cbatch</span></code> configuration file</a></li>
+<li><a class="reference internal" href="#running-cbatch">Running <code class="docutils literal notranslate"><span class="pre">cbatch</span></code></a><ul>
+<li><a class="reference internal" href="#path">Path</a></li>
+<li><a class="reference internal" href="#options">Options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,557 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Audio setup and configuration</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Applications" href="applications.html" />
+    <link rel="prev" title="Cerence ASR Components" href="components.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="audio-setup-and-configuration">
+<span id="audio-setup-and-config"></span><h1>Audio setup and configuration</h1>
+<p>For in-depth information on audio routing, implementing your own audio
+driver and much more information on audio in general, please consult
+the <a class="reference external" href="../../../audio/SDK_Audio_UserGuide.html">audio SDK user guide</a>.</p>
+<p>That said, let us take a look at some audio basics below.</p>
+<p>Briefly, audio input is handled using “audio paths” that consist of
+chains that may be built up from several parts. Each chain
+defines a sequence of stages that the audio samples go through, where
+in each stage they are processed before being passed on to the next
+stage.</p>
+<p>The simplest audio path would be audio input from file, which is then
+directly fed into a recognizer, with no real processing along the
+way. A more complex audio path could involve echo cancellation (eg. to
+remove background music from the audio stream) between the audio input
+and the recognizer. An audio path for remote recognition would involve
+stages such as up- or downsampling, echo cancellation, encoding, and
+buffering, before the audio data is passed to a recognizer on a remote
+server.</p>
+<p>Audio paths are grouped into audio scenarios. Audio scenarios are
+named, and can be activated by the application by name, without
+needing to be explicitly created component by component.</p>
+<div class="section" id="audio-scenarios">
+<span id="index-0"></span><span id="id1"></span><h2>Audio Scenarios</h2>
+<p>As described above, audio scenarios tie together the components listed
+below into chains, which can be instantiated to create actual
+input-to-ASR audio chains for different purposes. Note that audio
+scenarios are named, and that several audio scenarios can be used in
+parallel, for example a simple one for local processing, and a more
+complicated one for remote processing.</p>
+<p>The simplest, and also smallest, audio path definition uses input from
+file, which is directly fed into the recognizer:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;audio_scenario&quot;</span><span class="p">:</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span>       <span class="s2">&quot;file&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span> <span class="s2">&quot;test_file&quot;</span><span class="p">,</span> <span class="s2">&quot;rec&quot;</span> <span class="p">]</span> <span class="p">]</span>
+  <span class="p">}]</span>
+</pre></div>
+</div>
+<p>The value for the <code class="docutils literal notranslate"><span class="pre">audiopaths</span></code> key is an array of arrays: each
+element (array) in the “top-level” array is an audio path. When a path
+is instantiated, the components are chained in the order they appear
+in the array. Then final component in the path is the actual
+recognizer (called <code class="docutils literal notranslate"><span class="pre">rec</span></code> here; it is typically defined in a
+<code class="docutils literal notranslate"><span class="pre">recognizer.json</span></code> configuration file).</p>
+<p>Activating an audio scenario is part of the setup process before
+starting a recognition. It is done using the API function
+<code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_activateScenario</span></code>. (In the one-shot-WuW
+sample: <a class="reference internal" href="c_api.html#audio-scenario-activation"><span class="std std-ref">here</span></a>.)</p>
+</div>
+<div class="section" id="components">
+<span id="index-1"></span><h2>Components</h2>
+<p>The components discussed below (except for the AudioManager) take an
+input audio stream, and produce a processed output audio stream. Some
+of their configuration parameters will reference the structure of the
+audio stream they receive or produce. The image below shows visually
+how an audio stream is structured (a stereo stream in the example),
+and what the parts are called:</p>
+<a class="reference internal image-reference" href="../../_images/audiostream.png" id="index-2"><img alt="../../_images/audiostream.png" class="align-center" id="index-2" src="../../_images/audiostream.png" style="width: 80%;" /></a>
+<p>The terms “sample”, “frame” and “packet” denote progressively larger
+chunks of the audio stream:</p>
+<ul>
+<li><p class="first"><strong>sample</strong> denotes a single audio sample. In the context of Cerence
+ASR, a sample is a 16-bit, signed, little endian number, unless
+specified otherwise.</p>
+</li>
+<li><p class="first"><strong>samples per channel</strong> denotes a consecutive group of samples from
+the same channel. Often samples are always interleaved:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LRLRLR</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>However, there are also many cases where several samples from the
+same channel are grouped:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LLLLLRRRRRLLLLLRRRRR</span><span class="o">...</span>
+</pre></div>
+</div>
+<p>The samples per channel number states how many samples from the same
+channel the stream contains before switching to the next channel.</p>
+</li>
+<li><p class="first">A <strong>frame</strong> is a grouping of one “samples per channel” group for all
+the channels in the stream.</p>
+</li>
+<li><p class="first">A <strong>packet</strong> is a number of frames grouped together. Often, the
+packet size will correspond to the amount of data that a component
+can process at once.</p>
+</li>
+</ul>
+<div class="section" id="audiomanager">
+<span id="index-3"></span><h3>AudioManager</h3>
+<p>The Audio manager (<code class="docutils literal notranslate"><span class="pre">IAudioManager</span></code>) processes the audio
+configuration elements found in the JSON files in the configuration
+directory, and handles the creation and destruction of all audio
+components required by the audio chain configurations.</p>
+<p>All of the components described below have to be registered with the
+Audio manager before they can be used in an audio chain configuration.
+In the C API section, you can check <a class="reference internal" href="c_api.html#audio-component-registration"><span class="std std-ref">the example code</span></a> to see how this is generally done.
+Basically, the API for each component type has a <code class="docutils literal notranslate"><span class="pre">..._registerFactory</span></code>
+function. This function will register a factory with the Audio manager
+that can create components of that specific component type. This factory
+then enables the Audio manager to handle the creation of components
+of that type, as required by the audio chains configured in the
+<code class="docutils literal notranslate"><span class="pre">audioconfig.json</span></code> configuration file.</p>
+<p>This also applies for internal audio paths (such as the <a class="reference internal" href="#cloud-internal-audio"><span class="std std-ref">cloud
+audio path</span></a>). The registration of the component
+factories for component types used in the internal paths is not
+handled automatically, so applications using internal audio paths must
+also register the components required by these internal paths, even if
+they are not used in audio chains configured in <code class="docutils literal notranslate"><span class="pre">audioconfig.json</span></code>.</p>
+<span class="target" id="index-4"></span></div>
+<div class="section" id="audio-input">
+<h3>Audio Input</h3>
+<p>There are two possible input sources for audio: reading samples from
+file, and reading samples from an external source. An external source
+can be a microphone connected in some way to the system, a pipe from
+another process or application, etc.</p>
+<p>A file input component can be configured as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span>         <span class="s2">&quot;AudioFromFile&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span>         <span class="s2">&quot;test_file&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;audio_files&quot;</span><span class="p">:</span>  <span class="s2">&quot;../data/sound/enu_f16/hello_dragon_shuffle_nevermind.wav&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;audio_format&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;16khz_1ch&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that in this example, the <code class="docutils literal notranslate"><span class="pre">audio_files</span></code> key contains a string
+that points to a single file. If this string points to a path instead,
+then the <code class="docutils literal notranslate"><span class="pre">AudioFromFile</span></code> component will cycle through all the audio
+files found in that path.</p>
+<p id="index-5">The <code class="docutils literal notranslate"><span class="pre">audio_format</span></code> key describes the format of the samples that will
+be read from the file(s). The audio formats are defined as follows in
+the JSON configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;audio_format&quot;</span><span class="p">:</span> <span class="p">[</span>
+<span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span>                <span class="s2">&quot;16khz_1ch&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;sample_rate&quot;</span><span class="p">:</span>         <span class="mi">16000</span><span class="p">,</span>
+  <span class="s2">&quot;samples_per_channel&quot;</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+  <span class="s2">&quot;channel_count&quot;</span><span class="p">:</span>       <span class="mi">1</span>
+<span class="p">}]</span>
+</pre></div>
+</div>
+<p>In this example, the <code class="docutils literal notranslate"><span class="pre">16khz_1ch</span></code> format is defined as described: the
+sample rate is 16khz, and it is a mono signal.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Microphone input is more complicated, because it leans on the target
+platform’s low-level audio implementation. The audio input JSON
+definition itself is not complicated:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span>                <span class="s2">&quot;AudioInput&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span>                <span class="s2">&quot;mic_input&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;adapter_type&quot;</span><span class="p">:</span>        <span class="s2">&quot;CUSTOM_AUDIO&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;adapter_params&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;device_name&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;audio_format&quot;</span><span class="p">:</span>      <span class="p">{</span> <span class="s2">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;16khz_1ch&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p id="audio-input-adapter">The audio format specification is the same as in the file input
+case. Instead of a file name or a path, however, the audio input makes
+use of an <code class="docutils literal notranslate"><span class="pre">IAudioInputAdapter</span></code> to provide the audio samples.</p>
+<p>The audio input adapter is to be implemented by the application
+developer, and provides the bridge between the platform’s low-level
+audio implementation, and Cerence ASR’s audio chains.</p>
+<p>An audio input adapter requires essentially the implementation of a
+set of callback functions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">_vtable_nuance_audio_IAudioInputAdapter</span>
+<span class="p">{</span>
+   <span class="n">FUNC_nuance_audio_IAudioInputAdapter_configure</span> <span class="n">configure</span><span class="p">;</span>
+   <span class="n">FUNC_nuance_audio_IAudioInputAdapter_open</span> <span class="nb">open</span><span class="p">;</span>
+   <span class="n">FUNC_nuance_audio_IAudioInputAdapter_start</span> <span class="n">start</span><span class="p">;</span>
+   <span class="n">FUNC_nuance_audio_IAudioInputAdapter_stop</span> <span class="n">stop</span><span class="p">;</span>
+   <span class="n">FUNC_nuance_audio_IAudioInputAdapter_resume</span> <span class="n">resume</span><span class="p">;</span>
+   <span class="n">FUNC_nuance_audio_IAudioInputAdapter_close</span> <span class="n">close</span><span class="p">;</span>
+   <span class="n">FUNC_nuance_audio_IAudioInputAdapter_getErrorText</span> <span class="n">getErrorText</span><span class="p">;</span>
+   <span class="n">FUNC_nuance_audio_IAudioInputAdapter_destroyAdapter</span> <span class="n">destroyAdapter</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>So you implement functions to configure the audio input source, to
+open it, to start/stop/resume/close the audio capture, and to clean up
+the adapter and to retrieve the error message if anything goes wrong.</p>
+<p>An example of an implementation for win32, called the
+<code class="docutils literal notranslate"><span class="pre">CUSTOM_AUDIO</span></code>, can be found in the SDK sample source
+code. Section <a class="reference internal" href="../chapters/advanced_topics.html#custom-audio-input-adapter"><span class="std std-ref">Implementing a custom audio input adapter</span></a> provides more
+details about this implementation.</p>
+</div>
+<div class="section" id="audio-buffer">
+<span id="audio-module-buffer"></span><span id="index-6"></span><h3>Audio Buffer</h3>
+<p>The audio buffer component provides a buffer of configurable size at
+the position in the audio chain where the audio path puts it. It is
+configured as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span>        <span class="s2">&quot;AudioBuffer&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span>        <span class="s2">&quot;INT_rec_csHttp_buf&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;buffer_time&quot;</span><span class="p">:</span> <span class="mi">110000</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The “buffer_time” key specifies the minimum amount of audio the buffer
+must be able to store, in milliseconds. The minimum buffer time is
+100ms, the maximum time is 2 minutes (120000ms).</p>
+<p>The size of the buffer is determined based on the require buffer time,
+the sample rate of the input signal, and number of channels in the
+input signal.</p>
+<p>Refer to the NDS Audio documentation for full details:</p>
+<ul class="simple">
+<li><a class="reference external" href="../../../audio/audio_module_buffer/SDK_AudioBuffer_UserGuide.html">Audio buffer user guide</a>.</li>
+<li><a class="reference external" href="../../../../api_reference/audio/audio_module_buffer/c/_i_audio_buffer_8h.html">Audio buffer API reference</a>.</li>
+</ul>
+</div>
+<div class="section" id="audio-encoder">
+<span id="audio-module-encoder"></span><span id="index-7"></span><h3>Audio Encoder</h3>
+<p>The audio encoder component will encode raw PCM audio into an
+OPUS-encoded bitstream. A typical JSON configuration snippet (e.g. for
+inclusion in <code class="docutils literal notranslate"><span class="pre">audioconfig.json</span></code>) looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span>            <span class="s2">&quot;AudioEncoder&quot;</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span>            <span class="s2">&quot;INT_rec_csHttp_enc&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;encoder_type&quot;</span><span class="p">:</span>    <span class="s2">&quot;OPUS&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;encoder_param&quot;</span><span class="p">:</span>   <span class="p">{</span> <span class="s2">&quot;block_time&quot;</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;complexity&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;bit_rate&quot;</span><span class="p">:</span> <span class="mi">28000</span> <span class="p">},</span>
+  <span class="s2">&quot;container_type&quot;</span><span class="p">:</span>  <span class="s2">&quot;OGG&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;container_param&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;page_time&quot;</span><span class="p">:</span><span class="mi">100</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The component takes a few parameters, such as <code class="docutils literal notranslate"><span class="pre">complexity</span></code> and the
+target <code class="docutils literal notranslate"><span class="pre">bit_rate</span></code>. It normally also uses an OGG container as
+well. (The default container type, when <code class="docutils literal notranslate"><span class="pre">container_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">container_param</span></code> are omitted, is <code class="docutils literal notranslate"><span class="pre">NONE</span></code>, however it is advised to
+use the OGG container unless you have specific reasons not to.)</p>
+<p>Refer to the NDS Audio documentation for full details:</p>
+<ul class="simple">
+<li><a class="reference external" href="../../../audio/audio_module_encoder/SDK_AudioEncoder_UserGuide.html">Audio encoder user guide</a>.</li>
+<li><a class="reference external" href="../../../../api_reference/audio/audio_module_encoder/c/_i_audio_encoder_8h.html">Audio encoder API reference</a>.</li>
+</ul>
+</div>
+<div class="section" id="speech-signal-enhancement-sse">
+<span id="audio-module-sse"></span><span id="index-8"></span><h3>Speech Signal Enhancement (SSE)</h3>
+<p>There are several different operations the SSE component can perform:</p>
+<ul>
+<li><p class="first">noise reduction</p>
+</li>
+<li><p class="first">applying echo cancellation.</p>
+<p>If you are recording audio from a microphone in a car, and the car
+radio is playing music at the same time, then the audio signal from
+the microphone will contain (a somewhat distorted version of) the
+audio from the radio as well. The SSE component can subtract the
+radio audio from the microphone audio, so that the radio sound is
+much reduced, and less likely to interfere with the speech
+recognition.</p>
+</li>
+<li><p class="first">combining signals from several microphones</p>
+<p>The SSE component can process several parallel audio streams, and
+create a single stream from them. From these, it is possible to
+locate an audio source (speaker) relative to all microphones, and
+selectively amplify this audio source. This is called beam forming.</p>
+</li>
+<li><p class="first">…</p>
+</li>
+</ul>
+<p>What the SSE module does with the incoming signals is defined in a
+<code class="docutils literal notranslate"><span class="pre">.scd</span></code> configuration file. These configuration files are highly
+specific to the acoustic environments for which they were created, so
+generally they cannot easily be used to process signals from another
+environment.</p>
+<p>A simple SSE component definition looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span>                <span class="s2">&quot;SpeechSignalEnhancement&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span>                <span class="s2">&quot;sse_test_api&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;sse_config_file&quot;</span><span class="p">:</span>     <span class="s2">&quot;sse/DD_SDK_simple_tuning.scd&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">sse_config_file</span></code> points to the SSE configuration file that is
+to be used.</p>
+<p>Refer to the NDS Audio documentation for full details:</p>
+<ul class="simple">
+<li><a class="reference external" href="../../../audio/audio_module_sse/SDK_SpeechSignalEnhancement_UserGuide.html">SSE documentation</a>.</li>
+<li><a class="reference external" href="../../../../api_reference/audio/audio_module_sse/c/_i_speech_signal_enhancement_8h.html">SSE API reference</a>.</li>
+</ul>
+</div>
+<div class="section" id="sample-rate-converter">
+<span id="audio-module-src"></span><span id="index-9"></span><h3>Sample Rate Converter</h3>
+<p>The sample rate converter (SRC) component takes an input signal with a
+specific sample rate, and converts it into an output signal with a
+different sample rate. The input signal can have any number of
+channels. The output signal will have the same number of channels; it
+does not change the number of channels in the signal. (If that is what
+you need, the <a class="reference internal" href="#audio-module-sse"><span class="std std-ref">SSE module</span></a> can do that.)</p>
+<p>The configuration of an SRC module is done like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span>         <span class="s2">&quot;SampleRateConverter&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span>         <span class="s2">&quot;INT_rec_csHttp_src&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;filter_scope&quot;</span><span class="p">:</span> <span class="s2">&quot;SRC_FILTER_SCOPE_AUDIBILITY&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;audio_format&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;16khz_1ch&quot;</span> <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You specify the type of conversion by setting a filter scope. There
+are three possible filter scopes. The first two are built-in and can
+be used out-of-the-box; the third one needs an additional external
+configuration file:</p>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">SRC_FILTER_SCOPE_AUDIBILITY</span></code></p>
+<p>SRC configuration for the audibility use case.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">SRC_FILTER_SCOPE_RECOGNITION</span></code></p>
+<p>SRC configuration for the recognition use case.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">SRC_FILTER_SCOPE_PROJECT_SPECIFIC</span></code></p>
+<p>This filter scope makes it possible to use a custom configuration
+for the sample rate converter. It requires the use of an external
+configuration file, which can be configured using the additional
+JSON configuration key <code class="docutils literal notranslate"><span class="pre">filter_file</span></code>.</p>
+<p>It is not possible to make a filter configuration yourself; please
+contact Cerence if you think there is a need for a custom filter
+scope.</p>
+<p>Refer to the NDS Audio documentation for full details:</p>
+<ul class="simple">
+<li><a class="reference external" href="../../../audio/audio_module_src/SDK_SampleRateConverter_UserGuide.html">Sample rate converter user guide</a></li>
+<li><a class="reference external" href="../../../../api_reference/audio/audio_module_src/c/_i_sample_rate_converter_8h.html">Sample rate converter API reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="audio-processing-path-for-cloud-asr">
+<span id="cloud-internal-audio"></span><span id="index-10"></span><h2>Audio processing path for Cloud ASR</h2>
+<p>When using off-board recognition, the ASR component sets up an internal
+audio path.  This includes activating a built-in audio scenario using
+the main audio manager from the common component.  The following
+diagram illustrates this internal audio path.</p>
+<img alt="../../_images/NDS_Internal_AudioPath_VoConHighCloud.png" src="../../_images/NDS_Internal_AudioPath_VoConHighCloud.png" />
+<p>The audio data that are sent to the ASR component are put into the
+internal audio path via an audio adapter.  The subsequent audio
+processing includes noise reduction (using an instance of the SSE),
+audio encoding (e.g. OGG/OPUS) and finally transferring the audio data
+to the server with the CloudServices module.</p>
+<p id="index-11">The audio modules which are needed for this processing chain are
+created and connected <em>under the hood</em> in the ASR component.  The
+naming scheme for these internally created audio modules is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INT_</span><span class="o">&lt;</span><span class="n">component_inst_name</span><span class="o">&gt;</span><span class="n">_</span><span class="o">&lt;</span><span class="n">module_inst_name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">&lt;component_inst_name&gt;</span></code> is the application-dependent part and
+<code class="docutils literal notranslate"><span class="pre">module_inst_name</span></code> are fixed built-in names. The
+<code class="docutils literal notranslate"><span class="pre">&lt;component_inst_name&gt;</span></code> part is put together at runtime from the
+recognizer instance name and the CloudServices configuration name.</p>
+<p>In a customer project, expanding the <code class="docutils literal notranslate"><span class="pre">&lt;component_inst_name&gt;</span></code>
+requires the name of the recognizer instance handed in at creation, as
+well as the name of the cloud services component.  The name of the
+recognizer instance is identical to the name used in the audio
+scenario configuration (in <code class="docutils literal notranslate"><span class="pre">audioconfig.json</span></code>).  The name of the
+cloud service can be found in the CloudServices JSON configuration.</p>
+<p>For example, in the diagram shown above the recognizer instance name
+is <code class="docutils literal notranslate"><span class="pre">asr</span></code> and the CloudServices name (defined in the JSON
+configuration) is <code class="docutils literal notranslate"><span class="pre">cloud</span></code> so that <code class="docutils literal notranslate"><span class="pre">&lt;component_inst_name&gt;</span></code> is
+instantiated with <code class="docutils literal notranslate"><span class="pre">asr_cloud</span></code> in this example.  The
+<code class="docutils literal notranslate"><span class="pre">&lt;module_inst_name&gt;</span></code> parts are fixed to: <code class="docutils literal notranslate"><span class="pre">sse</span></code>, <code class="docutils literal notranslate"><span class="pre">enc</span></code>, <code class="docutils literal notranslate"><span class="pre">ao</span></code>,
+<code class="docutils literal notranslate"><span class="pre">buf</span></code>, <code class="docutils literal notranslate"><span class="pre">src</span></code> so that the following audio module names will be
+created in this example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INT_asr_cloud_sse</span>  <span class="p">(</span><span class="n">SSE</span><span class="p">)</span>
+<span class="n">INT_asr_cloud_enc</span>  <span class="p">(</span><span class="n">AudioEncoder</span><span class="p">)</span>
+<span class="n">INT_asr_cloud_buf</span>  <span class="p">(</span><span class="n">AudioBuffer</span><span class="p">)</span>
+<span class="n">INT_asr_cloud_src</span>  <span class="p">(</span><span class="n">SampleRateConverter</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>These internally created audio module names will occur in log files
+when running cloud ASR applications, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">00</span><span class="p">:</span><span class="mf">00.124</span> <span class="n">INFO</span><span class="p">:</span> <span class="p">[</span><span class="mi">7596</span><span class="p">]</span> <span class="n">nuance</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">AudioManager</span><span class="o">.</span><span class="n">MAIN</span>  <span class="n">registerAudioModule</span><span class="p">()</span> <span class="n">audio</span> <span class="n">module</span> <span class="s2">&quot;INT_asr_cloud_sse&quot;</span> <span class="n">registered</span> <span class="n">successfully</span><span class="o">.</span>
+</pre></div>
+</div>
+<p id="index-12">It is also possible to log audio from these internally created audio
+modules, using the standard audio logging name conventions.  For
+example, to log the audio that is coming out of the SSE module, you
+need to add a log consumer to the logger JSON configuration with
+<code class="docutils literal notranslate"><span class="pre">&quot;modules&quot;</span></code> set, in this example case, to
+<code class="docutils literal notranslate"><span class="pre">&quot;nuance.audio.SourcePad.INT_asr_cloud_sse&quot;</span></code>, e.g.:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+ <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+ <span class="nt">&quot;logger&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+     <span class="nt">&quot;consumers&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+             <span class="nt">&quot;name&quot;</span><span class="p">:</span>    <span class="s2">&quot;asr internal sse output log&quot;</span><span class="p">,</span>
+             <span class="nt">&quot;output&quot;</span><span class="p">:</span>  <span class="s2">&quot;./sample_INT_asr_cloud_sse_output_16kHz.pcm&quot;</span><span class="p">,</span>
+             <span class="nt">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.audio.SourcePad.INT_asr_cloud_sse&quot;</span><span class="p">,</span>
+             <span class="nt">&quot;zones&quot;</span><span class="p">:</span>   <span class="s2">&quot;LOG_DATA&quot;</span>
+        <span class="p">}</span>
+     <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Note</strong>: it is very important to <strong>not</strong> use these internal reserved
+audio module names when defining an external audio configuration.
+Failing to do so will result in undefined behaviour.</p>
+<p id="index-13">On the other hand, if it becomes necessary to change the default
+configuration of any of these internal audio modules, then this can be
+done by adding a configuration for the internal module to the JSON
+audio configuration. This will overwrite the default built-in
+configuration of the module, e.g. the following example changes the
+OGG/OPUS encoding parameters of the ASR internal audio encoder
+module:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;module_config&quot;</span><span class="p">:</span> <span class="p">[</span>
+   <span class="p">{</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span>                <span class="s2">&quot;AudioEncoder&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span>                <span class="s2">&quot;INT_asr_cloud_enc&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;encoder_type&quot;</span><span class="p">:</span>        <span class="s2">&quot;OPUS&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;encoder_param&quot;</span><span class="p">:</span>     <span class="p">{</span> <span class="nt">&quot;block_time&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="nt">&quot;complexity&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="nt">&quot;bit_rate&quot;</span><span class="p">:</span> <span class="mi">28000</span> <span class="p">},</span>
+    <span class="nt">&quot;container_type&quot;</span><span class="p">:</span>      <span class="s2">&quot;OGG&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;container_param&quot;</span><span class="p">:</span>   <span class="p">{</span> <span class="nt">&quot;page_time&quot;</span><span class="p">:</span> <span class="mi">80</span> <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Another example for changing built-in default settings might be the
+project-specific reconfiguration of the SSE noise reduction.  This can
+be achieved by adding a module configuration for
+<code class="docutils literal notranslate"><span class="pre">INT_&lt;module_inst_name&gt;_sse</span></code> to the audio JSON configuration and
+setting project-specific SSE configuration data.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Audio setup and configuration</a><ul>
+<li><a class="reference internal" href="#audio-scenarios">Audio Scenarios</a></li>
+<li><a class="reference internal" href="#components">Components</a><ul>
+<li><a class="reference internal" href="#audiomanager">AudioManager</a></li>
+<li><a class="reference internal" href="#audio-input">Audio Input</a></li>
+<li><a class="reference internal" href="#audio-buffer">Audio Buffer</a></li>
+<li><a class="reference internal" href="#audio-encoder">Audio Encoder</a></li>
+<li><a class="reference internal" href="#speech-signal-enhancement-sse">Speech Signal Enhancement (SSE)</a></li>
+<li><a class="reference internal" href="#sample-rate-converter">Sample Rate Converter</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#audio-processing-path-for-cloud-asr">Audio processing path for Cloud ASR</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="../chapters/using_the_csdk_ddfw.html">Using Cerence ASR</a><ul>
+      <li>Previous: <a href="components.html" title="previous chapter">Cerence ASR Components</a></li>
+      <li>Next: <a href="applications.html" title="next chapter">Applications</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

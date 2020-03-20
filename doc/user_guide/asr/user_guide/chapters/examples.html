@@ -1,0 +1,526 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Examples</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Advanced topics" href="advanced_topics.html" />
+    <link rel="prev" title="C API" href="../sections/c_api.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="examples">
+<h1>Examples</h1>
+<p>The sections below give examples of a few use-cases, and the
+configuration needed to implement them. The examples only highlight
+configuration that is specific for that use case; how to configure the
+audio chain or the recognizer is not explicitly shown here. Please
+refer to <a class="reference internal" href="references.html#json-config-reference"><span class="std std-ref">JSON Configuration reference</span></a> and <a class="reference internal" href="../sections/non_functional_aspects.html#json-minimal-configuration"><span class="std std-ref">Minimal configuration</span></a>.</p>
+<div class="section" id="case-1-a-single-application">
+<span id="index-0"></span><h2>Case 1: a single application</h2>
+<p>The following is an application configuration for a simple
+application. It’s a wake-up word application, but apart from some
+context specificities, nothing else here is specific to wake-up
+words.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;application&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;WUW&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;asr&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;WUW_SEARCH&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;static&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;wuw_anyspeech.fcf&quot;</span>
+          <span class="p">},</span>
+          <span class="s2">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;LH_SEARCH_PARAM_TSILENCE&quot;</span><span class="p">:</span> <span class="mi">150</span>
+          <span class="p">}</span>
+        <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The main components of this application are the name, and the input
+specification. The name will be used for activation. The input
+specification describes the setup of the search space. In this case it
+is an ASR specification only; there is no NLU here. The search space
+consists of a single, static context, which will be read from the file
+<code class="docutils literal notranslate"><span class="pre">wuw_anyspeech.fcf</span></code>.  Additionally, a custom ASR parameter setting
+is included.</p>
+<p>(Paths in JSON configuration files are relative to the configuration
+directory. In this case, <code class="docutils literal notranslate"><span class="pre">wuw_anyspeech.fcf</span></code> is loaded from the
+configuration directory.)</p>
+<p>The general pattern for defining a “local” application is this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;application&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;name&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;asr&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;search&quot;</span> <span class="p">:</span> <span class="p">[{</span> <span class="s2">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span> <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The search can be <code class="docutils literal notranslate"><span class="pre">static</span></code>, which means it refers to a pre-generated
+context, or <code class="docutils literal notranslate"><span class="pre">dynamic</span></code> which means it will be created based by a
+dynamic content consumer (see …).</p>
+</div>
+<div class="section" id="case-2-a-simple-cloud-application">
+<span id="index-1"></span><h2>Case 2: a simple cloud application</h2>
+<p>Broadly, a cloud application replaces the local, embedded recognizer
+with a “proxy” recognizer. Instead of doing the actual recognition,
+the proxy recognizer sets up a connection to an NCS cloud server, and
+then initiates a recognition session on the server and streams the audio
+to it. The server will then respond back with transcriptions, and the
+proxy recognizer will funnel the cloud result into the regular result
+processing pipeline (<code class="docutils literal notranslate"><span class="pre">&lt;IRecognizerListener&gt;.onResult(...)</span></code>):</p>
+<a class="reference internal image-reference" href="../../_images/remote-rec-with-upload-6.png"><img alt="../../_images/remote-rec-with-upload-6.png" class="align-center" src="../../_images/remote-rec-with-upload-6.png" style="width: 66%;" /></a>
+<p>In order to make this work, a cloud application assumes first of all
+that there is a proper CloudServices configuration
+available. Information on how to configure cloud services can be found
+here: <a class="reference internal" href="../../json/remote.html#remote-config-options"><span class="std std-ref">Remote / Cloud Configuration Options</span></a> (overview of connection info and
+cloudservices JSON definitions), here:
+<a class="reference internal" href="../sections/remote_applications.html#cloud-services-configuration"><span class="std std-ref">Cloud services</span></a> (JSON reference; specifically the
+<code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">ICloudServices</span> <span class="pre">}</span></code> section) and the CloudServices SDK user guide.</p>
+<p>The general pattern for defining a cloud application is similar to
+defining a “local” application:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;application&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;name&gt;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;csname&gt;&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span> <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}]</span>
+   <span class="p">}]</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+<p>The cloud application also has a name, which is used for activating
+the application. This happens in exactly the same way as for local
+applications, by calling <code class="docutils literal notranslate"><span class="pre">setApplications(...)</span></code> on the <code class="docutils literal notranslate"><span class="pre">AsrManager</span></code>.</p>
+<p>The difference is that the input type is declared to be of type
+<code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code>. The <code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code> entry then contains the data needed for
+doing the cloud recognition. This includes specifying the
+CloudServices configuration to use (typically defined in
+<code class="docutils literal notranslate"><span class="pre">cloudservices.json</span></code>, and referred to by name), the specific command
+you want the server to perform, and the data and parameters needed to
+perform the command.</p>
+<p>The audio streaming part is taken care of internally; when a cloud
+input is activated, ASR component will set up an internal audio
+path that handles sample rate conversion, speech signal enhancement,
+and audio encoding and buffering. The section <a class="reference internal" href="../sections/audio_setup_and_configuration.html#cloud-internal-audio"><span class="std std-ref">Audio processing path for Cloud ASR</span></a>
+has more details on the audio setup for cloud recognitions.</p>
+<p>Here is an example of a simple cloud application configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+
+  <span class="s2">&quot;application&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;REMOTE_TEST&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;remote_test_query&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_ASR_CMD&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;connection_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;automotive-dictation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span>
+              <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;param&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;REQUEST_INFO&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;REQUEST_INFO&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;enable_intermediate_response&quot;</span><span class="p">:</span> <span class="mi">0</span>
+                <span class="p">}</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}]</span>
+    <span class="p">}]</span>
+  <span class="p">}</span>
+</pre></div>
+</div>
+<p>Key items in <code class="docutils literal notranslate"><span class="pre">&quot;cloud&quot;</span></code> section are the cloud services name (usually
+defined in <code class="docutils literal notranslate"><span class="pre">cloudservices.json</span></code>), and the actual query to send to
+the server.</p>
+<p>In the example, the query command is <code class="docutils literal notranslate"><span class="pre">NVC_ASR_CMD</span></code>; the actual
+command will depend on the server setup; you should receive this info
+when your cloud server is delivered.</p>
+<p>The connection information sent along with the command details which
+language the query is for, which type of audio
+(e.g. <code class="docutils literal notranslate"><span class="pre">automotive-dictation</span></code>, or <code class="docutils literal notranslate"><span class="pre">ccpoi-assistant</span></code>), and more.
+The connection information is different depending on the command, and
+the server configuration. A more complete example of the keys and
+values that the connection info section can contain is here:
+<a class="reference internal" href="../sections/remote_applications.html#connection-info"><span class="std std-ref">Connection info</span></a>.</p>
+<p>Most cloud commands also require request info to be sent in the
+parameters. This includes a flag to indicate whether you want to
+receive intermediate results (e.g. for message dictation).</p>
+<p>As a side note, the <code class="docutils literal notranslate"><span class="pre">json</span></code> keys used with the <code class="docutils literal notranslate"><span class="pre">connection_info</span></code>
+and <code class="docutils literal notranslate"><span class="pre">REQUEST_INFO</span></code> keys mean that Cerence ASR will not interpret the
+contents of these sections. The contents are sent as-is to the server
+in the remote request. As an alternative to using <code class="docutils literal notranslate"><span class="pre">json</span></code> directly,
+it is possible to define, for example, the connection info elsewhere
+and assign a name to it. This can then be referred to using the
+<code class="docutils literal notranslate"><span class="pre">uses</span></code> key, which avoids duplication and promotes re-use of the
+configuration.</p>
+<p>More information can be found in the <a class="reference internal" href="../../json/remote.html#cloud-apps"><span class="std std-ref">Cloud Applications</span></a> section.</p>
+</div>
+<div class="section" id="case-3-a-cloud-application-that-uses-uploaded-data">
+<span id="index-2"></span><h2>Case 3: a cloud application that uses uploaded data</h2>
+<p>Just like in local recognition, there are cases in remote recognition,
+where you want to use dynamically generated contexts for recognizing
+user-specific phrases. A common example is where you want to recognize
+names from the user’s contact list.</p>
+<p>Suppose you have this remote application setup:</p>
+<a class="reference internal image-reference" href="../../_images/remote-rec-with-upload-5.png"><img alt="../../_images/remote-rec-with-upload-5.png" class="align-center" src="../../_images/remote-rec-with-upload-5.png" style="width: 66%;" /></a>
+<p>How can we increase the remote recognizer’s recognition accuracy for
+the user’s specific dictionary entries?</p>
+<p>In local situations, you use a dynamic content consumer for this,
+which will prepare a context (e.g. a list context), which can be added
+to a host grammar by filling it into a slot of the host grammar.</p>
+<p>In remote situations, the concept is similar. You also use a dynamic
+content consumer, but rather than constructing a local context, the
+data is uploaded to the server, with a unique ID attached to it. The
+server then creates a context from this data, and returns a version
+number (<code class="docutils literal notranslate"><span class="pre">checksum</span></code>) to the client. The ID and checksum can then be
+used by the client to refer to this grammar.</p>
+<p>Most commonly, the data to be uploaded on the client is organised in a
+so-called <a class="reference internal" href="references.html#cop-file"><span class="std std-ref">COP files</span></a> (“Categorized Orthographic Phonetic” file). A
+COP file is basically a file that contains a table specification
+(column names, column types) followed by rows that contain the actual
+data. The columns can contain numbers, orthographic data (written
+words) and phonetic data (phonetic transcriptions of written data). If
+no phonetic transcriptions are included in a COP file, the
+transcriptions will be generated on the server, using the
+transcription method that is available for the language in question.</p>
+<div class="section" id="step-1-prepare-the-data">
+<span id="index-3"></span><h3>Step 1: prepare the data</h3>
+<p>Here is an example of a simple COP file:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#ECO V1.2 UTF-8;
+
+#ECOScheme COP1 V1.6
+#EDBDatabaseID NBT_FirstLastNames_v_1_0
+#EDBTableUpdateID 12345678
+#EDBTableUpdateMode GivenInColumn
+#EDBTableUpdateType FullUpdate
+
+# Columns:
+#Column1 Entry_ID
+#Column2 FirstName_Ortho
+#Column3 LastName_Ortho
+
+# Column1 to Column2 must contain defined values, the others may be empty.
+# In the column EDBTableUpdateMode the allowed values are: r (remove) and a (add)
+
+#Format(Entry_ID) Ident
+#AFType(Entry_ID) NumID
+#NumIDFormat(Entry_ID) Decimal
+#NumIDBinLength(Entry_ID) 32
+
+1; &quot;Donald&quot;; &quot;Knuth&quot;
+2; &quot;Hopper&quot;; &quot;Grace&quot;
+3; &quot;Michael&quot;; &quot;More&quot;
+4; &quot;Lovelace&quot;; &quot;Ada&quot;
+</pre></div>
+</div>
+<p>This COP file has three columns:</p>
+<ul class="simple">
+<li>Entry_ID is an identifier field, of type integer</li>
+<li>FirstName_Ortho and LastName_Ortho are strings</li>
+</ul>
+<p>The column names follow the COP conventions of using _ID and _Ortho
+suffixes (the _Phon suffix is not used in this example). The field
+<code class="docutils literal notranslate"><span class="pre">EDBTableUpdateID</span></code> will contain the server-side ID (called
+<code class="docutils literal notranslate"><span class="pre">checksum</span></code>) of the table on which the update will be performed.</p>
+</div>
+<div class="section" id="step-2-upload-mechanism">
+<span id="index-4"></span><h3>Step 2: Upload mechanism</h3>
+<p>An example of a dynamic content consumer (DCC) for uploading data is
+this. (For more details, see <a class="reference internal" href="../../json/remote.html#remote-upload-data"><span class="std std-ref">Uploading Data</span></a>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CONTACTS_LIST&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Entry_ID&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;integer&quot;</span>
+      <span class="p">},{</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+      <span class="p">},{</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+      <span class="p">}],</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;remote&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;remote&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_DATA_UPLOAD_CMD&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;connection_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;automotive-dictation&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span>
+              <span class="p">}</span>
+          <span class="p">},</span>
+          <span class="s2">&quot;grammar_type&quot;</span><span class="p">:</span> <span class="s2">&quot;structured_content&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;structured_content&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;contacts&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Entry_ID&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+                  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;fn&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span>
+                  <span class="p">}</span>
+              <span class="p">},{</span>
+                  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ln&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span>
+                  <span class="p">}</span>
+              <span class="p">}]</span>
+          <span class="p">},</span>
+          <span class="s2">&quot;force_clear_all&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In this DCC, there are three components:</p>
+<ul class="simple">
+<li>a name</li>
+<li>a content description</li>
+<li>the query to send to the NCS server</li>
+</ul>
+<p>The name of the DCC will be used as the name for the remote context,
+created using the data uploaded by this DCC. It is important to
+remember this: although the name is given to a local object (the DCC),
+and is used locally to refer to this DCC, the name will also be used
+on the server to refer to the context that will be created there.</p>
+<p>The content descriptions corresponds to columns in the COP file. The
+COP file name does not appear in the DCC configuration, because it will
+usually be generated at run-time, and passed to the DCC during the
+data preparation phase.</p>
+<p>The remote query command in this case is a data upload command,
+<code class="docutils literal notranslate"><span class="pre">NVC_DATA_UPLOAD_CMD</span></code>, with a grammar type of “structured content”,
+and a structured content category of “contacts”. (Refer to
+<a class="reference internal" href="references.html#structured-content"><span class="std std-ref">Cloud uploads: structured content</span></a> for a more detailed explanation of content
+types.)</p>
+<p>The “content” field of the structured content description describes
+how to map remote fields to fields in the COP file, and specifies that
+“Entry_ID” is the identifier column. This is illustrated here:</p>
+<a class="reference internal image-reference" href="../../_images/remote-rec-with-upload-1.png"><img alt="../../_images/remote-rec-with-upload-1.png" class="align-center" src="../../_images/remote-rec-with-upload-1.png" style="width: 66%;" /></a>
+<p>The <code class="docutils literal notranslate"><span class="pre">force_clear_all</span></code> key specifies that the server should first
+clear the context, before adding the items from the COP file. It is
+also possible to incrementally add items to an existing remote
+context. Here, the version number (<code class="docutils literal notranslate"><span class="pre">checksum</span></code>, in the
+<code class="docutils literal notranslate"><span class="pre">EDBTableUpdateID</span></code> field of the COP file) comes into play; you
+use this to specify to which remote version of the context you want to
+add the new entries. If the version number doesn’t match, the entries
+will not be added to the context.</p>
+<p>Sending the upload command to the server will cause the contents of
+the COP file to be sent to the server, and will cause the server to
+use it to create a context that can be used in a remote recognition:</p>
+<a class="reference internal image-reference" href="../../_images/remote-rec-with-upload-2.png"><img alt="../../_images/remote-rec-with-upload-2.png" class="align-center" src="../../_images/remote-rec-with-upload-2.png" style="width: 66%;" /></a>
+<p>If successful, the server will send back the context’s version number
+(<code class="docutils literal notranslate"><span class="pre">checksum</span></code>) back in the command’s JSON result structure.</p>
+</div>
+<div class="section" id="step-3-recognition-using-the-uploaded-data">
+<span id="index-5"></span><h3>Step 3: recognition using the uploaded data</h3>
+<p>Below is an example of an ASR application that uses uploaded data in
+a remote recognition request. Most of the entries are the same as in a
+regular cloud request:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;application&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;REMOTE_REC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;remote_test_query&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_ASR_CMD&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;connection_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;automotive-dictation&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span>
+            <span class="p">}</span>
+          <span class="p">},</span>
+          <span class="s2">&quot;param&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;REQUEST_INFO&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;REQUEST_INFO&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;enable_intermediate_response&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;grammar_list&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                  <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;CONTACTS_LIST&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;contacts&quot;</span><span class="p">,</span>
+                <span class="p">}]</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The only addition here is the <code class="docutils literal notranslate"><span class="pre">&quot;grammar_list&quot;</span></code> section:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>...
+&quot;grammar_list&quot;: [{
+  &quot;id&quot;: &quot;CONTACTS_LIST&quot;,
+  &quot;type&quot;: &quot;contacts&quot;,
+}]
+...
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;grammar_list&quot;</span></code> entry in the remote query’s <code class="docutils literal notranslate"><span class="pre">REQUEST_INFO</span></code>
+tells the server which uploaded contexts should be used during the
+recognition. The entries in the grammar list contain the grammar ID
+(which corresponds to the name of the DCC used for uploading the
+data), and a type description.</p>
+<p>The entry shown above does not have a <code class="docutils literal notranslate"><span class="pre">&quot;checksum&quot;</span></code> key. It is not
+mandatory, but it can be used to declare that a specific version of
+the uploaded data should be used. If the remote version has a
+different version number, it will not be used in the recognition.</p>
+<p>So, telling the remote recognizer which contacts context to use in
+addition to its normal context setup, will enable it to achieve a
+higher accuracy on user-specific contact information:</p>
+<a class="reference internal image-reference" href="../../_images/remote-rec-with-upload-4.png"><img alt="../../_images/remote-rec-with-upload-4.png" class="align-center" src="../../_images/remote-rec-with-upload-4.png" style="width: 66%;" /></a>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Examples</a><ul>
+<li><a class="reference internal" href="#case-1-a-single-application">Case 1: a single application</a></li>
+<li><a class="reference internal" href="#case-2-a-simple-cloud-application">Case 2: a simple cloud application</a></li>
+<li><a class="reference internal" href="#case-3-a-cloud-application-that-uses-uploaded-data">Case 3: a cloud application that uses uploaded data</a><ul>
+<li><a class="reference internal" href="#step-1-prepare-the-data">Step 1: prepare the data</a></li>
+<li><a class="reference internal" href="#step-2-upload-mechanism">Step 2: Upload mechanism</a></li>
+<li><a class="reference internal" href="#step-3-recognition-using-the-uploaded-data">Step 3: recognition using the uploaded data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../sections/c_api.html" title="previous chapter">C API</a></li>
+      <li>Next: <a href="advanced_topics.html" title="next chapter">Advanced topics</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

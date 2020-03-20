@@ -1,0 +1,2120 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CERENCE SDK - CLOUDSERVICES USER’S GUIDE</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="doc-title">
+<h1>CERENCE SDK - CLOUDSERVICES USER’S GUIDE</h1>
+<div class="line-block">
+<div class="line">© 2020 Cerence, Inc. All rights reserved.</div>
+<div class="line">Published by Cerence, Inc.</div>
+<div class="line">15 Wayside Road, Burlington, Massachusetts 01803, U.S.A.</div>
+</div>
+<p>Cerence, Inc. provides this document without representation or warranty of any kind. The
+information in this document is subject to change without notice and
+does not represent a commitment by Cerence, Inc. The software and/or databases described in this document are furnished under a license
+agreement and may be used or copied only in accordance with the terms of such license agreement. Without
+limiting the rights under copyright reserved herein, and except as permitted by such license agreement, no part of
+this document may be reproduced or transmitted in any form or by any means, including, without limitation,
+electronic, mechanical, photocopying, recording, or otherwise, or transferred to information storage and retrieval
+systems, without the prior written permission of Cerence, Inc.</p>
+<p>Cerence and the Cerence logo are trademarks or registered trademarks of Cerence, Inc. or its affiliates in the United States and/or other countries. All other trademarks referenced
+herein are the property of their respective owners.</p>
+<div class="section" id="id1">
+<h2>Scope Of Document</h2>
+<p>The main scope of this SDK documentation is to serve as user guide
+for engineers who use Cerence SDK to develop and deliver project-specific applications.</p>
+</div>
+<div class="section" id="sdk-cloudservices-overview">
+<h2>SDK CloudServices Overview</h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> component provides connectivity between the SDK and Cerence Cloud Services (NCS) servers.
+It is used internally by <code class="docutils literal notranslate"><span class="pre">Prompter</span></code> and <code class="docutils literal notranslate"><span class="pre">Recognizer</span></code> components if they are configured to use cloud.</p>
+<p>In addition it can also be used to directly communicate with the NCS server. Therefore three diffent interface-modules
+are provided: <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code>, <code class="docutils literal notranslate"><span class="pre">CloudDataUploader</span></code>, <code class="docutils literal notranslate"><span class="pre">CloudLogger</span></code>. These modules internally are all based on a
+common protocol implementation called <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code>.</p>
+<p>At the moment only HTTP protocol is supported by the <code class="docutils literal notranslate"><span class="pre">SDK</span></code>:</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="_images/cloud_services_overview.png"><img alt="_images/cloud_services_overview.png" class="align-center" src="_images/cloud_services_overview.png" style="width: 602.5px; height: 232.5px;" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>It is recommended to use <code class="docutils literal notranslate"><span class="pre">Prompter</span></code> and <code class="docutils literal notranslate"><span class="pre">Recognizer</span></code> APIs for cloud-prompting and cloud-recognition. <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code>
+should only be used for scenarios not covered by those APIs (e.g. controlling server-dialogs).</p>
+<p class="last">For cloud-connectivity there is always a set of server-credentials needed which is not shipped with this SDK.</p>
+</div>
+<p>In the following sections we describe the basic usage and concepts of the <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> API, the full API documentation
+and header files for the <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> are included in SDK release packages.</p>
+</div>
+<div class="section" id="id2">
+<h2>Document conventions</h2>
+<p>API call examples in this document are shown in C syntax.</p>
+</div>
+<div class="section" id="cloudmanager">
+<h2><a class="reference internal" href="#cloudmanager">CloudManager</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CloudManager</span></code> is a central management instance responsible for creation and controlling of all <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> instances.</p>
+<div class="section" id="creating-cloudmanager">
+<h3><a class="reference internal" href="#creating-cloudmanager">Creating CloudManager</a></h3>
+<p>To create a <code class="docutils literal notranslate"><span class="pre">CloudManager</span></code> instance, you may use the follow API:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CLOUDSERVICES_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="n">nuance_cloudservices_ICloudManager_create</span>
+<span class="p">(</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span>
+  <span class="n">nuance_common_ISystemManager</span> <span class="o">*</span><span class="n">systemManager</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
+  <span class="n">nuance_cloudservices_ICloudManager</span> <span class="o">**</span><span class="n">cloudManager</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuring-cloudmanager">
+<h3><a class="reference internal" href="#configuring-cloudmanager">Configuring CloudManager</a></h3>
+<p>The configuration of the CloudManager itself is optional. By configuration it is possible to enable cloud-logging to NCS servers.
+For details see the <a class="reference internal" href="#logging">Logging</a> section.</p>
+<p>As the CloudManager is responsible for the creation of all <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> instances it must receive their configuration in the passed IConfiguration
+object.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> configuration defines the protocol that is used for client-server communication and the URL of the server to be used. It must also
+contain the credentials for client-authentication and all parameters of the NCS protocol which are generic over all commands. Optionally the
+audio-format / encoding that is used for the client-server transfer can be configured. It is strictly recommended to stay with the default audio-format
+unless there are good reasons for changing it.</p>
+<p>The JSON snippet example below shows how to define one <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> instance called <code class="docutils literal notranslate"><span class="pre">CloudServices_0</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudServices 1.0&quot;</span><span class="p">,</span>
+
+  <span class="s2">&quot;cloud_services&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CloudServices_0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;http&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;url&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://sample-url.nuancemobility.net:443/NmspServlet/&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;app_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;SAMPLE_APP_ID&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;app_key&quot;</span> <span class="p">:</span> <span class="s2">&quot;xxxxxxxxxxxxx&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;uid&quot;</span> <span class="p">:</span> <span class="s2">&quot;sample_user_id&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;device_model&quot;</span> <span class="p">:</span> <span class="s2">&quot;sample_device_model&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ssl_certificate_bundle&quot;</span> <span class="p">:</span> <span class="s2">&quot;./ca-bundle.crt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;app_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CDFW_Sample&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;app_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;app_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;en-us&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;carrier&quot;</span> <span class="p">:</span> <span class="s2">&quot;n/a&quot;</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="cloudcommander">
+<h2><a class="reference internal" href="#cloudcommander">CloudCommander</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> is a module that allows to send any NCS command to the NCS server.</p>
+<div class="section" id="configuring-cloudcommander">
+<h3><a class="reference internal" href="#configuring-cloudcommander">Configuring CloudCommander</a></h3>
+<p>As a prerequisite to be able to use one or more <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> instance(s) in an application, the desired instances must be
+defined in the JSON configuration.</p>
+<p>The JSON snippet example below shows how to define two <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> instances <code class="docutils literal notranslate"><span class="pre">appCmdr</span></code> and <code class="docutils literal notranslate"><span class="pre">appCmdr2</span></code>. Both use different
+<code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> instances for cloud connectivity. Using different <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> instances allows parallel sending of multiple
+commands. Using the same <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> with multiple CloudCommanders will serialize all cloud commands and would be similar
+to only using one <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudServices 1.0&quot;</span><span class="p">,</span>
+
+  <span class="s2">&quot;cloud_module_config&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudCommander&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;appCmdr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudServices_0&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudCommander&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;appCmdr2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudServices_1&quot;</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See chapter <a class="reference internal" href="#json-configuration">JSON configuration</a> to find a brief overview of the <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> JSON API.</p>
+</div>
+<div class="section" id="creating-cloudcommander">
+<h3><a class="reference internal" href="#creating-cloudcommander">Creating CloudCommander</a></h3>
+<p>To create a <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> instance, you may use the follow API:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CLOUDSERVICES_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="n">nuance_cloudservices_ICloudCommander_create</span>
+<span class="p">(</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span>
+  <span class="n">nuance_audio_IAudioManager</span> <span class="o">*</span><span class="n">audioManager</span><span class="p">,</span>
+  <span class="n">nuance_cloudservices_ICloudManager</span> <span class="o">*</span><span class="n">cloudManager</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
+  <span class="n">nuance_cloudservices_ICloudCommanderListener</span> <span class="o">*</span><span class="n">moduleListener</span><span class="p">,</span>
+  <span class="n">nuance_cloudservices_ICloudCommander</span> <span class="o">**</span><span class="n">cloudCommander</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The instance name for each <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> must be unique. While the CloudManager handle is mandatory, the AudioManager handle
+is only needed if audio needs to be streamed from / to the NCS cloud.</p>
+</div>
+<div class="section" id="using-cloudcommander">
+<h3><a class="reference internal" href="#using-cloudcommander">Using CloudCommander</a></h3>
+<p>There are two different ways to use the <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code>. You can either send out commands that are pre-configured in a JSON
+configuration file, or you can use the programmatic API to build up the CloudCommand manually. While the first one is more
+convenient, the second one is much more powerfull.</p>
+<div class="section" id="sending-pre-defined-commands">
+<h4><a class="reference internal" href="#sending-pre-defined-commands">Sending pre-defined commands</a></h4>
+<div class="section" id="configuring-cloud-commands">
+<h5><a class="reference internal" href="#configuring-cloud-commands">Configuring cloud commands</a></h5>
+<p>As a prerequisite to be able to send a cloud command it needs to be configured in the JSON configuration file.
+Each command-configuration consists of of the command-name from the NCS specification and a command-specific
+dictionary. In addition a list of parameters can be provided. The following parameter-types are currently supported:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">STRING</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">DICTIONARY</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">SEQUENCE</span></code>.</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">AUDIO</span></code> and <code class="docutils literal notranslate"><span class="pre">TTS</span></code> parameters are not supported by this API,
+instead the <code class="docutils literal notranslate"><span class="pre">propmter</span></code> and <code class="docutils literal notranslate"><span class="pre">recognizer</span></code> API should be used to trigger such commands.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudServices 1.0&quot;</span><span class="p">,</span>
+
+  <span class="s2">&quot;cloud_command&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CerenceNluCancel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>
+    <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;DRAGON_NLU_APPSERVER_CMD&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dictionary&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;ccpoi_assistant&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;application&quot;</span><span class="p">:</span><span class="s2">&quot;dragondrive_eval_1.0&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;params&quot;</span><span class="p">:[{</span>
+      <span class="s2">&quot;param_name&quot;</span><span class="p">:</span> <span class="s2">&quot;REQUEST_INFO&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;DICTIONARY&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;dictionary&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;start&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;end&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;text&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;appserver_data&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;message&quot;</span> <span class="p">:</span> <span class="s2">&quot;cancel&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;time&quot;</span> <span class="p">:</span> <span class="s2">&quot;2012-11-09T11:45:15-0500&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;timezone&quot;</span> <span class="p">:</span> <span class="s2">&quot;America/Toronto&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;speaker&quot;</span> <span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;error_on_user_data_not_uploaded&quot;</span> <span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;conversation&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;actions&quot;</span> <span class="p">:</span> <span class="p">[]</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;binary_results&quot;</span> <span class="p">:</span> <span class="mi">0</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sending-cloud-commands">
+<h5><a class="reference internal" href="#sending-cloud-commands">Sending cloud commands</a></h5>
+<p>The <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> API should be used with the method <code class="docutils literal notranslate"><span class="pre">nuance_cloudservices_ICloudCommander_sendCloudCommand</span></code>, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CLOUDSERVICES_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="n">nuance_cloudservices_ICloudCommander_sendCloudCommand</span>
+<span class="p">(</span>
+  <span class="n">nuance_cloudservices_ICloudCommander</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">commandName</span><span class="p">,</span>
+  <span class="n">nuance_cloudservices_ICloudCommandJsonListener</span> <span class="o">*</span><span class="n">listener</span><span class="p">,</span>
+  <span class="n">nuance_cloudservices_ICloudCommand</span> <span class="o">**</span><span class="n">cloudCommand</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>In this method the name of the command-configuration can be passed.
+The <code class="docutils literal notranslate"><span class="pre">sendCloudCommand</span></code> method is implemented asynchronous. It directly returns an <code class="docutils literal notranslate"><span class="pre">ICloudCommand</span></code> instance and starts
+the transfer to the server in the background. The <code class="docutils literal notranslate"><span class="pre">ICloudCommand</span></code> inherits from the <code class="docutils literal notranslate"><span class="pre">nuance.common.IBackgroundOperation</span></code>
+and therefore can be used to wait until the command is completed or to abort the execution of the command.
+Usually, an application will wait until a command has been completed, before continuing with further processing.
+This can be achieved by calling the synchronous method <code class="docutils literal notranslate"><span class="pre">waitForCompletion</span></code> after <code class="docutils literal notranslate"><span class="pre">sendCloudCommand</span></code>, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CLOUDSERVICES_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="n">nuance_cloudservices_ICloudCommand_waitForCompletion</span>
+<span class="p">(</span>
+    <span class="n">nuance_cloudservices_ICloudCommand</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">nuance_common_IBackgroundOperation_Status</span> <span class="o">*</span><span class="n">status</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>If the application needs to cancel the execution of a command, this can be done with the call
+<code class="docutils literal notranslate"><span class="pre">nuance_cloudservices_ICoudCommand_abortOperation</span></code>, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CLOUDSERVICES_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="n">nuance_cloudservices_ICloudCommand_abortOperation</span><span class="p">(</span><span class="n">nuance_cloudservices_ICloudCommand</span> <span class="o">*</span><span class="n">instance</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The  <code class="docutils literal notranslate"><span class="pre">CloudCommand</span></code> API provides a listener interface
+that calls the applications’s callback functions asynchronously to notify the application when internal errors or events occurred.
+If using the <code class="docutils literal notranslate"><span class="pre">nuance_cloudservices_ICloudCommander_sendCloudCommand</span></code> API, a listener will be provided by the API and will received
+various events.</p>
+<p>The following events are defined:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">typedef</span> <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_cloudservices_ICloudCommandJsonListener_onCommandStarted</span><span class="p">)</span>
+<span class="p">(</span>
+    <span class="n">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">const</span> <span class="n">nuance_cloudservices_ICloudCommand</span> <span class="o">*</span><span class="n">cmd</span>
+<span class="p">);</span>
+
+<span class="n">typedef</span> <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_cloudservices_ICloudCommandJsonListener_onCommandFinished</span><span class="p">)</span>
+<span class="p">(</span>
+    <span class="n">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">const</span> <span class="n">nuance_cloudservices_ICloudCommand</span> <span class="o">*</span><span class="n">cmd</span>
+<span class="p">);</span>
+
+<span class="n">typedef</span> <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_cloudservices_ICloudCommandJsonListener_onCommandResult</span><span class="p">)</span>
+<span class="p">(</span>
+    <span class="n">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">result</span><span class="p">,</span>
+    <span class="n">LH_BOOL</span> <span class="n">isComplete</span><span class="p">,</span>
+    <span class="n">const</span> <span class="n">nuance_cloudservices_ICloudCommand</span> <span class="o">*</span><span class="n">cmd</span>
+<span class="p">);</span>
+
+<span class="n">typedef</span> <span class="n">void</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_cloudservices_ICloudCommandJsonListener_onCommandError</span><span class="p">)</span>
+<span class="p">(</span>
+    <span class="n">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">error</span><span class="p">,</span>
+    <span class="n">const</span> <span class="n">nuance_cloudservices_ICloudCommand</span> <span class="o">*</span><span class="n">cmd</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Both results and errors are delivered as JSON-formatted strings.</p>
+</div>
+</div>
+<div class="section" id="create-cloud-commands">
+<h4><a class="reference internal" href="#create-cloud-commands">Create cloud commands</a></h4>
+<p>Instead of defining a cloud-command in the JSON configuration the programmatic API can be used to build up a
+cloud-command manually. This API has no restrictions regarding audio- and TTS- parameters like the configuration
+based API. Nevertheless <code class="docutils literal notranslate"><span class="pre">Prompter</span></code> and <code class="docutils literal notranslate"><span class="pre">Recognizer</span></code> APIs should be preferred for those scenarios.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> API should be used with the method <code class="docutils literal notranslate"><span class="pre">nuance_cloudservices_ICloudCommander_createCloudCommand</span></code>, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CLOUDSERVICES_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="n">nuance_cloudservices_ICloudCommander_createCloudCommand</span>
+<span class="p">(</span>
+  <span class="n">nuance_cloudservices_ICloudCommander</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">commandName</span><span class="p">,</span>
+  <span class="n">LH_S32</span> <span class="n">commandTimeout</span><span class="p">,</span>
+  <span class="n">nuance_common_IDictionary</span> <span class="o">*</span><span class="n">optionalSettings</span><span class="p">,</span>
+  <span class="n">nuance_cloudservices_ICloudCommandListener</span> <span class="o">*</span><span class="n">listener</span><span class="p">,</span>
+  <span class="n">nuance_cloudservices_ICloudCommand</span> <span class="o">**</span><span class="n">cloudCommand</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Similar to the attributes of the JSON configuration the equivalent runtime parameters are provided to configure the command.
+A command created programmatically supports all typed parameters, namely <code class="docutils literal notranslate"><span class="pre">STRING</span></code>, <code class="docutils literal notranslate"><span class="pre">DICTIONARY</span></code>, <code class="docutils literal notranslate"><span class="pre">SEQUENCE</span></code>, <code class="docutils literal notranslate"><span class="pre">BYTES</span></code>,
+<code class="docutils literal notranslate"><span class="pre">AUDIO</span></code> and <code class="docutils literal notranslate"><span class="pre">TTS</span></code>. Based on the NCS specification, multiple command parameters can be added to the created command to accomplish
+the desired cloud request. Once all the necessary parameters are added, the command should be finished by calling
+<code class="docutils literal notranslate"><span class="pre">nuance_cloudservices_ICloudCommand_finish()</span></code>, which in term signals the server to process the command and send back the results.
+Please note that even though the command is finished, the audio data associated with the <code class="docutils literal notranslate"><span class="pre">AUDIO</span></code> and <code class="docutils literal notranslate"><span class="pre">TTS</span></code> parameters is still
+being streamed in real-time. The command is terminated upon the final result or an error is delivered to the user via the command
+listener.</p>
+<p>For details see the <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> API reference.</p>
+</div>
+</div>
+</div>
+<div class="section" id="clouddatauploader">
+<h2><a class="reference internal" href="#clouddatauploader">CloudDataUploader</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CloudDataUploader</span></code> is a low-level module for data-upload (e.g. address-books) to the NCS cloud. It is recommended
+to use the <code class="docutils literal notranslate"><span class="pre">DynamicContentConsumer</span></code> API of the <code class="docutils literal notranslate"><span class="pre">ASR</span></code> component instead.</p>
+<p>For details on this module see the <code class="docutils literal notranslate"><span class="pre">CloudDataUploader</span></code> API reference.</p>
+</div>
+<div class="section" id="cloudlogger">
+<h2><a class="reference internal" href="#cloudlogger">CloudLogger</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CloudLogger</span></code> is a low-level module for sending log-messages to the NCS servers. A <code class="docutils literal notranslate"><span class="pre">CloudLogger</span></code> instance can be created either
+manually or automatically by enabling the cloud-logging in the JSON-configuration of the CloudManager.</p>
+<p>For details on this module see the <code class="docutils literal notranslate"><span class="pre">CloudLogger</span></code> API reference.</p>
+</div>
+<div class="section" id="json-configuration">
+<h2><a class="reference internal" href="#json-configuration">JSON Configuration</a></h2>
+<p>The SDK module can be configured through JSON configuration files. These files
+have to be a part of the configuration files passed to the SDK service providing the cloud functionality.
+Multiple SDK services are able to share the same <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> configuration or use
+a dedicated one. Sharing the same configuration does not mean sharing a <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> instance. On the
+contrary each SDK Service will create its own <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code> instance (or multiple of them).</p>
+<p>The following sections give a formal specification of the JSON configuration format for the <code class="docutils literal notranslate"><span class="pre">CloudServices</span></code>
+module.</p>
+<div class="section" id="cloudservices">
+<h3>CloudServices</h3>
+<div class="section" id="overview">
+<h4>Overview</h4>
+<p>The following is an overview of the structure of the JSON configuration files.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>{ <a class="reference internal" href="#itoplevelcloudservicesconfig">ITopLevelCloudServicesConfig</a> }</dt>
+<dd><ul class="first last">
+<li>version: String</li>
+<li>label: String</li>
+<li><dl class="first docutils">
+<dt>cloud_services: [ { <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>url: String</li>
+<li>app_id: String</li>
+<li>app_key: String</li>
+<li>app_name: String</li>
+<li>app_version: String</li>
+<li>app_language: String</li>
+<li>carrier: String</li>
+<li>device_model: String</li>
+<li>uid: String</li>
+<li>device_id: String</li>
+<li><dl class="first docutils">
+<dt>input_audio_format: { <a class="reference internal" href="#iaudioformatconfig">IAudioFormatConfig</a> }</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>sample_rate: int</li>
+<li>samples_per_channel: int</li>
+<li>channel_count: int</li>
+<li>encoding: <a class="reference internal" href="#encoding">Encoding</a></li>
+<li>container: <a class="reference internal" href="#container">Container</a></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li>output_audio_format: { <a class="reference internal" href="#iaudioformatconfig">IAudioFormatConfig</a> }</li>
+<li>idle_session_timeout: int</li>
+<li>connection_timeout: int</li>
+<li>ssl_certificate_bundle: Path</li>
+<li>socket_type: String</li>
+<li><em>type</em>: String</li>
+<li><em>http</em>: { <a class="reference internal" href="#icloudserviceshttpconfig">ICloudServicesHttpConfig</a> }</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>cloud_module_config: [ { <a class="reference internal" href="#icloudmoduleconfig">ICloudModuleConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li><em>type</em>: String</li>
+<li><dl class="first docutils">
+<dt><em>CloudCommander</em>: { <a class="reference internal" href="#icloudcommanderconfig">ICloudCommanderConfig</a> }</dt>
+<dd><ul class="first last">
+<li>cloud_services_name: String</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>cloud_manager: { <a class="reference internal" href="#icloudmanagerconfig">ICloudManagerConfig</a> }</dt>
+<dd><ul class="first last">
+<li>enable_cloud_logging: [ String ]</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>cloud_command: [ { <a class="reference internal" href="#icloudcommandconfig">ICloudCommandConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>command: String</li>
+<li>dictionary: { <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> }</li>
+<li>timeout: int</li>
+<li><dl class="first docutils">
+<dt>params: [ { <a class="reference internal" href="#icloudcommandparamconfig">ICloudCommandParamConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>param_name: String</li>
+<li><em>type</em>: String</li>
+<li><dl class="first docutils">
+<dt><em>DICTIONARY</em>: { <a class="reference internal" href="#idictionaryparamconfig">IDictionaryParamConfig</a> }</dt>
+<dd><ul class="first last">
+<li>dictionary: { <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> }</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>SEQUENCE</em>: { <a class="reference internal" href="#isequenceparamconfig">ISequenceParamConfig</a> }</dt>
+<dd><ul class="first last">
+<li>sequence: [ { <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> } ]</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>STRING</em>: { <a class="reference internal" href="#istringparamconfig">IStringParamConfig</a> }</dt>
+<dd><ul class="first last">
+<li>string: String</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="itoplevelcloudservicesconfig-the-top-level-cloud-services-configuration-structure">
+<span id="itoplevelcloudservicesconfig"></span><h4>ITopLevelCloudServicesConfig - The top-level cloud services configuration structure.</h4>
+<p>The top-level cloud services configuration structure.</p>
+<p>This configuration class describes the top-level configuration structure in the cloudservices namespace.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="33%" />
+<col width="7%" />
+<col width="39%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The version key, fixed to “CloudServices 1.0”.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>Label describing the content / version of the JSON file.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud_services&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level clould services configuration.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud_module_config&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudmoduleconfig">ICloudModuleConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level cloud module configuration.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud_manager&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudmanagerconfig">ICloudManagerConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The top-level cloud manager configuration.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudcommandconfig">ICloudCommandConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level cloud command configuration.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="itoplevelcloudservicesconfig-version">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;</span></code>:</dt>
+<dd>The version key, fixed to “CloudServices 1.0”.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcloudservicesconfig-label">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;</span></code>:</dt>
+<dd>Label describing the content / version of the JSON file.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcloudservicesconfig-cloud-services">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;cloud_services&quot;</span></code>:</dt>
+<dd>The top-level clould services configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcloudservicesconfig-cloud-module-config">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;cloud_module_config&quot;</span></code>:</dt>
+<dd>The top-level cloud module configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcloudservicesconfig-cloud-manager">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;cloud_manager&quot;</span></code>:</dt>
+<dd>The top-level cloud manager configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcloudservicesconfig-cloud-command">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;</span></code>:</dt>
+<dd>The top-level cloud command configuration.</dd>
+</dl>
+</div>
+<div class="section" id="iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">
+<span id="iuserjsonconfig"></span><h4>IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</h4>
+<p>Defines a verbatim block of json that is used by VoCon High as is.</p>
+<p>This is for example used to pass json configuration block on to VoCon Hybrid that need to configured
+by users of Vocon High. The Connection Info object in ASR is an example of this.</p>
+<p>This object lists not specific attributes because any valid json object can be used here, so the number, types
+and names of attributes are not limited.</p>
+</div>
+<div class="section" id="icloudservicesconfig-the-cloudservices-configuration">
+<span id="icloudservicesconfig"></span><h4>ICloudServicesConfig - The CloudServices configuration.</h4>
+<dl class="docutils">
+<dt>Sub types:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;http&quot;</span></code>, see <a class="reference internal" href="#icloudserviceshttpconfig">ICloudServicesHttpConfig</a></li>
+</ul>
+</dd>
+</dl>
+<p>The CloudServices configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="14%" />
+<col width="8%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;http&quot;</span></code></td>
+<td>yes</td>
+<td>Select the sub-type.</td>
+</tr>
+<tr class="row-odd"><td><em>inline keys from sub-type</em></td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudserviceshttpconfig">ICloudServicesHttpConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;http&quot;</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the CloudServices module.</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;url&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Server URL used by the CloudServices network protocol.</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;app_id&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Application ID provided by Cerence.</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;app_key&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Application Key provided by Cerence.</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;app_name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>User defined application name string that must be unique.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;app_version&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>Application version.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;app_language&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>Application language.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;carrier&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>Carrier name.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;device_model&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>Device model.</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;uid&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">User ID that will track a unique user across sessions.</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;device_id&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Device ID that will track a unique device across sessions.</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;input_audio_format&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iaudioformatconfig">IAudioFormatConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The input audio format.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;output_audio_format&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iaudioformatconfig">IAudioFormatConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The output audio format.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;idle_session_timeout&quot;:</span></code> </td>
+<td>int</td>
+<td>no</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;connection_timeout&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 30</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;ssl_certificate_bundle&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Path</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">An absolute or relative path to a file that holds a bundle of one or more certificates. The relative path is considered to be in relation to the JSON configuration directory</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudservicesconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd>The name of the CloudServices module.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-url">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;url&quot;</span></code>:</dt>
+<dd><p class="first">Server URL used by the CloudServices network protocol.</p>
+<p class="last">The URL syntax depends on the used CloudServices network protocol type.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-app-id">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_id&quot;</span></code>:</dt>
+<dd>Application ID provided by Cerence.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-app-key">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_key&quot;</span></code>:</dt>
+<dd>Application Key provided by Cerence.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-app-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_name&quot;</span></code>:</dt>
+<dd>User defined application name string that must be unique.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-app-version">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_version&quot;</span></code>:</dt>
+<dd>Application version.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-app-language">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_language&quot;</span></code>:</dt>
+<dd>Application language.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-carrier">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;carrier&quot;</span></code>:</dt>
+<dd>Carrier name.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-device-model">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;device_model&quot;</span></code>:</dt>
+<dd>Device model.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-uid">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;uid&quot;</span></code>:</dt>
+<dd>User ID that will track a unique user across sessions.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-device-id">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;device_id&quot;</span></code>:</dt>
+<dd>Device ID that will track a unique device across sessions.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-input-audio-format">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;input_audio_format&quot;</span></code>:</dt>
+<dd><p class="first">The input audio format.</p>
+<p>This configuration key defines the audio format which is expected to be coming in from the Audio Backbone and then send to the cloud recognizer.</p>
+<p>From that format also the configuration of the server connection is derived.</p>
+<p>For cloud asr the highest ogg opus quality is achieved using “OPUS_16K”, which is activated using the following format:</p>
+<ul class="simple">
+<li>“container”: “CONTAINER_OGG”</li>
+<li>“encoding”: “ENCODING_OPUS”</li>
+<li>“sample_rate”: 16000</li>
+<li>“samples_per_channel”: 512</li>
+<li>“buffer_count”: 1</li>
+</ul>
+<p class="last">For more details about supported audio formats please have a look at the “Supported codecs and audio encodings” section
+in the “Cerence Cloud Services  HTTP Services 2.0 Developers Guide”.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-output-audio-format">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;output_audio_format&quot;</span></code>:</dt>
+<dd><p class="first">The output audio format.</p>
+<p>This configuration key defines the audio format which will be send to the Audio Backbone after receiving it from the cloud tts.</p>
+<p>From that format also the configuration of the server connection is derived.</p>
+<p>For cloud TTS the best ogg opus quality is achieved using “OPUS_24K”, which is activated using the following format:</p>
+<ul class="simple">
+<li>“container”: “CONTAINER_OGG”</li>
+<li>“encoding”: “ENCODING_OPUS”</li>
+<li>“sample_rate”: 24000</li>
+<li>“samples_per_channel”: 2048</li>
+<li>“buffer_count”: 1</li>
+</ul>
+<p>For more details about supported audio formats please have a look at the “Supported codecs and audio encodings” section
+in the “Cerence Cloud Services  HTTP Services 2.0 Developers Guide”.</p>
+<p>Please be aware that the server originally synthesizes 22050Hz data, which is upsampled at the server due to the constrains of the opus codec.
+Therefore it is safe to downsample the data to 22050Hz without audible quality loss.</p>
+<p class="last">Nevertheless any downsampling below 22050Hz is not recommended since it will lead to audible quality losses.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-idle-session-timeout">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;idle_session_timeout&quot;</span></code>:</dt>
+<dd>Specifies the maximum time, in seconds, that the Cloud Services instance can remain connected while idle.
+It is considered to be idle when no transactions are sent or replies are received.
+Cloud Services will automatically reconnect upon sending a new transaction.
+Must be greater than zero. Default is 45.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-connection-timeout">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;connection_timeout&quot;</span></code>:</dt>
+<dd>Specifies the maximum time, in seconds, between the connection request (either at Cloud Services creation,
+or upon sending a transaction) and the connected confirmation is received from the server.
+Must be greater than zero. Default is 30.</dd>
+</dl>
+<dl class="docutils" id="icloudservicesconfig-ssl-certificate-bundle">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;ssl_certificate_bundle&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path to a file that holds a bundle of one or more certificates. The relative path is considered to be in relation to the JSON configuration directory</p>
+<p>For any client connecting to Cerence Cloud it is mandatory to run server authentication (Cerence Corporate Security request).
+This means that during the TLS handshake the client (here: CloudServices) has to receive and validate the server certificates.</p>
+<p>During establishment of a secure connection (e.g. HTTPS), an authenticity check of the remote peer’s
+certificate is performed. This way it is proved that the remote peer is really the one it claims to be.
+Server certificates are validated against the trust chain known to client.
+When using HTTPS the check is typically performed based on the CA (Certificate Authority) bundle located at the
+system’s default path. This property allows to change the path to a different user-specific
+certificate bundle.</p>
+<p class="last">The certificate bundle must contain a chain to the root certificates used to issue the Cerence Cloud server certificate.
+Note that root certificates in a trust chain may be withdrawn by the issuing authorities for security reasons.
+Therefore, it must be possible that applications can update the certificate bundle in the field during system lifetime.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="icloudserviceshttpconfig-the-cloudservices-http-configuration">
+<span id="icloudserviceshttpconfig"></span><h4>ICloudServicesHttpConfig - The CloudServices HTTP configuration.</h4>
+<p>Super type: <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a></p>
+<p>The CloudServices HTTP configuration.</p>
+<p>The CloudServices HTTP network protocol supports following “url” syntaxes:
+- “<a class="reference external" href="http:/">http:/</a>/&lt;host&gt;:&lt;port&gt;[/&lt;url_mapping&gt;/]”
+- “<a class="reference external" href="https:/">https:/</a>/&lt;host&gt;:&lt;port&gt;[/&lt;url_mapping&gt;/]” (SSL secured)</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="13%" />
+<col width="10%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The name of the CloudServices module.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;url&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Server URL used by the CloudServices network protocol.</div>
+<div class="line">This property supports vh_callback.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;app_id&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Application ID provided by Cerence.</div>
+<div class="line">This property supports vh_callback.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;app_key&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Application Key provided by Cerence.</div>
+<div class="line">This property supports vh_callback.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;app_name&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">User defined application name string that must be unique.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;app_version&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Application version.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;app_language&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Application language.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;carrier&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Carrier name.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;device_model&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Device model.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;uid&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">User ID that will track a unique user across sessions.</div>
+<div class="line">This property supports vh_callback.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;device_id&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Device ID that will track a unique device across sessions.</div>
+<div class="line">This property supports vh_callback.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;input_audio_format&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iaudioformatconfig">IAudioFormatConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The input audio format.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;output_audio_format&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iaudioformatconfig">IAudioFormatConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The output audio format.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;idle_session_timeout&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">int</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;connection_timeout&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">int</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no, default value is 30</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;ssl_certificate_bundle&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Path</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">An absolute or relative path to a file that holds a bundle of one or more certificates. The relative path is considered to be in relation to the JSON configuration directory</div>
+<div class="line">This property supports vh_callback.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudservicesconfig">ICloudServicesConfig</a>.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudserviceshttpconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd>The name of the CloudServices module.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-url">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;url&quot;</span></code>:</dt>
+<dd><p class="first">Server URL used by the CloudServices network protocol.</p>
+<p class="last">The URL syntax depends on the used CloudServices network protocol type.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-app-id">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_id&quot;</span></code>:</dt>
+<dd>Application ID provided by Cerence.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-app-key">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_key&quot;</span></code>:</dt>
+<dd>Application Key provided by Cerence.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-app-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_name&quot;</span></code>:</dt>
+<dd>User defined application name string that must be unique.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-app-version">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_version&quot;</span></code>:</dt>
+<dd>Application version.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-app-language">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_language&quot;</span></code>:</dt>
+<dd>Application language.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-carrier">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;carrier&quot;</span></code>:</dt>
+<dd>Carrier name.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-device-model">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;device_model&quot;</span></code>:</dt>
+<dd>Device model.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-uid">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;uid&quot;</span></code>:</dt>
+<dd>User ID that will track a unique user across sessions.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-device-id">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;device_id&quot;</span></code>:</dt>
+<dd>Device ID that will track a unique device across sessions.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-input-audio-format">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;input_audio_format&quot;</span></code>:</dt>
+<dd><p class="first">The input audio format.</p>
+<p>This configuration key defines the audio format which is expected to be coming in from the Audio Backbone and then send to the cloud recognizer.</p>
+<p>From that format also the configuration of the server connection is derived.</p>
+<p>For cloud asr the highest ogg opus quality is achieved using “OPUS_16K”, which is activated using the following format:</p>
+<ul class="simple">
+<li>“container”: “CONTAINER_OGG”</li>
+<li>“encoding”: “ENCODING_OPUS”</li>
+<li>“sample_rate”: 16000</li>
+<li>“samples_per_channel”: 512</li>
+<li>“buffer_count”: 1</li>
+</ul>
+<p class="last">For more details about supported audio formats please have a look at the “Supported codecs and audio encodings” section
+in the “Cerence Cloud Services  HTTP Services 2.0 Developers Guide”.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-output-audio-format">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;output_audio_format&quot;</span></code>:</dt>
+<dd><p class="first">The output audio format.</p>
+<p>This configuration key defines the audio format which will be send to the Audio Backbone after receiving it from the cloud tts.</p>
+<p>From that format also the configuration of the server connection is derived.</p>
+<p>For cloud TTS the best ogg opus quality is achieved using “OPUS_24K”, which is activated using the following format:</p>
+<ul class="simple">
+<li>“container”: “CONTAINER_OGG”</li>
+<li>“encoding”: “ENCODING_OPUS”</li>
+<li>“sample_rate”: 24000</li>
+<li>“samples_per_channel”: 2048</li>
+<li>“buffer_count”: 1</li>
+</ul>
+<p>For more details about supported audio formats please have a look at the “Supported codecs and audio encodings” section
+in the “Cerence Cloud Services  HTTP Services 2.0 Developers Guide”.</p>
+<p>Please be aware that the server originally synthesizes 22050Hz data, which is upsampled at the server due to the constrains of the opus codec.
+Therefore it is safe to downsample the data to 22050Hz without audible quality loss.</p>
+<p class="last">Nevertheless any downsampling below 22050Hz is not recommended since it will lead to audible quality losses.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-idle-session-timeout">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;idle_session_timeout&quot;</span></code>:</dt>
+<dd>Specifies the maximum time, in seconds, that the Cloud Services instance can remain connected while idle.
+It is considered to be idle when no transactions are sent or replies are received.
+Cloud Services will automatically reconnect upon sending a new transaction.
+Must be greater than zero. Default is 45.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-connection-timeout">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;connection_timeout&quot;</span></code>:</dt>
+<dd>Specifies the maximum time, in seconds, between the connection request (either at Cloud Services creation,
+or upon sending a transaction) and the connected confirmation is received from the server.
+Must be greater than zero. Default is 30.</dd>
+</dl>
+<dl class="docutils" id="icloudserviceshttpconfig-ssl-certificate-bundle">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;ssl_certificate_bundle&quot;</span></code>:</dt>
+<dd><p class="first">An absolute or relative path to a file that holds a bundle of one or more certificates. The relative path is considered to be in relation to the JSON configuration directory</p>
+<p>For any client connecting to Cerence Cloud it is mandatory to run server authentication (Cerence Corporate Security request).
+This means that during the TLS handshake the client (here: CloudServices) has to receive and validate the server certificates.</p>
+<p>During establishment of a secure connection (e.g. HTTPS), an authenticity check of the remote peer’s
+certificate is performed. This way it is proved that the remote peer is really the one it claims to be.
+Server certificates are validated against the trust chain known to client.
+When using HTTPS the check is typically performed based on the CA (Certificate Authority) bundle located at the
+system’s default path. This property allows to change the path to a different user-specific
+certificate bundle.</p>
+<p class="last">The certificate bundle must contain a chain to the root certificates used to issue the Cerence Cloud server certificate.
+Note that root certificates in a trust chain may be withdrawn by the issuing authorities for security reasons.
+Therefore, it must be possible that applications can update the certificate bundle in the field during system lifetime.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="icloudmoduleconfig-the-cloud-audio-module-configuration">
+<span id="icloudmoduleconfig"></span><h4>ICloudModuleConfig - The cloud audio module configuration.</h4>
+<dl class="docutils">
+<dt>Sub types:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;CloudCommander&quot;</span></code>, see <a class="reference internal" href="#icloudcommanderconfig">ICloudCommanderConfig</a></li>
+</ul>
+</dd>
+</dl>
+<p>The cloud audio module configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="32%" />
+<col width="7%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;CloudCommander&quot;</span></code></td>
+<td>yes</td>
+<td>Select the sub-type.</td>
+</tr>
+<tr class="row-odd"><td><em>inline keys from sub-type</em></td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudcommanderconfig">ICloudCommanderConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;CloudCommander&quot;</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the cloud module.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudmoduleconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the cloud module.</p>
+<p class="last">This name has to be unique. For instance it is used to reference this module from audio scenarios (audio paths).</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="icloudcommanderconfig-configuration-interface-of-the-cloudcommander-audio-module">
+<span id="icloudcommanderconfig"></span><h4>ICloudCommanderConfig - Configuration interface of the ‘CloudCommander’ audio module.</h4>
+<p>Super type: <a class="reference internal" href="#icloudmoduleconfig">ICloudModuleConfig</a></p>
+<p>Configuration interface of the ‘CloudCommander’ audio module.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="19%" />
+<col width="15%" />
+<col width="46%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The name of the cloud module.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudmoduleconfig">ICloudModuleConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;cloud_services_name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the CloudServices instance used for remote connections.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudcommanderconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the cloud module.</p>
+<p class="last">This name has to be unique. For instance it is used to reference this module from audio scenarios (audio paths).</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudcommanderconfig-cloud-services-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;cloud_services_name&quot;</span></code>:</dt>
+<dd>The name of the CloudServices instance used for remote connections.</dd>
+</dl>
+</div>
+<div class="section" id="icloudmanagerconfig-the-cloud-manager-configuration">
+<span id="icloudmanagerconfig"></span><h4>ICloudManagerConfig - The cloud manager configuration.</h4>
+<p>The cloud manager configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="24%" />
+<col width="8%" />
+<col width="43%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;enable_cloud_logging&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> String <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The cloud services instances used for cloud logging.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudmanagerconfig-enable-cloud-logging">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;enable_cloud_logging&quot;</span></code>:</dt>
+<dd>The cloud services instances used for cloud logging.</dd>
+</dl>
+</div>
+<div class="section" id="icloudcommandconfig-declaration-of-the-icloudcommandconfig-interface">
+<span id="icloudcommandconfig"></span><h4>ICloudCommandConfig - Declaration of the ICloudCommandConfig interface</h4>
+<p>Declaration of the ICloudCommandConfig interface</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="30%" />
+<col width="15%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The name of the cloud-command configuration used for referencing it.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;command&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the cloud command.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>yes</td>
+<td>Command dictionary.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;timeout&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 30000</td>
+<td>Defines the cloud command timeout in milliseconds.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;params&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#icloudcommandparamconfig">ICloudCommandParamConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>Parameters to be sent alongside the command.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudcommandconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd>The name of the cloud-command configuration used for referencing it.</dd>
+</dl>
+<dl class="docutils" id="icloudcommandconfig-command">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;command&quot;</span></code>:</dt>
+<dd><p class="first">The name of the cloud command.</p>
+<p class="last">This property describes the command name sent to the cloud.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudcommandconfig-dictionary">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;</span></code>:</dt>
+<dd><p class="first">Command dictionary.</p>
+<p>The command dictionary contains the parameters of the cloud command.</p>
+<p class="last">Note, that this <code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;</span></code> key is of type <code class="docutils literal notranslate"><span class="pre">IUserJsonConfig</span></code>, which allows
+the usage of the <code class="docutils literal notranslate"><span class="pre">&quot;vh_callback&quot;</span></code> mechanism.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudcommandconfig-timeout">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;timeout&quot;</span></code>:</dt>
+<dd><p class="first">Defines the cloud command timeout in milliseconds.</p>
+<p class="last">Time the client waits for a server response.</p>
+</dd>
+</dl>
+<dl class="docutils" id="icloudcommandconfig-params">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;params&quot;</span></code>:</dt>
+<dd>Parameters to be sent alongside the command.</dd>
+</dl>
+</div>
+<div class="section" id="icloudcommandparamconfig-parameters-to-be-sent-with-a-cloud-command">
+<span id="icloudcommandparamconfig"></span><h4>ICloudCommandParamConfig - Parameters to be sent with a cloud command.</h4>
+<dl class="docutils">
+<dt>Sub types:</dt>
+<dd><ul class="first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;DICTIONARY&quot;</span></code>, see <a class="reference internal" href="#idictionaryparamconfig">IDictionaryParamConfig</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;STRING&quot;</span></code>, see <a class="reference internal" href="#istringparamconfig">IStringParamConfig</a></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;SEQUENCE&quot;</span></code>, see <a class="reference internal" href="#isequenceparamconfig">ISequenceParamConfig</a></li>
+</ul>
+</dd>
+</dl>
+<p>Parameters to be sent with a cloud command.</p>
+<p>The type defines the concrete parameters that are expected.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="40%" />
+<col width="7%" />
+<col width="35%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;DICTIONARY&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;STRING&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;SEQUENCE&quot;</span></code></td>
+<td>yes</td>
+<td>Select the sub-type.</td>
+</tr>
+<tr class="row-odd"><td><em>inline keys from sub-type</em></td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#idictionaryparamconfig">IDictionaryParamConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;DICTIONARY&quot;</span></code>.</td>
+</tr>
+<tr class="row-even"><td><em>inline keys from sub-type</em></td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#istringparamconfig">IStringParamConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;STRING&quot;</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><em>inline keys from sub-type</em></td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#isequenceparamconfig">ISequenceParamConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>depends</td>
+<td>Required if and only if <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;SEQUENCE&quot;</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;param_name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the command parameter.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="icloudcommandparamconfig-param-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;param_name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the command parameter.</p>
+<p class="last">This property describes the parameter name sent to the cloud.
+See NCS documentation for details.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="idictionaryparamconfig">
+<span id="idictionaryparamconfig-dictionary-type-settings"></span><h4>IDictionaryParamConfig - DICTIONARY type settings</h4>
+<p>Super type: <a class="reference internal" href="#icloudcommandparamconfig">ICloudCommandParamConfig</a></p>
+<p>DICTIONARY type settings</p>
+<p>It specifies a cloud-command parameter that consists of a dictionary.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="24%" />
+<col width="8%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;param_name&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The name of the command parameter.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudcommandparamconfig">ICloudCommandParamConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>yes</td>
+<td>User defined dictionary parameter.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="idictionaryparamconfig-param-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;param_name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the command parameter.</p>
+<p class="last">This property describes the parameter name sent to the cloud.
+See NCS documentation for details.</p>
+</dd>
+</dl>
+<dl class="docutils" id="idictionaryparamconfig-dictionary">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;</span></code>:</dt>
+<dd><p class="first">User defined dictionary parameter.</p>
+<p class="last">See NCS documentation for more information on required parameters for each of the commands.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="istringparamconfig-string-type-settings">
+<span id="istringparamconfig"></span><h4>IStringParamConfig - STRING type settings</h4>
+<p>Super type: <a class="reference internal" href="#icloudcommandparamconfig">ICloudCommandParamConfig</a></p>
+<p>STRING type settings</p>
+<p>It specifies a cloud-command parameter that conists of a string.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="23%" />
+<col width="8%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;param_name&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The name of the command parameter.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudcommandparamconfig">ICloudCommandParamConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;string&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>String parameter.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="istringparamconfig-param-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;param_name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the command parameter.</p>
+<p class="last">This property describes the parameter name sent to the cloud.
+See NCS documentation for details.</p>
+</dd>
+</dl>
+<dl class="docutils" id="istringparamconfig-string">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;string&quot;</span></code>:</dt>
+<dd><p class="first">String parameter.</p>
+<p class="last">See NCS documentation for more information on required parameters for each of the commands.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="isequenceparamconfig-sequence-type-settings">
+<span id="isequenceparamconfig"></span><h4>ISequenceParamConfig - SEQUENCE type settings</h4>
+<p>Super type: <a class="reference internal" href="#icloudcommandparamconfig">ICloudCommandParamConfig</a></p>
+<p>SEQUENCE type settings</p>
+<p>It specifies a cloud-command parameter that consists of a sequence of dictionaries.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="30%" />
+<col width="7%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;param_name&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The name of the command parameter.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#icloudcommandparamconfig">ICloudCommandParamConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;sequence&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>yes</td>
+<td>User defined sequence parameter.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="isequenceparamconfig-param-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;param_name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the command parameter.</p>
+<p class="last">This property describes the parameter name sent to the cloud.
+See NCS documentation for details.</p>
+</dd>
+</dl>
+<dl class="docutils" id="isequenceparamconfig-sequence">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sequence&quot;</span></code>:</dt>
+<dd><p class="first">User defined sequence parameter.</p>
+<p class="last">A sequence consists of two or more dictionary items. For one item use dictionary param instead.
+See NCS documentation for more information on required parameters for each of the commands.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="iaudioformatconfig-the-audio-format-configuration">
+<span id="iaudioformatconfig"></span><h4>IAudioFormatConfig - The audio format configuration.</h4>
+<p>The audio format configuration.</p>
+<p>This configuration can be referenced with (<code class="docutils literal notranslate"><span class="pre">&quot;uses&quot;</span></code>) from other parts of the configuration using the <code class="docutils literal notranslate"><span class="pre">name</span></code> key.
+The name of audio format has to be unique.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="22%" />
+<col width="30%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The name of the audio format.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;sample_rate&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The sampling rate in Hz.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;samples_per_channel&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The number of units per channel.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;channel_count&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The number of channels.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;encoding&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> Encoding <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no, default value is ENCODING_PCM_16BIT</td>
+<td>The encoding type.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;container&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> Container <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no, default value is CONTAINER_NONE</td>
+<td>The container type.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iaudioformatconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the audio format.</p>
+<p class="last">This key is used for referencing this audio format from other parts of the configuration.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-sample-rate">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sample_rate&quot;</span></code>:</dt>
+<dd>The sampling rate in Hz.</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-samples-per-channel">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;samples_per_channel&quot;</span></code>:</dt>
+<dd><p class="first">The number of units per channel.</p>
+<p class="last">This key defines the samples per channel for plain PCM data (ENCODING_PCM_16BIT) without a container (CONTAINER_NONE).
+In all other cases it defines bytes per channel.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-channel-count">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;channel_count&quot;</span></code>:</dt>
+<dd>The number of channels.</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-encoding">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;encoding&quot;</span></code>:</dt>
+<dd><p class="first">The encoding type.</p>
+<blockquote class="last">
+<div><p id="encoding"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> Encoding <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ENCODING_USER&quot;</span></code>: user specific encoding type, unknown by the system</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ENCODING_PCM_16BIT&quot;</span></code>: Signed 16Bit PCM raw data</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ENCODING_OPUS&quot;</span></code>: OPUS encoding</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ENCODING_MP3&quot;</span></code>: MP3 encoding</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-container">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;container&quot;</span></code>:</dt>
+<dd><p class="first">The container type.</p>
+<blockquote class="last">
+<div><p id="container"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> Container <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;CONTAINER_USER&quot;</span></code>: user specific container type, unknown by the system</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;CONTAINER_NONE&quot;</span></code>: No container used/desired</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;CONTAINER_OGG&quot;</span></code>: OGG container</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="logging">
+<span id="clouddatauploadermode"></span><h2><a class="reference internal" href="#logging">Logging</a></h2>
+<div class="section" id="log-communication-between-sdk-client-and-ncs-server">
+<h3>Log communication between SDK client and NCS server</h3>
+<p>For debugging purposes the communication between the SDK client and the Cerence cloud can be traced by configuring corresponding log consumers,</p>
+<div class="section" id="id3">
+<h4>Overview</h4>
+<p>For debugging purposes it may be necessary to understand what is exactly going on between the client and the
+NCS cloud. When using HTTP CloudServices there is an option to enable the debug-functionality of the underlaying
+CURL library.</p>
+<p>The Logger offers two data logging points one for the transfer sent to the cloud, one for the data
+received from the cloud. They can be activated by defining a log consumer with zone <code class="docutils literal notranslate"><span class="pre">LOG_DATA</span></code> and the correct
+log-module name.</p>
+<p>This document will describe how to identify and configure those log-points correctly.</p>
+</div>
+<div class="section" id="general-advice">
+<h4>General Advice</h4>
+<p>The logger configuration parameter <code class="docutils literal notranslate"><span class="pre">&quot;data_buffer_size_per_channel&quot;</span></code> should be set to a quite high value (e.g. “data_buffer_size_per_channel”:500000,)
+to avoid buffer overruns (cf. section “Buffer overrun”).</p>
+</div>
+<div class="section" id="available-logging-points">
+<h4>Available Logging Points</h4>
+<p>As already mentioned there are two dedicated logging points, one for the incoming and one for the outgoing data. Both are located in the
+CURL wrapping layer which defines the prefix for the log module name: “nuance.cloudservices.EasyCurlAdapter”. As the logging points are
+instance-specific they need to be extended by the instance name and an “in” or “out” suffix for the direction.</p>
+<p>It is recommended to define one dedicated destination/file for each data logging point. This is done by writing the full definition of the
+logging point to the “modules” section of the log consumer configuration and using <code class="docutils literal notranslate"><span class="pre">LOG_DATA</span></code> as logging zone.</p>
+</div>
+<div class="section" id="finding-names">
+<h4>Finding names</h4>
+<p>When HTTP CloudServices are used directly the instance-name is the one passed during creation. It can also be found in the “cloud_services”
+section of the JSON configuration.</p>
+<p>When using CloudServices integrated into a high level component the instance-name is inherited from the instance-name of this component.</p>
+</div>
+<div class="section" id="limitations">
+<h4>Limitations</h4>
+<p>When logging to file the files are created when writing the first data package. If no data is transfered no file will be created.</p>
+</div>
+<div class="section" id="configuration">
+<h4>Configuration</h4>
+<p>The following example shows how to configure/access those HTTP transaction logging points.
+It assumes that the instance name of HTTP CloudServices is “httpInst”.
+It can be used as a blueprint for setting up the desired configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;logger&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;data_buffer_size_per_channel&quot;</span><span class="p">:</span><span class="mi">500000</span><span class="p">,</span>
+      <span class="s2">&quot;consumers&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="p">{</span>
+              <span class="s2">&quot;name&quot;</span><span class="p">:</span>    <span class="s2">&quot;csHttp in transaction log&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;output&quot;</span><span class="p">:</span>  <span class="s2">&quot;csHttp_in_%DATE_TIME%.log&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.cloudservices.EasyCurlAdapter.httpInst.in&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;zones&quot;</span><span class="p">:</span>   <span class="s2">&quot;LOG_DATA&quot;</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+              <span class="s2">&quot;name&quot;</span><span class="p">:</span>    <span class="s2">&quot;csHttp out transaction log&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;output&quot;</span><span class="p">:</span>  <span class="s2">&quot;csHttp_out_%DATE_TIME%.log&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.cloudservices.EasyCurlAdapter.httpInst.out&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;zones&quot;</span><span class="p">:</span>   <span class="s2">&quot;LOG_DATA&quot;</span>
+          <span class="p">}</span>
+      <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="send-log-data-from-sdk-client-to-ncs-server">
+<h3>Send log data from SDK client to NCS server</h3>
+<p>SDK client applications can send log data to NCS servers using the <code class="docutils literal notranslate"><span class="pre">ILogging_logText</span></code> API, see <a class="reference external" href="../common/SDK_Common_UserGuide.html">Common user guide</a> log text.</p>
+<p>When an application calls <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_logText</span></code> the log data handed over to this function will be sent by the SDK
+to NCS with a <code class="docutils literal notranslate"><span class="pre">NVC_LOG_REVISION_CMD</span></code> if:</p>
+<blockquote>
+<div><ul class="simple">
+<li>the log zone is set to <code class="docutils literal notranslate"><span class="pre">NUANCE_COMMON_LOGZONE_LOG_CLOUD</span></code></li>
+<li>the cloud logging is enabled in the JSON configuration of the <code class="docutils literal notranslate"><span class="pre">&quot;cloud_manager&quot;</span></code>, e.g.</li>
+</ul>
+</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudServices 1.0&quot;</span><span class="p">,</span>
+<span class="s2">&quot;cloud_manager&quot;</span><span class="p">:</span>
+ <span class="p">{</span>
+  <span class="s2">&quot;enable_cloud_logging&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;csOpusOggHttp&quot;</span><span class="p">,</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">]</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Given such a configuration, the cloud manager will create the CloudServices instances needed for this logging automatically.
+By default, cloud logging is disabled. That means, if an application wants to use cloud logging, then <code class="docutils literal notranslate"><span class="pre">&quot;enable_cloud_logging&quot;</span></code> must be
+explicitly set for the corresponding CloudService instances.</p>
+</div>
+</div>
+<div class="section" id="references">
+<h2>REFERENCES</h2>
+<ul class="simple">
+<li><a class="reference external" href="../common/SDK_Common_UserGuide.html">Common user guide</a></li>
+</ul>
+</div>
+<div class="section" id="version-history">
+<h2>VERSION HISTORY</h2>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="5%" />
+<col width="5%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>REVISION</em></th>
+<th class="head"><em>DATE</em></th>
+<th class="head"><em>DESCRIPTION</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1.0</td>
+<td>13.03.2019</td>
+<td>initial version</td>
+</tr>
+<tr class="row-odd"><td>2.0</td>
+<td>03.12.2019</td>
+<td>adapted document to Cerence</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CERENCE SDK - CLOUDSERVICES USER’S GUIDE</a><ul>
+<li><a class="reference internal" href="#id1">Scope Of Document</a></li>
+<li><a class="reference internal" href="#sdk-cloudservices-overview">SDK CloudServices Overview</a></li>
+<li><a class="reference internal" href="#id2">Document conventions</a></li>
+<li><a class="reference internal" href="#cloudmanager">CloudManager</a><ul>
+<li><a class="reference internal" href="#creating-cloudmanager">Creating CloudManager</a></li>
+<li><a class="reference internal" href="#configuring-cloudmanager">Configuring CloudManager</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cloudcommander">CloudCommander</a><ul>
+<li><a class="reference internal" href="#configuring-cloudcommander">Configuring CloudCommander</a></li>
+<li><a class="reference internal" href="#creating-cloudcommander">Creating CloudCommander</a></li>
+<li><a class="reference internal" href="#using-cloudcommander">Using CloudCommander</a><ul>
+<li><a class="reference internal" href="#sending-pre-defined-commands">Sending pre-defined commands</a><ul>
+<li><a class="reference internal" href="#configuring-cloud-commands">Configuring cloud commands</a></li>
+<li><a class="reference internal" href="#sending-cloud-commands">Sending cloud commands</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#create-cloud-commands">Create cloud commands</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#clouddatauploader">CloudDataUploader</a></li>
+<li><a class="reference internal" href="#cloudlogger">CloudLogger</a></li>
+<li><a class="reference internal" href="#json-configuration">JSON Configuration</a><ul>
+<li><a class="reference internal" href="#cloudservices">CloudServices</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#itoplevelcloudservicesconfig-the-top-level-cloud-services-configuration-structure">ITopLevelCloudServicesConfig - The top-level cloud services configuration structure.</a></li>
+<li><a class="reference internal" href="#iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</a></li>
+<li><a class="reference internal" href="#icloudservicesconfig-the-cloudservices-configuration">ICloudServicesConfig - The CloudServices configuration.</a></li>
+<li><a class="reference internal" href="#icloudserviceshttpconfig-the-cloudservices-http-configuration">ICloudServicesHttpConfig - The CloudServices HTTP configuration.</a></li>
+<li><a class="reference internal" href="#icloudmoduleconfig-the-cloud-audio-module-configuration">ICloudModuleConfig - The cloud audio module configuration.</a></li>
+<li><a class="reference internal" href="#icloudcommanderconfig-configuration-interface-of-the-cloudcommander-audio-module">ICloudCommanderConfig - Configuration interface of the ‘CloudCommander’ audio module.</a></li>
+<li><a class="reference internal" href="#icloudmanagerconfig-the-cloud-manager-configuration">ICloudManagerConfig - The cloud manager configuration.</a></li>
+<li><a class="reference internal" href="#icloudcommandconfig-declaration-of-the-icloudcommandconfig-interface">ICloudCommandConfig - Declaration of the ICloudCommandConfig interface</a></li>
+<li><a class="reference internal" href="#icloudcommandparamconfig-parameters-to-be-sent-with-a-cloud-command">ICloudCommandParamConfig - Parameters to be sent with a cloud command.</a></li>
+<li><a class="reference internal" href="#idictionaryparamconfig">IDictionaryParamConfig - DICTIONARY type settings</a></li>
+<li><a class="reference internal" href="#istringparamconfig-string-type-settings">IStringParamConfig - STRING type settings</a></li>
+<li><a class="reference internal" href="#isequenceparamconfig-sequence-type-settings">ISequenceParamConfig - SEQUENCE type settings</a></li>
+<li><a class="reference internal" href="#iaudioformatconfig-the-audio-format-configuration">IAudioFormatConfig - The audio format configuration.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging">Logging</a><ul>
+<li><a class="reference internal" href="#log-communication-between-sdk-client-and-ncs-server">Log communication between SDK client and NCS server</a><ul>
+<li><a class="reference internal" href="#id3">Overview</a></li>
+<li><a class="reference internal" href="#general-advice">General Advice</a></li>
+<li><a class="reference internal" href="#available-logging-points">Available Logging Points</a></li>
+<li><a class="reference internal" href="#finding-names">Finding names</a></li>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#send-log-data-from-sdk-client-to-ncs-server">Send log data from SDK client to NCS server</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">REFERENCES</a></li>
+<li><a class="reference internal" href="#version-history">VERSION HISTORY</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SDK_CloudServices_UserGuide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

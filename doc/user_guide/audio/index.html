@@ -1,0 +1,1721 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CERENCE SDK - AUDIO USER’S GUIDE</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Overview" href="user_guide/audio_core_configuration_api_ref.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="doc-title">
+<h1>CERENCE SDK - AUDIO USER’S GUIDE</h1>
+<div class="line-block">
+<div class="line">© 2020 Cerence, Inc. All rights reserved.</div>
+<div class="line">Published by Cerence, Inc.</div>
+<div class="line">15 Wayside Road, Burlington, Massachusetts 01803, U.S.A.</div>
+</div>
+<p>Cerence, Inc. provides this document without representation or warranty of any kind. The
+information in this document is subject to change without notice and
+does not represent a commitment by Cerence, Inc. The software and/or databases described in this document are furnished under a license
+agreement and may be used or copied only in accordance with the terms of such license agreement. Without
+limiting the rights under copyright reserved herein, and except as permitted by such license agreement, no part of
+this document may be reproduced or transmitted in any form or by any means, including, without limitation,
+electronic, mechanical, photocopying, recording, or otherwise, or transferred to information storage and retrieval
+systems, without the prior written permission of Cerence, Inc.</p>
+<p>Cerence and the Cerence logo are trademarks or registered trademarks of Cerence, Inc. or its affiliates in the United States and/or other countries. All other trademarks referenced
+herein are the property of their respective owners.</p>
+<div class="section" id="scope-of-document">
+<h2>Scope of Document</h2>
+<p>The main scope of this documentation is to serve as a developer guide for Cerence Professional Services (<abbr title="Cerence Professional Service">PS</abbr>) engineers and for
+customers who want to use the audio framework of the Cerence <abbr title="Software Development Kit">SDK</abbr>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><abbr title="Application Programming Interface">API</abbr> call examples in this document are shown in C syntax.</p>
+</div>
+</div>
+<div class="section" id="overview">
+<h2>Overview</h2>
+<p>The audio framework provides access to Cerence’s state-of-the-art audio processing components through high-level
+easy-to-use application programming interfaces (<abbr title="Application Programming Interface">API</abbr>) that enable fast-track development of complex audio use cases.</p>
+<p>The audio framework concept is simply based on a set of <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> and a central <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>
+component. Thereby each <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> is providing a specific audio processing capability like for instance audio i/o,
+audio coding, speech signal enhancement, sample rate conversion, speech recognition, text-to-speech synthesis or such the like. The
+<a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> on the other hand provides among others the possibility to connect <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a>
+to specific audio processing chains to realize different audio use cases. These use case specific <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> chains
+can be predefined in a <abbr title="JavaScript Object Notation">JSON</abbr> configuration file of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> in so called <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>
+definitions. The <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> provides a corresponding <abbr title="Application Programming Interface">API</abbr> to connect the <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> predefined
+in these <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> definitions.</p>
+<p>In addition the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> acts as a central registry of <a class="reference internal" href="#id14"><span class="std std-ref">audio adapters</span></a>, <a class="reference internal" href="#id22"><span class="std std-ref">audio codecs</span></a>
+and <a class="reference internal" href="#id30"><span class="std std-ref">audio containers</span></a> that can be used from specific <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> to perform external audio i/o
+and decoding, encoding, packing and unpacking of audio data.</p>
+<p>The audio framework components are configurable via <abbr title="JavaScript Object Notation">JSON</abbr> configuration file(s) to the needs of the audio use
+cases they are used for.</p>
+</div>
+<div class="section" id="basic-concepts">
+<h2>Basic Concepts</h2>
+<div class="section" id="external-audio-integration">
+<span id="id2"></span><h3>External Audio Integration</h3>
+</div>
+<p>The audio framework uses an <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> approach to realize the access to external audio sinks and sources
+(e.g. audio devices). These <a class="reference internal" href="#id14"><span class="std std-ref">audio adapters</span></a> can be integrated as subcomponents of the <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> and <a class="reference external" href="./audio_module_output/index.html">Audio Output</a>
+<a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> in order to stream audio into or from an audio processing chain defined in an <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>.
+Thereby the binding of a specific <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> to a dedicated <a class="reference external" href="./audio_module_input/index.html">Audio Input</a>  or <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> module instance is configurable
+via the corresponding module <abbr title="JavaScript Object Notation">JSON</abbr> configuration by setting the unique adapter type name. For more details see chapter <a class="reference internal" href="#id14"><span class="std std-ref">Audio Adapters</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>As <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> implementations are highly platform and project specific the <abbr title="Software Development Kit">SDK</abbr> delivery does contain only sample
+<a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> implementations for each standard platform <abbr title="Software Development Kit">SDK</abbr> package. These sample adapters are provided as source code
+and may serve as a starting point for Cerence <abbr title="Cerence Professional Service">PS</abbr> or customer engineers to develop project specific <a class="reference internal" href="#id14"><span class="std std-ref">adapter(s)</span></a>. Note that the
+sample adapters are not guaranteed to work on each specific platform. Finally it is the responsibility of Cerence <abbr title="Cerence Professional Service">PS</abbr> or the customer to implement
+and test a properly working external audio integration in the form of an <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a>.</p>
+<p class="last">These external audio implementations must fulfill the <a class="reference external" href="../../system_requirements/Audio_Transfer_Requirements_CDFW_CSDK.pdf">CSDK Audio Requirements</a>.</p>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="_images/audio_adapter_approach_external.png"><img alt="_images/audio_adapter_approach_external.png" class="align-center" src="_images/audio_adapter_approach_external.png" style="width: 709.0px; height: 276.0px;" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="section" id="audio-codecs-and-containers">
+<span id="id3"></span><h3>Audio Codecs and Containers</h3>
+<p>The <abbr title="Software Development Kit">SDK</abbr> is delivered with a set of <a class="reference internal" href="#id22"><span class="std std-ref">audio codecs</span></a> (e.g. <cite>Opus</cite>) and <a class="reference internal" href="#id30"><span class="std std-ref">containers</span></a> (e.g. <cite>Ogg</cite>). In case
+these codecs and containers do not meet the project requirements the audio framework provides a possibility to implement and add other codecs respectively
+containers.</p>
+<p>In general all these audio codecs and containers can be integrated as subcomponent of the <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> and <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> audio
+modules into an audio processing chain defined in an <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>. Thereby the binding of a specific audio codec and container
+to a dedicated <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> or <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> audio module instance is configurable via the corresponding module <abbr title="JavaScript Object Notation">JSON</abbr> configuration by setting the
+unique type name of the codec or container. For more details see chapter <a class="reference internal" href="#id14"><span class="std std-ref">Audio Codecs</span></a> and <a class="reference internal" href="#id30"><span class="std std-ref">Audio Containers</span></a>.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="_images/audio_codec_container_approach.png"><img alt="_images/audio_codec_container_approach.png" class="align-center" src="_images/audio_codec_container_approach.png" style="width: 510.5px; height: 463.0px;" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="audio-module-creation-and-destruction">
+<span id="id4"></span><h3>Audio Module Creation and Destruction</h3>
+<p>In general there are two different methods to create and destroy <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a>. One is the so called <cite>implicit</cite> method that
+is the propagated way and the other is the <cite>explicit</cite> method that should be used only if necessary. Which method is supported by which module is
+described in chapter <a class="reference internal" href="#id10"><span class="std std-ref">Audio Modules</span></a>.</p>
+<p>The <cite>implicit</cite> creation method is a feature of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> that automatically creates <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a>
+instances during the activation of an <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>. As a precondition for using <cite>implicit</cite> module creation the application
+needs to register the corresponding factory at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>. For that purpose all <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> which
+support implicit creation provide a <cite>registerFactory</cite> <abbr title="Application Programming Interface">API</abbr> function. For details see chapter <a class="reference internal" href="#registering-audio-module-factories"><span class="std std-ref">Registering Audio Module Factories</span></a>.</p>
+<p>An <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instance is created implicitly by the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> in context of an
+<a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> activation when the following conditions are met:</p>
+<ul class="simple">
+<li>the corresponding <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> factory is registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a></li>
+<li>the <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> is part of the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> being activated</li>
+<li>an <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instance, having this instance name, does not already exist</li>
+</ul>
+<p>Implicitly created <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instances are automatically destroyed on the deactivation of the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>
+they are part of.</p>
+<p>The <cite>explicit</cite> creation is the way that the application instantiates and destroys an <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instance via its specific
+<abbr title="Application Programming Interface">API</abbr>. This has to happen before the instance is used in an <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> context. Explicitly created module instances
+need to be destroyed by the application after the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> they are used in is deactivated.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Both ways to create <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> can be used in a mixed way. This means, an application can create some
+<a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> <cite>explicitly</cite>, whereas others are created <cite>implicitly</cite> during the activation of an <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>.
+As a rule of thumb the application developer generally should use the <cite>implicit</cite> method. The <cite>explicit</cite> method should only be used in case the application
+needs to control the specific audio module via its specific <abbr title="Application Programming Interface">API</abbr>. For instance the <a class="reference external" href="../asr/index.html">Asr</a> speech recognizer always needs to be created <cite>explicitly</cite> because
+the application has to control the module via its <abbr title="Application Programming Interface">API</abbr>.</p>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="_images/audio_module_creation_approach.png"><img alt="_images/audio_module_creation_approach.png" class="align-center" src="_images/audio_module_creation_approach.png" style="width: 679.0px; height: 311.0px;" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="audio-module-connection">
+<h3>Audio Module Connection</h3>
+<p>All <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> can be chained in a flexible way to realize specific audio processing use cases.
+The definition of such audio chains can be done in so called <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> definitions in a <abbr title="JavaScript Object Notation">JSON</abbr> configuration
+file of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>. Each <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> definition must have a unique name that can
+be used to activate and deactivate it at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>. During an activation of an <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>
+all involved <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> are connected automatically by the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>, whereas on
+deactivation they become disconnected again. For more details see chapter <a class="reference internal" href="#connecting-audio-modules"><span class="std std-ref">Connecting Audio Modules</span></a>.</p>
+<p>The following survey schematically shows the required steps to define and use an <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> in order to connect
+<a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> to a use case specific audio processing chain:</p>
+<ul class="simple">
+<li>The specific <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> that shall cover an audio use case needs to be defined in a <abbr title="JavaScript Object Notation">JSON</abbr>
+configuration that is used to configure the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> (<strong>1</strong>).</li>
+<li>Whenever this <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> is needed the application can activate it (<strong>2</strong>) at the
+<a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> <abbr title="Application Programming Interface">API</abbr>. By the same token an activated <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>
+can be deactivated when it is no longer needed (<strong>4</strong>).</li>
+<li>In context of an activation the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> connects the involved <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a>
+instances defined in the specific <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> (<strong>3</strong>). <a class="reference internal" href="#id10"><span class="std std-ref">Audio module</span></a> instances
+and related subcomponents (e.g. adapters, codecs) that do not already exist are created implicitly when a corresponding factory
+was registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> beforehand.</li>
+<li>On deactivation of a scenario the involved <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instances are disconnected(<strong>5</strong>).
+<a class="reference internal" href="#id10"><span class="std std-ref">Audio module</span></a> instances and related subcomponents (e.g. adapters, codecs) that were previously created
+implicitly on activation are destroyed automatically.</li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="_images/audio_scenario_approach.png"><img alt="_images/audio_scenario_approach.png" class="align-center" src="_images/audio_scenario_approach.png" style="width: 594.0px; height: 414.0px;" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Note:</strong></p>
+<p>The audio framework of the <abbr title="Software Development Kit">SDK</abbr> is designed to operate for speech dialog systems only.</p>
+<p>This means that:</p>
+<ul class="simple">
+<li>it is designed to hand audio data from an external real time audio device to an engine like the ASR, operating faster than real time.</li>
+<li>it is designed to hand audio data from an engine like the TTS, operating faster than real time, to an external real time audio device.</li>
+<li>it is NOT designed to hand audio data from an external real time audio device to an external real time audio device.
+The audio framework works asynchronous, therefore it is not guaranteed that one packet of audio data handed in, from an external audio device,
+via the audio input, triggers immediately the emission of a corresponding packet of audio data, via the audio output, to an external audio device.</li>
+</ul>
+<p><strong>Example:</strong></p>
+<p>The following shall illustrate an overall example from definition of a specific <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> in the <abbr title="JavaScript Object Notation">JSON</abbr>
+configuration to using the programmatical <abbr title="Application Programming Interface">API</abbr> to activate and deactivate the defined <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> chain.</p>
+<p>First of all an corresponding <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> needs to be defined in the audio <abbr title="JavaScript Object Notation">JSON</abbr> configuration. Such a scenario
+definition contains a <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter that is used to activate and deactivate the specific <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> and
+an <code class="docutils literal notranslate"><span class="pre">audiopaths</span></code> parameter that allows to define a list of <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instances that shall be connected to each
+other. Here, the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> named <code class="docutils literal notranslate"><span class="pre">recognitionScenario</span></code> shall connect an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> module instance
+<code class="docutils literal notranslate"><span class="pre">microphone</span></code> with an <a class="reference external" href="../asr/index.html">Asr</a> module instance <code class="docutils literal notranslate"><span class="pre">recognizer</span></code> to realize a simple recognition audio processing chain. In addition the
+<a class="reference external" href="./audio_module_input/index.html">Audio Input</a> module instance <code class="docutils literal notranslate"><span class="pre">microphone</span></code> shall use an instance of an <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> implementation of type
+<code class="docutils literal notranslate"><span class="pre">asio_audio_adapter</span></code> that realizes an external audio integration as already described in chapter <a class="reference internal" href="#id2">External Audio Integration</a>. This is
+configured in the module configuration of the <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> module instance <code class="docutils literal notranslate"><span class="pre">microphone</span></code> with parameter <code class="docutils literal notranslate"><span class="pre">adapter_type</span></code>. The configuration
+of the <a class="reference external" href="../asr/index.html">Asr</a> module instance <code class="docutils literal notranslate"><span class="pre">recognizer</span></code> is not shown in this <abbr title="JavaScript Object Notation">JSON</abbr> example configuration.</p>
+<div class="literal-block-wrapper docutils container" id="id43">
+<div class="code-block-caption"><span class="caption-text">Audio scenario definition and module configuration in an audioconfig.json file</span></div>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;AudioMgr 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;audio_scenario&quot;</span><span class="p">:</span> <span class="p">[</span>
+  <span class="p">{</span>
+<span class="hll">    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;recognitionScenario&quot;</span><span class="p">,</span>
+</span><span class="hll">    <span class="nt">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;microphone&quot;</span><span class="p">,</span> <span class="s2">&quot;recognizer&quot;</span><span class="p">]</span> <span class="p">]</span>
+</span>  <span class="p">}],</span>
+
+  <span class="nt">&quot;module_config&quot;</span><span class="p">:</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;AudioInput&quot;</span><span class="p">,</span>
+<span class="hll">    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;microphone&quot;</span><span class="p">,</span>
+</span><span class="hll">    <span class="nt">&quot;adapter_type&quot;</span><span class="p">:</span> <span class="s2">&quot;asio_audio_adapter&quot;</span><span class="p">,</span>
+</span>    <span class="nt">&quot;audio_format&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;16khz_1ch&quot;</span><span class="p">}</span>
+  <span class="p">}],</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>After the definition of the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> and the configuration of the involved <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a>
+instances in <abbr title="JavaScript Object Notation">JSON</abbr> it can be used by the application. Therefor the application needs to perform the following steps:</p>
+<ul class="simple">
+<li>Create a <cite>Configuration</cite> instance containing among others the <abbr title="JavaScript Object Notation">JSON</abbr> configuration with the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>
+definition. For more details see <a class="reference external" href="../common/index.html#loading-json-configuration">Common Configuration Loading</a>.</li>
+<li>Create an <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> instance taking this configuration as an input parameter. For more
+details see <a class="reference internal" href="#audio-manager-creating-and-configuring"><span class="std std-ref">Audio Manager Creation</span></a>.</li>
+<li>Register the factories of the <a class="reference internal" href="#id10"><span class="std std-ref">audio module(s)</span></a> and their related subcomponents that shall be implicitly created
+during the scenario activation. In this example an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> module factory and an external <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a>
+implementation of type <code class="docutils literal notranslate"><span class="pre">asio_audio_adapter</span></code>. For details see <a class="reference internal" href="#registering-internal-components"><span class="std std-ref">Registering Internal Components</span></a>
+and <a class="reference internal" href="#registering-external-components"><span class="std std-ref">Registering External Components</span></a>.</li>
+<li>Explicitly create the <a class="reference internal" href="#id10"><span class="std std-ref">audio module(s)</span></a> involved in this scenario. In this example the <a class="reference external" href="../asr/index.html">Asr</a> module instance
+<code class="docutils literal notranslate"><span class="pre">recognizer</span></code>.</li>
+<li>Activate the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> by usage of the scenarios unique name defined in the <abbr title="JavaScript Object Notation">JSON</abbr> configuration.
+In this example the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> <code class="docutils literal notranslate"><span class="pre">recognitionScenario</span></code>. For more details see
+<a class="reference internal" href="#connecting-audio-modules"><span class="std std-ref">Connecting Audio Modules</span></a>.</li>
+<li>Perform the desired audio use case that shall be covered by this <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>. In this example a speech
+recognition use case.</li>
+<li>Deactivate the <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> by usage of its unique scenario name <code class="docutils literal notranslate"><span class="pre">recognitionScenario</span></code>.</li>
+<li>Finally, destroy all explicitly created <a class="reference internal" href="#id10"><span class="std std-ref">audio module(s)</span></a> and related subcomponents.
+In this example the <a class="reference external" href="../asr/index.html">Asr</a> module instance and others.</li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id44">
+<div class="code-block-caption"><span class="caption-text">Activating and deactivating of an audio scenario</span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">;</span>
+<span class="n">nuance_common_ISystemManager</span> <span class="o">*</span><span class="n">systemMgr</span><span class="p">;</span>
+<span class="n">nuance_audio_IAudioManager</span> <span class="o">*</span><span class="n">audioMgr</span><span class="p">;</span>
+<span class="n">nuance_audio_IAudioInputAdapterFactory</span> <span class="o">*</span><span class="n">asioInputAdapterFactory</span><span class="p">;</span>
+<span class="n">nuance_asr5_IAsrManager</span> <span class="o">*</span><span class="n">asrManager</span><span class="p">;</span>
+<span class="n">nuance_asr5_IRecognizer</span> <span class="o">*</span><span class="n">recognizer</span><span class="p">;</span>
+
+<span class="cm">/* create a &#39;Configuration&#39; instance, e.g. out of a Json configuration path that</span>
+<span class="cm">   among others needs to contain the audio scenario definition described above */</span>
+<span class="n">nuance_common_IConfiguration_create</span><span class="p">(</span><span class="n">jsonConfigPath</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">);</span>
+
+<span class="cm">/* create a &#39;System Manager&#39; instance */</span>
+<span class="n">nuance_common_ISystemManager_create</span><span class="p">(</span><span class="s">&quot;systemMgr&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">systemMgr</span><span class="p">);</span>
+
+<span class="cm">/* create an &#39;Audio Manager&#39; instance */</span>
+<span class="n">nuance_audio_IAudioManager_create</span><span class="p">(</span><span class="s">&quot;audioMgr&quot;</span><span class="p">,</span> <span class="n">systemMgr</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">audioMgr</span><span class="p">);</span>
+
+<span class="cm">/* create an &#39;Asr Manager&#39; instance required by &#39;Asr&#39; audio module */</span>
+<span class="n">nuance_asr5_IAsrManager_create</span><span class="p">(</span><span class="s">&quot;asrManager&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">audioMgr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">asrManagerListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">asrManager</span><span class="p">);</span>
+
+<span class="cm">/* explicitly create an &#39;Asr&#39; audio module instance */</span>
+<span class="n">nuance_asr5_IRecognizer_create</span><span class="p">(</span><span class="s">&quot;recognizer&quot;</span><span class="p">,</span> <span class="n">asrManager</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">recognizerListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">recognizer</span><span class="p">);</span>
+
+<span class="cm">/* register an &#39;Audio Input&#39; audio module factory at the &#39;Audio Manager&#39; for implicit creation */</span>
+<span class="n">nuance_audio_IAudioInput_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+
+<span class="cm">/* create an external audio input adapter factory of type &#39;asio_audio_adapter&#39; (project/customer specific) */</span>
+<span class="n">asioInputAdapterFactoryCreate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">asioInputAdapterFactory</span><span class="p">);</span>
+
+<span class="cm">/* register an audio input adapter of type &#39;asio_audio_adapter&#39; at the &#39;Audio Manager&#39; for implicit creation */</span>
+<span class="n">nuance_audio_IAudioManager_registerAudioInputAdapterFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="n">asioInputAdapterFactory</span><span class="p">)</span>
+
+<span class="cm">/* activate audio scenario &#39;recognitionScenario&#39; at the &#39;Audio Manager&#39; which implicitly</span>
+<span class="cm">   creates an &#39;Audio Input&#39; instance and connects it to the already existing &#39;Asr&#39; instance */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* do anything in this audio scenario context, e.g. perform a recognition */</span>
+<span class="p">...</span>
+
+<span class="cm">/* deactivate audio scenario &#39;recognitionScenario&#39; at the &#39;Audio Manager&#39; which implicitly</span>
+<span class="cm">   disconnects the &#39;Audio Input&#39; from the &#39;Asr&#39; instance and destroys the &#39;Audio Input&#39; instance</span>
+<span class="cm">   that was created implicitly on scenario activation */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_deActivateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* destroy explicitly created &#39;Asr&#39; instance */</span>
+<span class="n">nuance_asr5_IRecognizer_destroy</span><span class="p">(</span><span class="n">recognizer</span><span class="p">);</span>
+
+<span class="cm">/* destroy &#39;Asr Manager&#39; instance */</span>
+<span class="n">nuance_asr5_IAsrManager_destroy</span><span class="p">(</span><span class="n">asrManager</span><span class="p">);</span>
+
+<span class="cm">/* destroy &#39;Audio Manager&#39; instance */</span>
+<span class="n">nuance_audio_IAudioManager_destroy</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+
+<span class="cm">/* destroy &#39;System Manager&#39; instance */</span>
+<span class="n">nuance_common_ISystemManager_destroy</span><span class="p">(</span><span class="n">systemMgr</span><span class="p">);</span>
+
+<span class="cm">/* destroy &#39;Configuration&#39; instance */</span>
+<span class="n">nuance_common_IConfiguration_destroy</span><span class="p">(</span><span class="n">config</span><span class="p">);</span>
+
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="audio-manager">
+<span id="id5"></span><h2>Audio Manager</h2>
+<div class="section" id="description">
+<h3>Description</h3>
+<p>The <cite>Audio Manager</cite> is the central audio management component with the following functions:</p>
+<ul class="simple">
+<li>setting up general audio framework infrastructure needed by all <a class="reference internal" href="#id10"><span class="std std-ref">Audio Modules</span></a></li>
+<li>providing a central registry for:<ul>
+<li><a class="reference internal" href="#id10"><span class="std std-ref">Audio Modules</span></a></li>
+<li><a class="reference internal" href="#id14"><span class="std std-ref">Audio Adapters</span></a></li>
+<li><a class="reference internal" href="#id22"><span class="std std-ref">Audio Codecs</span></a></li>
+<li><a class="reference internal" href="#id30"><span class="std std-ref">Audio Containers</span></a></li>
+</ul>
+</li>
+<li>providing an <abbr title="Application Programming Interface">API</abbr> to connect and disconnect <cite>Audio Modules</cite></li>
+<li>implicit <cite>Audio Module</cite> creation and destruction</li>
+</ul>
+</div>
+<div class="section" id="developing-applications">
+<h3>Developing Applications</h3>
+<div class="section" id="api-reference">
+<h4><abbr title="Application Programming Interface">API</abbr> Reference</h4>
+<p>The <abbr title="Application Programming Interface">API</abbr> reference documentation of the <abbr title="Software Development Kit">SDK</abbr> <cite>Audio Manager</cite>, which is part of the <cite>audio core</cite> component, is included in the Cerence <abbr title="Software Development Kit">SDK</abbr>
+package at <code class="file docutils literal notranslate"><span class="pre">doc/api_reference/audio/audio_core/</span></code>. There is a separate folder for each supported programming language in which the reference
+documentation can be accessed via the main page <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+<p>The C <abbr title="Application Programming Interface">API</abbr> documentation is available at <a class="reference external" href="../../api_reference/audio/audio_core/c/index.html">doc/api_reference/audio/audio_core/c/index.html</a>.</p>
+</div>
+<div class="section" id="configuration-api-reference">
+<span id="audio-manager-configuration-api-reference"></span><h4>Configuration <abbr title="Application Programming Interface">API</abbr> Reference</h4>
+<p>The configuration has to be done in the <abbr title="JavaScript Object Notation">JSON</abbr> format as specified in the configuration <abbr title="Application Programming Interface">API</abbr> reference:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html#itoplevelaudioconfig-the-top-level-audio-configuration-structure">ITopLevelAudioConfig - The top-level audio configuration structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html#itoplevelconfig-interface-for-top-level-configuration-classes">ITopLevelConfig - Interface for top-level configuration classes.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html#iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html#iaudioscenarioconfig-the-audio-scenario-configuration">IAudioScenarioConfig - The audio scenario configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html#iaudiopluginconfig-the-audio-plug-in-configuration">IAudioPluginConfig - The audio plug-in configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html#iaudiomoduleconfig-the-audio-module-configuration">IAudioModuleConfig - The audio module configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html#ichunkpoolconfig-chunkpool-configuration">IChunkPoolConfig - ChunkPool configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_core_configuration_api_ref.html#iaudioformatconfig-the-audio-format-configuration">IAudioFormatConfig - The audio format configuration.</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="creating-and-configuring">
+<span id="audio-manager-creating-and-configuring"></span><h4>Creating and Configuring</h4>
+<p>An <cite>Audio Manager</cite> instance is created with the function <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_create()</span></code>. Before calling the
+<code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_create()</span></code> function a <code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration</span></code> instance containing the <cite>Audio Manager</cite>’s
+<abbr title="JavaScript Object Notation">JSON</abbr> <a class="reference internal" href="#audio-manager-configuration-api-reference"><span class="std std-ref">configuration</span></a> needs to be created. This is done by loading the <abbr title="JavaScript Object Notation">JSON</abbr>
+configuration as described in <a class="reference external" href="../common/index.html#loading-json-configuration">Common Configuration Loading</a>. Additionally the <cite>Audio Manager</cite> needs a <cite>System Manager</cite> handle.
+For details see <a class="reference external" href="../common/index.html#system-manager">System Manager Creation</a>.</p>
+<p>As central component of the audio framework the <cite>Audio Manager</cite> has to be created at the first place before any <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id45">
+<div class="code-block-caption"><span class="caption-text">Creating and configuring an <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">;</span>
+<span class="n">nuance_common_ISystemManager</span> <span class="o">*</span><span class="n">systemMgr</span><span class="p">;</span>
+<span class="n">nuance_audio_IAudioManager</span> <span class="o">*</span><span class="n">audioMgr</span><span class="p">;</span>
+
+<span class="cm">/* create a &#39;Configuration&#39; instance, e.g. out of a .json configuration path */</span>
+<span class="hll"><span class="n">nuance_common_IConfiguration_create</span><span class="p">(</span><span class="n">jsonConfigPath</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">);</span>
+</span>
+<span class="cm">/* create a &#39;System Manager&#39; instance */</span>
+<span class="hll"><span class="n">nuance_common_ISystemManager_create</span><span class="p">(</span><span class="s">&quot;systemMgr&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">systemMgr</span><span class="p">);</span>
+</span>
+<span class="cm">/* create an &#39;Audio Manager&#39; instance */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_create</span><span class="p">(</span><span class="s">&quot;audioMgr&quot;</span><span class="p">,</span> <span class="n">systemMgr</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">audioMgr</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="registering-internal-components">
+<span id="id6"></span><h4>Registering Internal Components</h4>
+<p>In the case that <abbr title="Software Development Kit">SDK</abbr> audio components (<a class="reference internal" href="#id10"><span class="std std-ref">modules</span></a>, <a class="reference internal" href="#id22"><span class="std std-ref">codecs</span></a> or <a class="reference internal" href="#id30"><span class="std std-ref">containers</span></a>) shall
+be created implicitly by the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> then the application needs to register them at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>
+as described in this chapter.</p>
+<div class="section" id="audio-modules">
+<span id="registering-audio-module-factories"></span><h5>Audio Modules</h5>
+<p>The factory of a specific <abbr title="Software Development Kit">SDK</abbr> <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> can be registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> with a call
+to the corresponding <code class="docutils literal notranslate"><span class="pre">registerFactory</span></code> function at the module’s <abbr title="Application Programming Interface">API</abbr>. This enables the <a class="reference internal" href="#audio-module-creation-and-destruction"><span class="std std-ref">implicit creation</span></a>
+capability for this specific <abbr title="Software Development Kit">SDK</abbr> <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id46">
+<div class="code-block-caption"><span class="caption-text">Registering the factories of the <cite>Audio Input</cite> and <cite>Audio Output</cite> audio modules at the <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="cm">/* NOTE: A created &#39;AudioManager&#39; object is preconditioned! */</span>
+
+<span class="cm">/* implicitly create an &#39;Audio Input&#39; module factory and register it at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioInput_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+</span>
+<span class="cm">/* implicitly create an &#39;Audio Output&#39; module factory and register it at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioOutput_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="audio-codecs">
+<span id="registering-internal-audio-codecs"></span><h5>Audio Codecs</h5>
+<p>The factory of a specific <abbr title="Software Development Kit">SDK</abbr> <a class="reference internal" href="#id22"><span class="std std-ref">audio codec</span></a> can be registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> with a call
+to the corresponding <code class="docutils literal notranslate"><span class="pre">registerFactory</span></code> function at the codec’s <abbr title="Application Programming Interface">API</abbr>. This enables the <cite>implicit</cite> creation capability for this specific
+<abbr title="Software Development Kit">SDK</abbr> <a class="reference internal" href="#id22"><span class="std std-ref">audio codec</span></a>. With that the <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> or <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> audio module is capable to request an instance
+of the registered codec at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> for usage. For more details see chapter <a class="reference internal" href="#id22"><span class="std std-ref">Audio Codecs</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id47">
+<div class="code-block-caption"><span class="caption-text">Registering the factories of the <cite>Opus</cite> audio decoder and encoder at the <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="cm">/* NOTE: A created &#39;AudioManager&#39; object is preconditioned! */</span>
+
+<span class="cm">/* implicitly create an &#39;Opus&#39; decoder factory and register it at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IOpusDecoder_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+</span>
+<span class="cm">/* implicitly create an &#39;Opus&#39; encoder factory and register it at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IOpusEncoder_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="audio-container">
+<span id="registering-internal-audio-containers"></span><h5>Audio Container</h5>
+<p>The factory of a specific <abbr title="Software Development Kit">SDK</abbr> <a class="reference internal" href="#id30"><span class="std std-ref">audio container</span></a> can be registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> with a call
+to the corresponding <code class="docutils literal notranslate"><span class="pre">registerFactory</span></code> function at the codec’s <abbr title="Application Programming Interface">API</abbr>. This enables the <cite>implicit</cite> creation capability for this specific
+<abbr title="Software Development Kit">SDK</abbr> <a class="reference internal" href="#id30"><span class="std std-ref">audio container</span></a>. With that the <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> or <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> audio module is capable to request an instance
+of the registered container at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> for usage. For more details see chapter <a class="reference internal" href="#id30"><span class="std std-ref">Audio Containers</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id48">
+<div class="code-block-caption"><span class="caption-text">Registering the factories of the <cite>Ogg</cite> audio packer and unpacker at the <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="cm">/* NOTE: A created &#39;AudioManager&#39; object is preconditioned! */</span>
+
+<span class="cm">/* implicitly create an &#39;Ogg&#39; container packer factory and register it at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IOggPacker_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+</span>
+<span class="cm">/* implicitly create an &#39;Ogg&#39; container unpacker factory and register it at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IOggUnpacker_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="registering-external-components">
+<span id="id7"></span><h4>Registering External Components</h4>
+<p>In the case that external respectively customer provided audio components (<a class="reference internal" href="#id14"><span class="std std-ref">adapters</span></a>, <a class="reference internal" href="#id22"><span class="std std-ref">codecs</span></a> or
+<a class="reference internal" href="#id30"><span class="std std-ref">containers</span></a>) shall be added to the <abbr title="Software Development Kit">SDK</abbr> audio framework then the application needs to register them at the
+<a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> as described in this chapter.</p>
+<div class="section" id="audio-adapters">
+<span id="registering-external-audio-adapters"></span><h5>Audio Adapters</h5>
+<p>An instantiated factory of an externally provided <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> can be registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>
+with a call to <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_registerAudioInputAdapterFactory()</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_registerAudioOutputAdapterFactory()</span></code>.
+This enables the <cite>implicit</cite> creation capability for this specific external <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a>. With that the <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> or <a class="reference external" href="./audio_module_output/index.html">Audio Output</a>
+audio module is capable to request an instance of the registered adapter at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> for usage. For more details see chapter
+<a class="reference internal" href="#id14"><span class="std std-ref">Audio Adapters</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id49">
+<div class="code-block-caption"><span class="caption-text">Registering externally provided audio adapters at the <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="n">nuance_audio_IAudioInputAdapterFactory</span> <span class="o">*</span><span class="n">externalAudioInputAdapterFactory</span><span class="p">;</span>
+<span class="n">nuance_audio_IAudioOutputAdapterFactory</span> <span class="o">*</span><span class="n">externalAudioOutputAdapterFactory</span><span class="p">;</span>
+
+<span class="cm">/* NOTE: A created &#39;AudioManager&#39; object is preconditioned! */</span>
+
+<span class="cm">/* create a specific external audio input adapter factory */</span>
+<span class="n">externalAudioInputAdapterFactory</span> <span class="o">=</span> <span class="n">createExternalAudioInputAdapterFactory</span><span class="p">(...);</span>
+
+<span class="cm">/* register specific external audio input adapter factory at &#39;AudioManager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_registerAudioInputAdapterFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="n">externalAudioInputAdapterFactory</span><span class="p">);</span>
+</span>
+<span class="cm">/* create a specific external audio output adapter factory */</span>
+<span class="n">externalAudioOutputAdapterFactory</span> <span class="o">=</span> <span class="n">createExternalAudioOutputAdapterFactory</span><span class="p">(...);</span>
+
+<span class="cm">/* register specific external audio output adapter factory at &#39;AudioManager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_registerAudioOutputAdapterFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="n">externalAudioOutputAdapterFactory</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="registering-external-audio-codecs">
+<span id="id8"></span><h5>Audio Codecs</h5>
+<p>An instantiated factory of a specific externally provided <a class="reference internal" href="#id22"><span class="std std-ref">audio codec</span></a> can be registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>
+with a call to <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_registerAudioEncoderFactory()</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_registerAudioDecoderFactory()</span></code>. This
+enables the <cite>implicit</cite> creation capability for this specific external <a class="reference internal" href="#id22"><span class="std std-ref">audio codec</span></a>. With that the <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> or <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a>
+audio module is capable to request an instance of the registered codec at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> for usage. For more details see chapter
+<a class="reference internal" href="#id22"><span class="std std-ref">Audio Codecs</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id50">
+<div class="code-block-caption"><span class="caption-text">Registering externally provided audio codecs at the <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="n">nuance_audio_IEncoderFactory</span> <span class="o">*</span><span class="n">externalEncoderFactory</span><span class="p">;</span>
+<span class="n">nuance_audio_IDecoderFactory</span> <span class="o">*</span><span class="n">externalDecoderFactory</span><span class="p">;</span>
+
+<span class="cm">/* NOTE: A created &#39;AudioManager&#39; object is preconditioned! */</span>
+
+<span class="cm">/* create a specific external audio encoder factory */</span>
+<span class="n">externalEncoderFactory</span> <span class="o">=</span> <span class="n">createExternalEncoderFactory</span><span class="p">(...);</span>
+
+<span class="cm">/* register specific external audio encoder factory at &#39;AudioManager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_registerAudioEncoderFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="n">externalEncoderFactory</span><span class="p">);</span>
+</span>
+<span class="cm">/* create a specific external audio decoder factory */</span>
+<span class="n">externalDecoderFactory</span> <span class="o">=</span> <span class="n">createExternalDecoderFactory</span><span class="p">(...);</span>
+
+<span class="cm">/* register specific external audio decoder factory at &#39;AudioManager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_registerAudioDecoderFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="n">externalDecoderFactory</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="audio-containers">
+<span id="registering-external-audio-containers"></span><h5>Audio Containers</h5>
+<p>An instantiated factory of a specific externally provided <a class="reference internal" href="#id30"><span class="std std-ref">audio container</span></a> can be registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>
+with a call to <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_registerAudioContainerPackerFactory()</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_registerAudioContainerUnpackerFactory()</span></code>.
+This enables the <cite>implicit</cite> creation capability for this specific external <a class="reference internal" href="#id22"><span class="std std-ref">audio codec</span></a>. With that the <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> or <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a>
+audio module is capable to request an instance of the registered container at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> for usage. For more details see chapter
+<a class="reference internal" href="#id22"><span class="std std-ref">Audio Codecs</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id51">
+<div class="code-block-caption"><span class="caption-text">Registering externally provided audio containers at the <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="n">nuance_audio_IContainerPackerFactory</span> <span class="o">*</span><span class="n">externalContainerPackerFactory</span><span class="p">;</span>
+<span class="n">nuance_audio_IContainerUnpackerFactory</span> <span class="o">*</span><span class="n">externalContainerUnpackerFactory</span><span class="p">;</span>
+
+<span class="cm">/* NOTE: A created &#39;AudioManager&#39; object is preconditioned! */</span>
+
+<span class="cm">/* create a specific external audio container packer factory */</span>
+<span class="n">externalContainerPackerFactory</span> <span class="o">=</span> <span class="n">createExternalContainerPackerFactory</span><span class="p">(...);</span>
+
+<span class="cm">/* register specific audio container packer factory at &#39;AudioManager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_registerAudioContainerPackerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="n">externalContainerPackerFactory</span><span class="p">);</span>
+</span>
+<span class="cm">/* create a specific audio container unpacker factory */</span>
+<span class="n">externalContainerUnpackerFactory</span> <span class="o">=</span> <span class="n">createExternalContainerUnpackerFactory</span><span class="p">(...);</span>
+
+<span class="cm">/* register specific audio container unpacker factory at &#39;AudioManager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_registerAudioContainerUnpackerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="n">externalContainerUnpackerFactory</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="connecting-audio-modules">
+<span id="id9"></span><h4>Connecting Audio Modules</h4>
+<p>The <cite>Audio Manager</cite> supports the activation and deactivation of so called <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenarios</span></a> to connect
+<a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> to audio processing chains that realize specific audio use cases. <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">Audio scenarios</span></a>
+are defined in the <abbr title="JavaScript Object Notation">JSON</abbr> configuration file of the <cite>Audio Manager</cite>. An <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> definition contains
+a <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter that is used to activate and deactivate this specific <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>. The <code class="docutils literal notranslate"><span class="pre">audiopaths</span></code>
+parameter allows to define a list of <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio paths</span></a>. Whereas each <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio path</span></a> defines a list of
+<a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> that shall be connected to each other.</p>
+<p>Examples of <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio path</span></a> definitions:</p>
+<ul>
+<li><p class="first">an audio scenario with 1 <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio path</span></a> connecting the 2 <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instances <cite>a</cite> and <cite>b</cite>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">inst_module_a</span><span class="p">,</span> <span class="n">inst_module_b</span><span class="p">]]</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">an audio scenario with 1 <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio path</span></a> connecting the 3 <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instances <cite>a</cite>, <cite>b</cite> and <cite>c</cite>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">inst_module_a</span><span class="p">,</span> <span class="n">inst_module_b</span><span class="p">],</span> <span class="p">[</span><span class="n">inst_module_b</span><span class="p">,</span> <span class="n">inst_module_c</span><span class="p">]]</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">an audio scenario with 2 <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio paths</span></a> connecting the 3 <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instances <cite>a</cite>, <cite>b</cite> and <cite>c</cite>
+in the first <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio path</span></a> and the 2 <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instances <cite>x</cite>, <cite>y</cite> in the second one:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="n">inst_module_a</span><span class="p">,</span> <span class="n">inst_module_b</span><span class="p">],[</span><span class="n">inst_module_b</span><span class="p">,</span> <span class="n">inst_module_c</span><span class="p">],</span>
+ <span class="p">[</span><span class="n">inst_module_x</span><span class="p">,</span> <span class="n">inst_module_y</span><span class="p">]]</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The following shows a <abbr title="JavaScript Object Notation">JSON</abbr> audio configuration file that contains the three <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> definitions <code class="docutils literal notranslate"><span class="pre">promptingScenario</span></code>,
+<code class="docutils literal notranslate"><span class="pre">recognitionScenario</span></code> and <code class="docutils literal notranslate"><span class="pre">combinedScenario</span></code>. The <code class="docutils literal notranslate"><span class="pre">promptingScenario</span></code> <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> contains 1 <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio path</span></a>
+connecting a <a class="reference external" href="../prompter/SDK_Prompter_UserGuide.html">Prompter</a> <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instance named <cite>prompter</cite> with an <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instance
+named <cite>loudspeaker</cite>. The <code class="docutils literal notranslate"><span class="pre">recognitionScenario</span></code> <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> contains 1 <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio path</span></a> connecting an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a>
+<a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instance named <cite>microphone</cite> with a <a class="reference external" href="./audio_module_sse/index.html">Speech Signal Enhancement</a> <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instance named <cite>sse</cite>
+which in turn is connected with with an <a class="reference external" href="../asr/index.html">Asr</a> <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instance named <cite>recognizer</cite>. The <code class="docutils literal notranslate"><span class="pre">combinedScenario</span></code>
+<a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> contains 2 <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio paths</span></a> illustrating a combination of the <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio path</span></a> definitions
+of the <code class="docutils literal notranslate"><span class="pre">promptingScenario</span></code> and <code class="docutils literal notranslate"><span class="pre">recognitionScenario</span></code> <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> in one single scenario definition.</p>
+<div class="literal-block-wrapper docutils container" id="id52">
+<div class="code-block-caption"><span class="caption-text">An audioconfig.json file containing audio scenario definitions</span></div>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;AudioMgr 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;audio_scenario&quot;</span><span class="p">:</span> <span class="p">[</span>
+  <span class="p">{</span>
+<span class="hll">    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;promptingScenario&quot;</span><span class="p">,</span>
+</span><span class="hll">    <span class="nt">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;prompter&quot;</span><span class="p">,</span> <span class="s2">&quot;loudspeaker&quot;</span><span class="p">]</span> <span class="p">]</span>
+</span>  <span class="p">},</span> <span class="p">{</span>
+<span class="hll">    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;recognitionScenario&quot;</span><span class="p">,</span>
+</span><span class="hll">    <span class="nt">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;microphone&quot;</span><span class="p">,</span> <span class="s2">&quot;sse&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;sse&quot;</span><span class="p">,</span> <span class="s2">&quot;recognizer&quot;</span><span class="p">]</span> <span class="p">]</span>
+</span>  <span class="p">},</span> <span class="p">{</span>
+<span class="hll">    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;combinedScenario&quot;</span><span class="p">,</span>
+</span><span class="hll">    <span class="nt">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;microphone&quot;</span><span class="p">,</span> <span class="s2">&quot;sse&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;sse&quot;</span><span class="p">,</span> <span class="s2">&quot;recognizer&quot;</span><span class="p">],</span>
+</span><span class="hll">                    <span class="p">[</span><span class="s2">&quot;prompter&quot;</span><span class="p">,</span> <span class="s2">&quot;loudspeaker&quot;</span><span class="p">]</span> <span class="p">]</span>
+</span>  <span class="p">}</span> <span class="p">],</span>
+
+  <span class="nt">&quot;module_config&quot;</span><span class="p">:</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;AudioInput&quot;</span><span class="p">,</span>
+<span class="hll">    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;microphone&quot;</span><span class="p">,</span>
+</span>    <span class="nt">&quot;audio_format&quot;</span><span class="p">:</span> <span class="p">{</span><span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;16khz_1ch&quot;</span><span class="p">}</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;AudioOutput&quot;</span><span class="p">,</span>
+<span class="hll">    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker&quot;</span><span class="p">,</span>
+</span>    <span class="nt">&quot;audio_format&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;22khz_1ch&quot;</span> <span class="p">}</span>
+  <span class="p">}</span> <span class="p">],</span>
+
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>The <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">Audio scenarios</span></a> defined in a <abbr title="JavaScript Object Notation">JSON</abbr> audio configuration can be activated with a call to the
+<code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_activateScenario</span></code> and deactivated with a call to the <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_deActivateScenario</span></code>
+function of the <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager</span></code>. The <code class="docutils literal notranslate"><span class="pre">name</span></code> parameter defined in the <abbr title="JavaScript Object Notation">JSON</abbr> configuration serves as unique
+identifier of the specific <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">Audio scenario</span></a> that shall be activate or deactivated.</p>
+<div class="literal-block-wrapper docutils container" id="id54">
+<div class="code-block-caption"><span class="caption-text">Activating and deactivation of audio scenarios at the <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="cm">/* NOTE: A created &#39;AudioManager&#39; instance and if required explicitly created</span>
+<span class="cm">   audio module instances of involved audio modules in the audio scenario are</span>
+<span class="cm">   preconditioned! */</span>
+
+<span class="cm">/* activate audio scenario &#39;promptingScenario&#39; at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;promptingScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* do anything in this audio scenario context, e.g. play a prompt */</span>
+<span class="p">...</span>
+
+<span class="cm">/* deactivate audio scenario &#39;promptingScenario&#39; at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_deActivateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;promptingScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* activate audio scenario &#39;recognitionScenario&#39; at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* do anything in this audio scenario context, e.g. perform a recognition */</span>
+<span class="p">...</span>
+
+<span class="cm">/* deactivate audio scenario &#39;recognitionScenario&#39; at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_deActivateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>An <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a> can also be activated in parallel with another <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenario</span></a>,
+if both scenarios are using distinct <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio paths</span></a> with different <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> instances.</p>
+<div class="literal-block-wrapper docutils container" id="id56">
+<div class="code-block-caption"><span class="caption-text">Parallel activating and deactivation of audio scenarios at the <cite>Audio Manager</cite></span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="cm">/* NOTE: A created &#39;AudioManager&#39; instance and if required explicitly created</span>
+<span class="cm">   audio module instances of involved audio modules in the audio scenario are</span>
+<span class="cm">   preconditioned! */</span>
+
+<span class="cm">/* activate audio scenario &#39;promptingScenario&#39; at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;promptingScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* activate audio scenario &#39;recognitionScenario&#39; at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* do anything in this context, e.g. play prompts, perform recognitions */</span>
+<span class="p">...</span>
+
+<span class="cm">/* deactivate audio scenario &#39;recognitionScenario&#39; at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_deActivateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* deactivate audio scenario &#39;promptingScenario&#39; at the &#39;Audio Manager&#39; */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_deActivateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;promptingScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p><a class="reference internal" href="#id10"><span class="std std-ref">Audio modules</span></a> that were created via the <cite>explicit</cite> method must not be destroyed
+before all audio scenarios they are used in are deactivated.</p>
+</div>
+</div>
+</div>
+<div class="section" id="id10">
+<span id="id11"></span><h2>Audio Modules</h2>
+<div class="section" id="id12">
+<h3>Description</h3>
+<p>The delivery contains a set of so called audio modules. Each audio module provides a specific audio processing capability (e.g. speech recognition).
+To realize complex audio use cases these audio modules can be chained together in so called <a class="reference internal" href="#term-audio-scenario"><span class="xref std std-term">audio scenarios</span></a> that can be
+activated and deactivated. For more details see <a class="reference internal" href="#connecting-audio-modules"><span class="std std-ref">Connecting Audio Modules</span></a>.</p>
+<p>Furthermore there exist an <cite>implicit</cite> and an <cite>explicit</cite> method to create and destroy <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a>. For more details see
+<a class="reference internal" href="#audio-module-creation-and-destruction"><span class="std std-ref">Audio Module Creation and Destruction</span></a>.</p>
+</div>
+<div class="section" id="synoptic-table">
+<span id="audio-module-synoptic-table"></span><h3>Synoptic Table</h3>
+<p>The following table gives a brief overview of all audio modules delivered with the <abbr title="Software Development Kit">SDK</abbr>. For more details to a specific module see the linked
+user’s guide documents in the <cite>Audio Module</cite> column.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="51%" />
+<col width="15%" />
+<col width="15%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Audio Module</th>
+<th class="head">Brief Description</th>
+<th class="head">Implicit Creation Support</th>
+<th class="head">Explicit Creation Support</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference external" href="../asr/index.html">Asr</a></td>
+<td>Performs a speech recognition.</td>
+<td>-</td>
+<td>x</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="./audio_module_buffer/index.html">Audio Buffer</a></td>
+<td>Buffers audio data.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a></td>
+<td>Decodes and optionally unpacks audio data by usage of
+<a class="reference internal" href="#id22"><span class="std std-ref">audio codecs</span></a> and <a class="reference internal" href="#id30"><span class="std std-ref">audio containers</span></a>.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a></td>
+<td>Encodes and optionally packs audio data by usage of
+<a class="reference internal" href="#id22"><span class="std std-ref">audio codecs</span></a> and <a class="reference internal" href="#id30"><span class="std std-ref">audio containers</span></a>.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="./audio_module_from_file/index.html">Audio From File</a></td>
+<td>Streams audio data from one or more audio files.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="./audio_module_input/index.html">Audio Input</a></td>
+<td>Streams audio data from an <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> representing
+an external audio source.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="./audio_module_output/index.html">Audio Output</a></td>
+<td>Streams audio data to an <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> representing
+an external audio sink.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="./audio_module_segmentation/index.html">Audio Segmentation</a></td>
+<td>Detects speech in an data stream.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="./audio_module_stream_distributor/index.html">Audio Stream Distributor</a></td>
+<td>Distributes input audio data to one or more audio modules in a configurable way.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="./audio_module_to_file/index.html">Audio To File</a></td>
+<td>Streams audio data to an audio file.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="../cloudservices/index.html">Cloud Commander</a></td>
+<td>Provides connectivity between the <abbr title="Software Development Kit">SDK</abbr> and Cerence Cloud Services servers.</td>
+<td>-</td>
+<td>x</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="../prompter/SDK_Prompter_UserGuide.html">Prompter</a></td>
+<td>Performs a text-to-speech synthesis.</td>
+<td>-</td>
+<td>x</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="./audio_module_src/index.html">Sample Rate Converter</a></td>
+<td>Converts the sample rate of audio data.</td>
+<td>x</td>
+<td>x</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="./audio_module_sse/index.html">Speech Signal Enhancement</a></td>
+<td>Enhances an audio signal in different ways (e.g. beam forming, echo cancellation,
+noise reduction, ..).</td>
+<td>x</td>
+<td>x</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="creating-and-configuring-audio-modules">
+<span id="id13"></span><h3>Creating and Configuring</h3>
+<p>In general there exists an <cite>implicit</cite> and an <cite>explicit</cite> method to create and destroy <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> as explained in
+<a class="reference internal" href="#audio-module-creation-and-destruction"><span class="std std-ref">Audio Module Creation and Destruction</span></a>. Which method is supported by which module can be seen
+in the <a class="reference internal" href="#audio-module-synoptic-table"><span class="std std-ref">synoptic table</span></a> above.</p>
+<p>To prepare a module for implicit creation see chapter <a class="reference internal" href="#registering-audio-module-factories"><span class="std std-ref">Registering Audio Module Factories</span></a>.
+The following code shows the <cite>implicit</cite> creation and configuration of an audio module by taking the example of an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> audio module instance:</p>
+<div class="literal-block-wrapper docutils container" id="id58">
+<div class="code-block-caption"><span class="caption-text">Implicit creation and configuration of an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> audio module</span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">;</span>
+
+<span class="cm">/* create a &#39;Configuration&#39; instance, e.g. out of a Json configuration path that</span>
+<span class="cm">   among others needs to contain the audio module specific configuration, in this</span>
+<span class="cm">   example an &#39;Audio Input&#39; module configuration */</span>
+<span class="hll"><span class="n">nuance_common_IConfiguration_create</span><span class="p">(</span><span class="n">jsonConfigPath</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">);</span>
+</span>
+<span class="cm">/* NOTE: The creation of a &#39;System Manager&#39; and an &#39;AudioManager&#39; instance is</span>
+<span class="cm">   preconditioned but not explicitly shown! */</span>
+<span class="p">...</span>
+
+<span class="cm">/* register an &#39;Audio Input&#39; audio module factory at the &#39;Audio Manager&#39; for implicit creation */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioInput_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+</span>
+<span class="cm">/* explicit creation of audio modules and/or registration of further audio component</span>
+<span class="cm">   factories (modules, adapters, codecs,..) for implicit creation */</span>
+<span class="p">...</span>
+
+<span class="cm">/* activate the audio scenario at the &#39;Audio Manager&#39; where an &#39;Audio Input&#39; module is</span>
+<span class="cm">   involved. This implicitly creates an &#39;Audio Input&#39; instance and connects it to the</span>
+<span class="cm">   other modules defined in this scenario. */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* do anything in this audio scenario context, e.g. perform a recognition */</span>
+<span class="p">...</span>
+
+<span class="cm">/* deactivate the audio scenario at the &#39;Audio Manager&#39; which implicitly disconnects</span>
+<span class="cm">   all involved audio modules and destroys the &#39;Audio Input&#39; module instance */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_deActivateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>For explicit creation each module provides a specific <code class="docutils literal notranslate"><span class="pre">create</span></code> function (e.g. <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioInput_create</span></code>). All these create functions
+have the following input parameters in common:</p>
+<ul class="simple">
+<li>An <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> instance that needs to be created beforehand as described in  <a class="reference internal" href="#audio-manager-creating-and-configuring"><span class="std std-ref">Audio Manager Creation</span></a>.</li>
+<li>A <code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration</span></code> instance containing the <abbr title="JavaScript Object Notation">JSON</abbr> configuration of the audio module as described in the specific audio module user’s
+guide in the <cite>Configuration API Reference</cite> chapter. The <abbr title="JavaScript Object Notation">JSON</abbr> configuration can be loaded as described in <a class="reference external" href="../common/index.html#loading-json-configuration">Common Configuration Loading</a>.</li>
+</ul>
+<p>The following code shows the <cite>explicit</cite> creation and configuration of an audio module by taking the example of an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> audio module instance:</p>
+<div class="literal-block-wrapper docutils container" id="id59">
+<div class="code-block-caption"><span class="caption-text">Explicit creation and configuration of an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> audio module</span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">;</span>
+<span class="n">nuance_audio_IAudioInput</span> <span class="o">*</span><span class="n">audioInput</span><span class="p">;</span>
+
+<span class="cm">/* create a &#39;Configuration&#39; instance, e.g. out of a Json configuration path that</span>
+<span class="cm">   among others needs to contain the audio module specific configuration, in this</span>
+<span class="cm">   example an &#39;Audio Input&#39; module configuration */</span>
+<span class="hll"><span class="n">nuance_common_IConfiguration_create</span><span class="p">(</span><span class="n">jsonConfigPath</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">);</span>
+</span>
+<span class="cm">/* NOTE: The creation of a &#39;System Manager&#39; and an &#39;AudioManager&#39; instance is</span>
+<span class="cm">   preconditioned but not explicitly shown! */</span>
+<span class="p">...</span>
+
+<span class="cm">/* explicitly create an &#39;Audio Input&#39; module instance */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioInput_create</span><span class="p">(</span><span class="s">&quot;microphone&quot;</span><span class="p">,</span> <span class="n">audioMgr</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">audioInput</span><span class="p">);</span>
+</span>
+<span class="cm">/* explicit creation of other audio modules and/or registration of audio component</span>
+<span class="cm">   factories (modules, adapters, codecs,..) for implicit creation */</span>
+<span class="p">...</span>
+
+<span class="cm">/* activate the audio scenario at the &#39;Audio Manager&#39; where this &#39;Audio Input&#39; module</span>
+<span class="cm">   instance is involved. This connects it to the other modules defined in this scenario. */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* do anything in this audio scenario context, e.g. perform a recognition */</span>
+<span class="p">...</span>
+
+<span class="cm">/* deactivate the audio scenario at the &#39;Audio Manager&#39; which disconnects all involved</span>
+<span class="cm">   audio modules */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioManager_deActivateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;recognitionScenario&quot;</span><span class="p">);</span>
+</span>
+<span class="cm">/* explicitly destroy the &#39;Audio Input&#39; module instance if no longer used */</span>
+<span class="hll"><span class="n">nuance_audio_IAudioInput_destroy</span><span class="p">(</span><span class="n">audioInput</span><span class="p">);</span>
+</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="subcomponents-for-audio-modules">
+<span id="subcomponents-audio-modules"></span><h2>Subcomponents for Audio Modules</h2>
+<div class="section" id="id14">
+<span id="id15"></span><h3>Audio Adapters</h3>
+<div class="section" id="id16">
+<h4>Description</h4>
+<p>The audio framework uses an audio adapter approach to realize the access to external audio sinks and sources of any kind whatsoever
+(e.g. audio devices, pipes, ..) as explained in the basic concepts chapter <a class="reference internal" href="#external-audio-integration"><span class="std std-ref">External Audio Integration</span></a>. This is
+realized with the <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> and <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> of the <abbr title="Software Development Kit">SDK</abbr> which use audio adapters to perform external
+audio I/O. Thereby each instance of an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> and <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> module can be configured to use a specific audio adapter and thus to
+communicate with a specific external audio data sink respectively source. This approach offers the possibility to define complex
+<a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> scenarios with external audio I/O in a flexible manner. To keep the <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> and <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> modules
+independent of any specific adapter implementation, each audio adapter needs to implement a generic adapter interface.</p>
+<p>The audio framework of the <abbr title="Software Development Kit">SDK</abbr> is capable to handle any number of audio adapters. Therefore each adapter is registered with a unique name
+(e.g. <cite>asio_audio_adapter</cite>), the so called <cite>adapter type</cite>, to the internal adapter registry of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>. This
+adapter type name can be chosen individually by the developer of an adapter implementation, but has to be unique within its adapter category
+(input resp. output adapter). The <abbr title="JavaScript Object Notation">JSON</abbr> configuration of an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> and <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> module instance contains an <code class="docutils literal notranslate"><span class="pre">adapter_type</span></code> parameter
+to have the possibility to bind a specific adapter implementation to it. With this information the <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> and <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> module instances
+are capable to request an instance of the corresponding adapter at the internal adapter registry of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> and to use
+it then via the generic adapter interface.</p>
+<p>In fact each audio adapter implementation consists of an audio adapter factory and the actual audio adapter implementation. The audio adapter factory
+implements the generic <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioInputAdapterFactory</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioOutputAdapterFactory</span></code> interface and with that provides the
+possibility to create instances of the specific audio adapter implementation on request. This <abbr title="Application Programming Interface">API</abbr> is used by the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>
+when an <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> or <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> module request an instance of a specific <code class="docutils literal notranslate"><span class="pre">adapter_type</span></code>. In contrast the audio adapter implements the generic
+adapter interface <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioInputAdapter</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioOutputAdapter</span></code> which is used by the <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> or <a class="reference external" href="./audio_module_output/index.html">Audio Output</a>
+module to perform audio I/O with the adapter and so with the external audio sink or source.</p>
+<p>In order that it can be used each audio adapter factory needs to be registered at the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> with the procedure described
+in chapter <a class="reference internal" href="#registering-external-audio-adapters"><span class="std std-ref">Registering External Audio Adapters</span></a>.</p>
+</div>
+<div class="section" id="sample-implementations">
+<h4>Sample Implementations</h4>
+<p>Sample implementations of an input and an output audio adapter are contained in the <abbr title="Software Development Kit">SDK</abbr> delivery in the <abbr title="Software Development Kit">SDK</abbr> sample programs.</p>
+</div>
+<div class="section" id="id17">
+<h4><abbr title="Application Programming Interface">API</abbr> Reference</h4>
+<p>The <abbr title="Application Programming Interface">API</abbr> reference documentation of the audio adapters are part of the <cite>audio core</cite> component and are included in the Cerence <abbr title="Software Development Kit">SDK</abbr>
+package at <code class="file docutils literal notranslate"><span class="pre">doc/api_reference/audio/audio_core/</span></code>. There is a separate folder for each supported programming language in which the reference
+documentation can be accessed via the main page <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+<p>The C <abbr title="Application Programming Interface">API</abbr> documentation is available at <a class="reference external" href="../../api_reference/audio/audio_core/c/index.html">doc/api_reference/audio/audio_core/c/index.html</a>.</p>
+</div>
+<div class="section" id="id19">
+<h4>Configuration <abbr title="Application Programming Interface">API</abbr> Reference</h4>
+<p>In general for each audio adapter implementation a specific <abbr title="JavaScript Object Notation">JSON</abbr> configuration can be defined. This configuration can be set at the corresponding
+<a class="reference external" href="./audio_module_input/index.html">Audio Input</a> or <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> module instance configuration via the <code class="docutils literal notranslate"><span class="pre">adapter_params</span></code> whose <abbr title="JavaScript Object Notation">JSON</abbr> string is given one-to-one from the
+<a class="reference external" href="./audio_module_input/index.html">Audio Input</a> or <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> module instance to the audio adapter implementation. Needless to say that the interpretation and <abbr title="JavaScript Object Notation">JSON</abbr> parsing
+needs to be done by the adapter itself.</p>
+<p>See also the <abbr title="JavaScript Object Notation">JSON</abbr> configuration <abbr title="Application Programming Interface">API</abbr> of the <a class="reference external" href="./audio_module_input/index.html">Audio Input</a> or <a class="reference external" href="./audio_module_output/index.html">Audio Output</a> described in chapter <a class="reference external" href="./audio_module_input/index.html#configuration-api-reference">Audio Input Configuration API Reference</a>
+and <a class="reference external" href="./audio_module_output/index.html#configuration-api-reference">Audio Output Configuration API Reference</a>.</p>
+</div>
+<div class="section" id="delivered-audio-adapters">
+<span id="id20"></span><h4>Delivered Audio Adapters</h4>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> implementations are highly platform and project specific the <abbr title="Software Development Kit">SDK</abbr> delivery does contain only sample
+<a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a> implementations for each standard platform <abbr title="Software Development Kit">SDK</abbr> package. These sample adapters are provided as source code
+and may serve as a starting point for Cerence <abbr title="Cerence Professional Service">PS</abbr> or customer engineers to develop project specific <a class="reference internal" href="#id14"><span class="std std-ref">adapter(s)</span></a>. Note that the
+sample adapters are not guaranteed to work on each specific platform. Finally it is the responsibility of Cerence <abbr title="Cerence Professional Service">PS</abbr> or the customer to implement
+and test a properly working external audio integration in the form of an <a class="reference internal" href="#id14"><span class="std std-ref">audio adapter</span></a>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="id22">
+<span id="id23"></span><h3>Audio Codecs</h3>
+<div class="section" id="id24">
+<h4>Description</h4>
+<p>The audio framework uses a generic audio codec approach to realize the encoding and decoding of any kind whatsoever (e.g. Mp3,
+Opus, ..) as explained in the basic concepts chapter <a class="reference internal" href="#audio-codecs-and-containers"><span class="std std-ref">Audio Codecs and Containers</span></a>. This is realized with
+the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> of the <abbr title="Software Development Kit">SDK</abbr> which use audio codecs to perform encoding and
+decoding. Thereby each instance of an <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> can be configured to use a
+specific audio codec. This approach offers the possibility to define complex <a class="reference internal" href="#id10"><span class="std std-ref">audio module</span></a> scenarios with encoding and
+decoding in a flexible manner. To keep the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> modules independent of any specific codec implementation,
+each audio codec needs to implement a generic codec interface.</p>
+<p>The audio framework of the <abbr title="Software Development Kit">SDK</abbr> is capable to handle any number of audio codecs. Therefore each codec is registered with a unique name
+(e.g. <cite>OPUS</cite>), the so called “codec type”, to the internal codec registry of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>. This codec type name
+can be chosen individually by the developer of a codec implementation, but it has to be unique within its codec category (encoder resp. decoder).
+The <abbr title="JavaScript Object Notation">JSON</abbr> configuration of an <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module instance contains an <code class="docutils literal notranslate"><span class="pre">encoder_type</span></code> or <code class="docutils literal notranslate"><span class="pre">decoder_type</span></code> parameter
+to have the possibility to bind a specific codec implementation to it. With this information the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module
+instance is capable to request an instance of the corresponding codec at the internal codec registry of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>
+and to use it then via the generic codec interface.</p>
+<p>In fact each audio codec implementation consists of an audio codec factory and the actual audio codec implementation. The audio codec factory
+implements the generic <code class="docutils literal notranslate"><span class="pre">nuance_audio_IEncoderFactory</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IDecoderFactory</span></code> interface and with that provides the possibility to
+create instances of the specific audio codec implementation on request. This <abbr title="Application Programming Interface">API</abbr> is used by the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> when an
+<a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module request an instance of a specific <code class="docutils literal notranslate"><span class="pre">encoder_type</span></code> or <code class="docutils literal notranslate"><span class="pre">decoder_type</span></code>. In contrast the audio codec
+implements the generic adapter interface <code class="docutils literal notranslate"><span class="pre">nuance_audio_IEncoder</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IDecoder</span></code> which is used by the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or
+<a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module to perform audio encoding or decoding.</p>
+<p>In order that a specific <abbr title="Software Development Kit">SDK</abbr> internal or externally provided codec can be used its codec factory needs to be registered at the
+<a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> as described in chapter <a class="reference internal" href="#registering-internal-audio-codecs"><span class="std std-ref">Registering Internal Audio Codecs</span></a>
+or <a class="reference internal" href="#registering-external-audio-codecs"><span class="std std-ref">Registering External Audio Codecs</span></a>.</p>
+<p>The <abbr title="Software Development Kit">SDK</abbr> delivery contains a set of standard audio codecs described in chapter <a class="reference internal" href="#delivered-audio-codecs"><span class="std std-ref">Delivered audio codecs</span></a>. In case these audio
+codecs are not sufficient to fulfill all the requirements of a project, any number of different audio codec implementations can be developed and
+registered at <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>.</p>
+</div>
+<div class="section" id="id25">
+<h4><abbr title="Application Programming Interface">API</abbr> Reference</h4>
+<p>The <abbr title="Application Programming Interface">API</abbr> reference documentation of the audio codecs are part of the <cite>audio core</cite> component and are included in the Cerence <abbr title="Software Development Kit">SDK</abbr>
+package at <code class="file docutils literal notranslate"><span class="pre">doc/api_reference/audio/audio_core/</span></code>. There is a separate folder for each supported programming language in which the reference
+documentation can be accessed via the main page <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+<p>The C <abbr title="Application Programming Interface">API</abbr> documentation is available at <a class="reference external" href="../../api_reference/audio/audio_core/c/index.html">doc/api_reference/audio/audio_core/c/index.html</a>.</p>
+</div>
+<div class="section" id="id27">
+<h4>Configuration <abbr title="Application Programming Interface">API</abbr> Reference</h4>
+<p>In general for each audio codec implementation a specific <abbr title="JavaScript Object Notation">JSON</abbr> configuration can be defined. This configuration can be set at the corresponding
+<a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module instance configuration via the <code class="docutils literal notranslate"><span class="pre">encoder_params</span></code> or <code class="docutils literal notranslate"><span class="pre">decoder_params</span></code> parameter whose <abbr title="JavaScript Object Notation">JSON</abbr> string
+is given one-to-one from the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module instance to the actual audio codec implementation. Needless to say that
+the interpretation and <abbr title="JavaScript Object Notation">JSON</abbr> parsing needs to be done by the codec itself.</p>
+<p>See also the <abbr title="JavaScript Object Notation">JSON</abbr> configuration <abbr title="Application Programming Interface">API</abbr> of the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> described in chapter <a class="reference external" href="./audio_module_decoder/index.html#configuration-api-reference">Audio Decoder Configuration API Reference</a>
+and <a class="reference external" href="./audio_module_encoder/index.html#configuration-api-reference">Audio Encoder Configuration API Reference</a>.</p>
+</div>
+<div class="section" id="delivered-audio-codecs">
+<span id="id28"></span><h4>Delivered Audio Codecs</h4>
+<div class="section" id="id29">
+<h5>Synoptic Table</h5>
+<p>The following table gives a brief overview of all <cite>audio codecs</cite> delivered. For more details to a specific codec see the linked
+user’s guide documents in the <cite>Audio Codec</cite> column.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="56%" />
+<col width="16%" />
+<col width="16%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Audio Codec</th>
+<th class="head">Brief Description</th>
+<th class="head">Implicit Creation Support</th>
+<th class="head">Explicit Creation Support</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference external" href="./audio_codec_mp3/index.html">Mp3</a></td>
+<td>A <cite>Mp3</cite> decoder implementation based on <cite>MiniMp3</cite>, a minimalistic Mp3 decoder single
+header library.</td>
+<td>x</td>
+<td>-</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="./audio_codec_opus/index.html">Opus</a></td>
+<td>An <cite>Opus</cite> encoder and decoder implementation.</td>
+<td>x</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="id30">
+<span id="id31"></span><h3>Audio Containers</h3>
+<div class="section" id="id32">
+<h4>Description</h4>
+<p>The audio framework uses a generic audio container approach to realize the packing and unpacking of any kind whatsoever container
+type (e.g. Ogg, ..) as explained in the basic concepts chapter <a class="reference internal" href="#audio-codecs-and-containers"><span class="std std-ref">Audio Codecs and Containers</span></a>. This is also
+realized with the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> audio modules which are capable in addition to the encoding or decoding (see chapter
+<a class="reference internal" href="#id22"><span class="std std-ref">Audio Codecs</span></a>) to perform a packing or unpacking of a specified container format. Thereby each instance of an <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a>
+or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> audio module can be configured to use in addition to a codec a specific audio container. This approach offers the possibility
+to define complex audio module scenarios with encoding or decoding and in parallel packing or unpacking in a flexible manner. To keep the
+<a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> modules independent of any specific container implementation, each audio container has to implement a generic
+container interface.</p>
+<p>The audio framework of the <abbr title="Software Development Kit">SDK</abbr> is capable to handle any number of audio containers. Therefore each container is registered with a unique name
+(e.g. <cite>OGG</cite>), the so called “container type”, to the internal container registry of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>. This container type name
+can be chosen individually by the developer of a container implementation, but has to be unique within its container category (packer resp. unpacker).
+The <abbr title="JavaScript Object Notation">JSON</abbr> configuration of an <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> resp. an <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module instance contains a <code class="docutils literal notranslate"><span class="pre">container_type</span></code> parameter to have the possibility
+to bind a specific container implementation to it. With this information the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module instance is capable to request
+an instance of the corresponding container at the internal container registry of the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> and to use it then via the
+generic container interface.</p>
+<p>In fact each audio container implementation consists of an audio container factory and the actual audio container implementation. The audio container factory
+implements the generic <code class="docutils literal notranslate"><span class="pre">nuance_audio_IContainerPackerFactory</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IContainerUnpackerFactory</span></code> interface and with that provides the possibility
+to create instances of the specific audio container implementation on request. This <abbr title="Application Programming Interface">API</abbr> is used by the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> when an
+<a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module requests an instance of a specific <code class="docutils literal notranslate"><span class="pre">container_type</span></code>. In contrast the audio container implements the generic
+container interface <code class="docutils literal notranslate"><span class="pre">nuance_audio_IContainerPacker</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IContainerUnpacker</span></code> which is used by the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module
+to perform audio container packing respectively unpacking.</p>
+<p>In order that a specific <abbr title="Software Development Kit">SDK</abbr> internal or externally provided codec can be used its codec factory needs to be registered at the
+<a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> as described in chapter <a class="reference internal" href="#registering-internal-audio-containers"><span class="std std-ref">Registering Internal Audio Containers</span></a>
+or <a class="reference internal" href="#registering-external-audio-containers"><span class="std std-ref">Registering External Audio Containers</span></a>.</p>
+<p>The <abbr title="Software Development Kit">SDK</abbr> delivery contains an audio container implementation described in chapter <a class="reference internal" href="#delivered-audio-containers"><span class="std std-ref">Delivered audio containers</span></a>. In case these
+audio container is not sufficient to fulfill all the requirements of a project, any number of different audio container implementations can be developed
+and registered at <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It may be that not each <a class="reference internal" href="#id22"><span class="std std-ref">audio codec</span></a> and <a class="reference internal" href="#id30"><span class="std std-ref">audio container</span></a> combination is applicable even if it can be
+configured in the <abbr title="JavaScript Object Notation">JSON</abbr> configuration of the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> audio modules! Please see corresponding notes in specific audio
+<a class="reference internal" href="#id30"><span class="std std-ref">container</span></a> that shall be used.</p>
+</div>
+</div>
+<div class="section" id="id33">
+<h4><abbr title="Application Programming Interface">API</abbr> Reference</h4>
+<p>The <abbr title="Application Programming Interface">API</abbr> reference documentation of the audio containers are part of the <cite>audio core</cite> component and are included in the Cerence <abbr title="Software Development Kit">SDK</abbr>
+package at <code class="file docutils literal notranslate"><span class="pre">doc/api_reference/audio/audio_core/</span></code>. There is a separate folder for each supported programming language in which the reference
+documentation can be accessed via the main page <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+<p>The C <abbr title="Application Programming Interface">API</abbr> documentation is available at <a class="reference external" href="../../api_reference/audio/audio_core/c/index.html">doc/api_reference/audio/audio_core/c/index.html</a>.</p>
+</div>
+<div class="section" id="id35">
+<h4>Configuration <abbr title="Application Programming Interface">API</abbr> Reference</h4>
+<p>In general for each audio container implementation a specific <abbr title="JavaScript Object Notation">JSON</abbr> configuration can be defined. This configuration can be set at the corresponding
+<a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> or <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module instance configuration via the <code class="docutils literal notranslate"><span class="pre">container_params</span></code> parameter whose <abbr title="JavaScript Object Notation">JSON</abbr> string is given one-to-one from
+the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> module instance to the actual audio container implementation. Needless to say that the interpretation and
+<abbr title="JavaScript Object Notation">JSON</abbr> parsing needs to be done by the container itself.</p>
+<p>See also the <abbr title="JavaScript Object Notation">JSON</abbr> configuration <abbr title="Application Programming Interface">API</abbr> of the <a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a> and <a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a> described in chapter <a class="reference external" href="./audio_module_decoder/index.html#configuration-api-reference">Audio Decoder Configuration API Reference</a>
+and <a class="reference external" href="./audio_module_encoder/index.html#configuration-api-reference">Audio Encoder Configuration API Reference</a>.</p>
+</div>
+<div class="section" id="delivered-audio-containers">
+<span id="id36"></span><h4>Delivered Audio Containers</h4>
+<div class="section" id="id37">
+<h5>Synoptic Table</h5>
+<p>The following table gives a brief overview of all <cite>Audio Containers</cite> delivered. More details to the single
+containers can be found in the linked user’s guide documents.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="57%" />
+<col width="16%" />
+<col width="16%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Audio Container</th>
+<th class="head">Brief Description</th>
+<th class="head">Implicit Creation Support</th>
+<th class="head">Explicit Creation Support</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference external" href="./audio_container_ogg/index.html">Ogg</a></td>
+<td><p class="first">An <cite>Ogg</cite> packer and unpacker audio container implementation.</p>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <cite>Ogg</cite> container can be used currently only in combination with the
+<a class="reference external" href="./audio_codec_opus/index.html">Opus</a> audio codec. Other <a class="reference internal" href="#id22"><span class="std std-ref">audio codecs</span></a> are not supported!</p>
+</div>
+</td>
+<td>x</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="audio-logging">
+<h2>Audio Logging</h2>
+<p>The logging of audio data can be done as described as follows:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_logging.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_logging.html#audio-data-logging">Audio Data Logging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/audio_logging.html#id1">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/audio_logging.html#audio-data-logging-points">Audio Data Logging Points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/audio_logging.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/audio_logging.html#data-format">Data Format</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_logging.html#audio-data-timing-analysis-logging">Audio Data Timing Analysis Logging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/audio_logging.html#id3">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/audio_logging.html#id4">Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_logging.html#references">References</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="audio-integration-requirements">
+<h2>Audio Integration Requirements</h2>
+<p>Any external audio implementation needs to meet the <a class="reference external" href="../../system_requirements/Audio_Transfer_Requirements_CDFW_CSDK.pdf">CSDK Audio Requirements</a>.</p>
+</div>
+<div class="section" id="references">
+<h2>References</h2>
+<p>Audio Modules:</p>
+<ul class="simple">
+<li><a class="reference external" href="../asr/index.html">Asr</a></li>
+<li><a class="reference external" href="./audio_module_buffer/index.html">Audio Buffer</a></li>
+<li><a class="reference external" href="./audio_module_decoder/index.html">Audio Decoder</a></li>
+<li><a class="reference external" href="./audio_module_encoder/index.html">Audio Encoder</a></li>
+<li><a class="reference external" href="./audio_module_from_file/index.html">Audio From File</a></li>
+<li><a class="reference external" href="./audio_module_input/index.html">Audio Input</a></li>
+<li><a class="reference external" href="./audio_module_output/index.html">Audio Output</a></li>
+<li><a class="reference external" href="./audio_module_segmentation/index.html">Audio Segmentation</a></li>
+<li><a class="reference external" href="./audio_module_stream_distributor/index.html">Audio Stream Distributor</a></li>
+<li><a class="reference external" href="./audio_module_to_file/index.html">Audio To File</a></li>
+<li><a class="reference external" href="../cloudservices/index.html">Cloud Commander</a></li>
+<li><a class="reference external" href="../prompter/SDK_Prompter_UserGuide.html">Prompter</a></li>
+<li><a class="reference external" href="./audio_module_src/index.html">Sample Rate Converter</a></li>
+<li><a class="reference external" href="./audio_module_sse/index.html">Speech Signal Enhancement</a></li>
+</ul>
+<p>Audio Codecs:</p>
+<ul class="simple">
+<li><a class="reference external" href="./audio_codec_mp3/index.html">Mp3</a></li>
+<li><a class="reference external" href="./audio_codec_opus/index.html">Opus</a></li>
+</ul>
+<p>Audio Containers:</p>
+<ul class="simple">
+<li><a class="reference external" href="./audio_container_ogg/index.html">Ogg</a></li>
+</ul>
+<p>Audio Integration Requirements:</p>
+<ul class="simple">
+<li><a class="reference external" href="../../system_requirements/Audio_Transfer_Requirements_CDFW_CSDK.pdf">CSDK Audio Requirements</a></li>
+</ul>
+<p>Additional Documents:</p>
+</div>
+<div class="section" id="glossary">
+<h2>Glossary</h2>
+<dl class="glossary docutils">
+<dt id="term-audio-path">Audio Path</dt>
+<dd>An <cite>audio path</cite> is a concatenation of <a class="reference internal" href="#id10"><span class="std std-ref">audio modules</span></a> to realize an audio processing chain
+for a specific use case. Thereby the very first <cite>audio module</cite> must have an audio output (audio source) only,
+the very last an audio input (audio sink) only and all in-between at least one audio input and one output.</dd>
+<dt id="term-audio-scenario">Audio Scenario</dt>
+<dd>An <cite>audio scenario</cite> is a definition of one or more <a class="reference internal" href="#term-audio-path"><span class="xref std std-term">audio paths</span></a>. <cite>Audio scenario</cite> can be
+defined with a unique name in the <abbr title="JavaScript Object Notation">JSON</abbr> audio configuration file. Each <cite>audio scenario</cite> can be activated
+and deactivate by usage of its unique name via the <a class="reference internal" href="#audio-manager"><span class="std std-ref">Audio Manager</span></a> <abbr title="Application Programming Interface">API</abbr>.</dd>
+</dl>
+</div>
+<div class="section" id="version-history">
+<h2>Version History</h2>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="5%" />
+<col width="5%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>REVISION</em></th>
+<th class="head"><em>DATE</em></th>
+<th class="head"><em>DESCRIPTION</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1.0</td>
+<td>22.07.2019</td>
+<td>initial version</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CERENCE SDK - AUDIO USER’S GUIDE</a><ul>
+<li><a class="reference internal" href="#scope-of-document">Scope of Document</a></li>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#basic-concepts">Basic Concepts</a><ul>
+<li><a class="reference internal" href="#external-audio-integration">External Audio Integration</a></li>
+<li><a class="reference internal" href="#audio-codecs-and-containers">Audio Codecs and Containers</a></li>
+<li><a class="reference internal" href="#audio-module-creation-and-destruction">Audio Module Creation and Destruction</a></li>
+<li><a class="reference internal" href="#audio-module-connection">Audio Module Connection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#audio-manager">Audio Manager</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#developing-applications">Developing Applications</a><ul>
+<li><a class="reference internal" href="#api-reference"><abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#configuration-api-reference">Configuration <abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#creating-and-configuring">Creating and Configuring</a></li>
+<li><a class="reference internal" href="#registering-internal-components">Registering Internal Components</a><ul>
+<li><a class="reference internal" href="#audio-modules">Audio Modules</a></li>
+<li><a class="reference internal" href="#audio-codecs">Audio Codecs</a></li>
+<li><a class="reference internal" href="#audio-container">Audio Container</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#registering-external-components">Registering External Components</a><ul>
+<li><a class="reference internal" href="#audio-adapters">Audio Adapters</a><ul class="simple">
+</ul>
+</li>
+<li><a class="reference internal" href="#registering-external-audio-codecs">Audio Codecs</a><ul class="simple">
+</ul>
+</li>
+<li><a class="reference internal" href="#audio-containers">Audio Containers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#connecting-audio-modules">Connecting Audio Modules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10">Audio Modules</a><ul>
+<li><a class="reference internal" href="#id12">Description</a></li>
+<li><a class="reference internal" href="#synoptic-table">Synoptic Table</a></li>
+<li><a class="reference internal" href="#creating-and-configuring-audio-modules">Creating and Configuring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#subcomponents-for-audio-modules">Subcomponents for Audio Modules</a><ul>
+<li><a class="reference internal" href="#id14">Audio Adapters</a><ul>
+<li><a class="reference internal" href="#id16">Description</a></li>
+<li><a class="reference internal" href="#sample-implementations">Sample Implementations</a></li>
+<li><a class="reference internal" href="#id17"><abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#id19">Configuration <abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#delivered-audio-adapters">Delivered Audio Adapters</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id22">Audio Codecs</a><ul>
+<li><a class="reference internal" href="#id24">Description</a></li>
+<li><a class="reference internal" href="#id25"><abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#id27">Configuration <abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#delivered-audio-codecs">Delivered Audio Codecs</a><ul>
+<li><a class="reference internal" href="#id29">Synoptic Table</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id30">Audio Containers</a><ul>
+<li><a class="reference internal" href="#id32">Description</a></li>
+<li><a class="reference internal" href="#id33"><abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#id35">Configuration <abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#delivered-audio-containers">Delivered Audio Containers</a><ul>
+<li><a class="reference internal" href="#id37">Synoptic Table</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#audio-logging">Audio Logging</a></li>
+<li><a class="reference internal" href="#audio-integration-requirements">Audio Integration Requirements</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#glossary">Glossary</a></li>
+<li><a class="reference internal" href="#version-history">Version History</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="user_guide/audio_core_configuration_api_ref.html" title="next chapter">Overview</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SDK_Audio_UserGuide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

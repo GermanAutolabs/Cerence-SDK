@@ -1,0 +1,259 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Overview</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="CERENCE SDK - OPUS AUDIO CODEC USER’S GUIDE" href="../SDK_OpusAudioCodec_UserGuide.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview</h1>
+<p>The following is an overview of the structure of the JSON configuration files.</p>
+<blockquote>
+<div><ul class="simple">
+<li>{ <a class="reference internal" href="#iopusaudiodecoderconfig">IOpusAudioDecoderConfig</a> }</li>
+<li><dl class="first docutils">
+<dt>{ <a class="reference internal" href="#iopusaudioencoderconfig">IOpusAudioEncoderConfig</a> }</dt>
+<dd><ul class="first last">
+<li>block_time: int</li>
+<li>complexity: int</li>
+<li>bit_rate: int</li>
+<li>vbr_on: bool</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="iopusaudiodecoderconfig-the-opus-decoder-configuration">
+<span id="iopusaudiodecoderconfig"></span><h1>IOpusAudioDecoderConfig - The ‘opus decoder’ configuration.</h1>
+<p>The ‘opus decoder’ configuration.</p>
+<p>Currently there are no configuration parameters defined.</p>
+<p>This built-in opus-decoder implementation can be bound to an audio decoder module by setting the param “decoder_type” to the value “OPUS”.</p>
+<p>It transforms audio data with the encoding “ENCODING_OPUS” into audio data with the encoding “ENCODING_PCM_16BIT”.</p>
+</div>
+<div class="section" id="iopusaudioencoderconfig-the-opus-encoder-configuration">
+<span id="iopusaudioencoderconfig"></span><h1>IOpusAudioEncoderConfig - The ‘opus encoder’ configuration.</h1>
+<p>The ‘opus encoder’ configuration.</p>
+<p>This built-in opus-encoder implementation can be bound to an audio encoder module by setting the param “encoder_type” to the value “OPUS”.</p>
+<p>It transforms audio data with the encoding “ENCODING_PCM_16BIT” into audio data with the encoding “ENCODING_OPUS”.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="28%" />
+<col width="19%" />
+<col width="37%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;block_time&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 20</td>
+<td>The input block size the encoder is working with in ms.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;complexity&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 5</td>
+<td>The complexity the encoding should be done with.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;bit_rate&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 256000</td>
+<td>The bit rate the encoding should be done with.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;vbr_on&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code></td>
+<td>no, default value is “false”</td>
+<td>The flag to activate variable bitrate (vbr) encoding.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iopusaudioencoderconfig-block-time">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;block_time&quot;</span></code>:</dt>
+<dd><p class="first">The input block size the encoder is working with in ms.</p>
+<p><strong>Minimum Value:</strong> 10
+<strong>Maximum Value:</strong> 60
+<strong>Default Value:</strong> 20
+<strong>Permitted Values:</strong> 10, 20, 40 or 60 ms</p>
+<p>For NCS the recommended block size is 20.</p>
+<p>This property can be changed during runtime using the vh_callback mechanism.
+A changed property takes effect with the next scenario activation.</p>
+<p><strong>Example:</strong>
+“blockTime”: { “vh_callback”: { “name”: “(instance_name)_blockTime”, “type”: “integer”, “default”: “20” } },</p>
+<p>It is proposed to be expand/replace (instance_name) with the name property of the module, defined in the
+IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it. Setting the
+vh_callback default value makes the vh_callback to return always a valid string.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property blockTime is handled like not defined at all and the blockTime default value “20”
+is used.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iopusaudioencoderconfig-complexity">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;complexity&quot;</span></code>:</dt>
+<dd><p class="first">The complexity the encoding should be done with.</p>
+<p><strong>Minimum Value:</strong> 0
+<strong>Maximum Value:</strong> 10
+<strong>Default Value:</strong> 5</p>
+<p>For NCS the recommended complexity is 10.</p>
+<p>This property can be changed during runtime using the vh_callback mechanism.
+A changed property takes effect with the next scenario activation.</p>
+<p><strong>Example:</strong>
+“complexity”: { “vh_callback”: { “name”: “(instance_name)_complexity”, “type”: “integer”, “default”: “5” } },</p>
+<p>It is proposed to be expand/replace (instance_name) with the name property of the module, defined in the
+IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it. Setting the
+vh_callback default value makes the vh_callback to return always a valid string.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property complexity is handled like not defined at all and the complexity default value “5”
+is used.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iopusaudioencoderconfig-bit-rate">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;bit_rate&quot;</span></code>:</dt>
+<dd><p class="first">The bit rate the encoding should be done with.</p>
+<p><strong>Minimum Value:</strong> 500
+<strong>Maximum Value:</strong> 512000
+<strong>Additional Value:</strong> -1 (OPUS_BITRATE_MAX)
+<strong>Additional Value:</strong> -1000 (OPUS_AUTO)
+<strong>Default Value:</strong> 256000 (This might be reduced in the future to 28000)</p>
+<p>For NCS the recommended bit_rate is 28000.</p>
+<p>This property can be changed during runtime using the vh_callback mechanism.
+A changed property takes effect with the next scenario activation.</p>
+<p><strong>Example:</strong>
+“bit_rate”: { “vh_callback”: { “name”: “(instance_name)_bit_rate”, “type”: “integer”, “default”: “256000” } },</p>
+<p>It is proposed to be expand/replace (instance_name) with the name property of the module, defined in the
+IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it. Setting the
+vh_callback default value makes the vh_callback to return always a valid string.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property bit_rate is handled like not defined at all and the bit_rate default value “256000”
+is used.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iopusaudioencoderconfig-vbr-on">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;vbr_on&quot;</span></code>:</dt>
+<dd><p class="first">The flag to activate variable bitrate (vbr) encoding.</p>
+<p><strong>Default Value:</strong> false</p>
+<p>For NCS the recommended value is false.</p>
+<p>This property can be changed during runtime using the vh_callback mechanism.
+A changed property takes effect with the next scenario activation.</p>
+<p><strong>Example:</strong>
+“vbr_on”: { “vh_callback”: { “name”: “(instance_name)_vbr_on”, “type”: “bool”, “default”: “false” } },</p>
+<p>It is proposed to be expand/replace (instance_name) with the name property of the module, defined in the
+IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it. Setting the
+vh_callback default value makes the vh_callback to return always a valid string.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property vbr_on is handled like not defined at all and the vbr_on default value “false”
+is used.</p>
+</dd>
+</dl>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_OpusAudioCodec_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_OpusAudioCodec_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a></li>
+<li><a class="reference internal" href="#iopusaudiodecoderconfig-the-opus-decoder-configuration">IOpusAudioDecoderConfig - The ‘opus decoder’ configuration.</a></li>
+<li><a class="reference internal" href="#iopusaudioencoderconfig-the-opus-encoder-configuration">IOpusAudioEncoderConfig - The ‘opus encoder’ configuration.</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_OpusAudioCodec_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../SDK_OpusAudioCodec_UserGuide.html" title="previous chapter">CERENCE SDK - OPUS AUDIO CODEC USER’S GUIDE</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/audio_codec_opus_configuration_api_ref.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

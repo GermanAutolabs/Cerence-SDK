@@ -1,0 +1,982 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Overview</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="CERENCE SDK - SPEECH SIGNAL ENHANCEMENT USER’S GUIDE" href="../SDK_SpeechSignalEnhancement_UserGuide.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview</h1>
+<p>The following is an overview of the structure of the JSON configuration files.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>{ <a class="reference internal" href="#itoplevelaudioconfig">ITopLevelAudioConfig</a> }</dt>
+<dd><ul class="first last">
+<li>version: String</li>
+<li>label: String</li>
+<li><dl class="first docutils">
+<dt>audio_scenario: [ { <a class="reference internal" href="#iaudioscenarioconfig">IAudioScenarioConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>audiopaths: [ [ String ] ]</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>audio_plugin: [ { <a class="reference internal" href="#iaudiopluginconfig">IAudioPluginConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>type: String</li>
+<li>lib_name: String</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>module_config: [ { <a class="reference internal" href="#iaudiomoduleconfig">IAudioModuleConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li><dl class="first docutils">
+<dt>{ <a class="reference internal" href="#ispeechsignalenhancementconfig">ISpeechSignalEnhancementConfig</a> }</dt>
+<dd><ul class="first last">
+<li>sse_lib: String</li>
+<li>sse_config_file: Path</li>
+<li>adapt_on_connect: bool</li>
+<li>signal_statistics_interval: int</li>
+<li>active_acoustic_zones: [ int ]</li>
+<li>reset_timing: [ int ]</li>
+<li>activate_tuning_port: int</li>
+<li>prompt_start_info_trigger: <a class="reference internal" href="#promptstartinfotype">promptStartInfoType</a></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>audio_format: [ { <a class="reference internal" href="#iaudioformatconfig">IAudioFormatConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>sample_rate: int</li>
+<li>samples_per_channel: int</li>
+<li>channel_count: int</li>
+<li>encoding: <a class="reference internal" href="#encoding">Encoding</a></li>
+<li>container: <a class="reference internal" href="#container">Container</a></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="ispeechsignalenhancementconfig-the-configuration-of-the-speech-signal-enhancement-module">
+<span id="ispeechsignalenhancementconfig"></span><h1>ISpeechSignalEnhancementConfig - The configuration of the speech signal enhancement module.</h1>
+<p>Super type: <a class="reference internal" href="#iaudiomoduleconfig">IAudioModuleConfig</a></p>
+<p>The configuration of the speech signal enhancement module.</p>
+<p>The ISpeechSignalEnhancementConfig interface is used to represent the configuration of the speech signal enhancement module.</p>
+<p>The speech signal enhancement module integrates the sse core component into the SDK’s audio backbone, if configured.
+Depending on its configuration it will do beam forming, echo cancellation, etc.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="18%" />
+<col width="17%" />
+<col width="47%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">String</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">yes</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The name of the audio module.</div>
+<div class="line">This property is inherited from <a class="reference internal" href="#iaudiomoduleconfig">IAudioModuleConfig</a>.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;sse_lib&quot;:</span></code> </td>
+<td>String</td>
+<td>no, default value is “sse”</td>
+<td>The name of the sse shared library file.</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;sse_config_file&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">Path</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no, default value is &lt;empty&gt;</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The name of the sse configuration file.</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;adapt_on_connect&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code></td>
+<td>no, default value is “false”</td>
+<td>The flag to activate immediate data capturing after being connected.</td>
+</tr>
+<tr class="row-even"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;signal_statistics_interval&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">int</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no, default value is -1</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The interval (in milliseconds) how often <code class="docutils literal notranslate"><span class="pre">onSseSignalStatistic()</span></code> is called.</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">&quot;active_acoustic_zones&quot;:</span></code> </div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">[</span></code> int <code class="docutils literal notranslate"><span class="pre">]</span></code></div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">no</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">The acoustic zones the sse uses to build its mixed output signal.</div>
+<div class="line">This property supports vh_callback.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;reset_timing&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> int <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>Define what type of reset has to be done between two successive audio streams.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;activate_tuning_port&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 0</td>
+<td>parameter used to activate the tuning port</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;prompt_start_info_trigger&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> promptStartInfoType <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no, default value is PROMPT_FIRST_WRITE</td>
+<td>parameter used to define when to notify the sse core component instance that a prompt is going to be played</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ispeechsignalenhancementconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the audio module.</p>
+<p class="last">This name has to be unique. For instance it is used to reference this module from audio scenarios (audio paths).</p>
+</dd>
+</dl>
+<dl class="docutils" id="ispeechsignalenhancementconfig-sse-lib">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sse_lib&quot;</span></code>:</dt>
+<dd><p class="first">The name of the sse shared library file.</p>
+<p>With the parameter <code class="docutils literal notranslate"><span class="pre">&quot;sse_lib&quot;</span></code>, the name of the shared object containing the sse core component
+used in the speech signal enhancement module is being configured.
+The name must be in the format <code class="docutils literal notranslate"><span class="pre">&quot;sse_major_minor&quot;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&quot;major_minor&quot;</span></code> are optional.
+e.g. <code class="docutils literal notranslate"><span class="pre">&quot;sse_4_1&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sse_4_2&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sse&quot;</span></code> and must not include platform-specific prefixes
+(like “lib”) or suffixes (like “dll”, “so”) or file path information.
+Any name value that does not match that format will lead to an error.</p>
+<p>By default the speech signal enhancement module uses the latest sse library which is
+part of a standard delivery package (<code class="docutils literal notranslate"><span class="pre">&quot;sse&quot;</span></code>).</p>
+<p>SSE versions that are older than the latest offered version are supported under
+following circumstances:</p>
+<ul class="simple">
+<li>The library file name must be in the above described naming format.</li>
+<li>The library file must be available at the expected location in the file system.</li>
+<li>The library file contains an SSE 4.1.4 or more recent.</li>
+</ul>
+<p>If it is required that a speech signal enhancement instance uses an older sse library version than the default one,
+the relevant sse library name must be configured in the above described format.
+E.g. if the version of the older library is <code class="docutils literal notranslate"><span class="pre">4.1</span></code>, the library must be named
+<code class="docutils literal notranslate"><span class="pre">&lt;prefix&gt;sse_4_1.&lt;suffix&gt;</span></code> and the value of the <code class="docutils literal notranslate"><span class="pre">&quot;sse_lib&quot;</span></code>
+property must be defined identically to the library part name <code class="docutils literal notranslate"><span class="pre">&quot;sse_4_1&quot;</span></code>.
+Note, that the speech signal enhancement module checks during loading of the sse library if the passed version
+information matches. In case of a mismatch the creation of the speech signal enhancement instance fails.</p>
+<p>Examples showing how to use an sse version <code class="docutils literal notranslate"><span class="pre">4.1</span></code> on different platforms:</p>
+<ul class="simple">
+<li>On Windows: sse library is named <code class="docutils literal notranslate"><span class="pre">sse_4_1.dll</span></code> and the property defined to <code class="docutils literal notranslate"><span class="pre">&quot;sse_lib&quot;:</span> <span class="pre">&quot;sse_4_1&quot;</span></code></li>
+<li>On Linux: sse library is named <code class="docutils literal notranslate"><span class="pre">sse_4_1.so</span></code> and the property defined to <code class="docutils literal notranslate"><span class="pre">&quot;sse_lib&quot;:</span> <span class="pre">&quot;sse_4_1&quot;</span></code></li>
+<li>On Android: sse library is named <code class="docutils literal notranslate"><span class="pre">libsse_4_1.so</span></code> and the property defined to <code class="docutils literal notranslate"><span class="pre">&quot;sse_lib&quot;:</span> <span class="pre">&quot;sse_4_1&quot;</span></code></li>
+</ul>
+<p class="last"><strong>Note:</strong> the parameter <code class="docutils literal notranslate"><span class="pre">&quot;sse_config_file&quot;</span></code> needs to be set accordingly.
+That means for an <code class="docutils literal notranslate"><span class="pre">&quot;sse_lib&quot;</span></code> referencing an sse 4 a “*.scd” file needs to be configured.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ispeechsignalenhancementconfig-sse-config-file">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sse_config_file&quot;</span></code>:</dt>
+<dd><p class="first">The name of the sse configuration file.</p>
+<p>With the parameter <code class="docutils literal notranslate"><span class="pre">&quot;sse_config_file&quot;</span></code>, the main configuration file for the sse core component inside of
+the speech signal enhancement module is being configured.</p>
+<p>If the parameter <code class="docutils literal notranslate"><span class="pre">&quot;sse_config_file&quot;</span></code> is not defined, a build in single channel configuration for cloud recognition is activated.</p>
+<p><strong>Note:</strong> The audio format of the modules around the speech signal enhancement module must match the configured values
+in the sse configuration file in terms of <code class="docutils literal notranslate"><span class="pre">channel_count</span></code> and <code class="docutils literal notranslate"><span class="pre">sample_rate</span></code>.
+The speech signal enhancement module will use the same amount of <code class="docutils literal notranslate"><span class="pre">samples_per_channel</span></code> at the output as received via the input,
+independently of the configuration within the sse configuration file.</p>
+<p>The property supports the vh_callback mechanism, meaning that the sse_config_file can be changed during runtime.</p>
+<p><strong>Example:</strong>
+“sse_config_file”: { “vh_callback”: { “name”: “(instance_name)_sse_config_file”, “type”: “string”, “default”: “” } }</p>
+<p>it is proposed to expand/replace (instance_name) with the name property of the module,
+defined in the IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p>The SpeechSignalEnhancement module evaluates the sse_config_file each time the scenario it is used in is prepared
+(in more detail when the module is instantiated).</p>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it.
+Setting the vh_callback default value makes the vh_callback to return always a valid value.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property sse_config_file is handled like not defined at all and the sse_config_file default value “” is used.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ispeechsignalenhancementconfig-adapt-on-connect">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;adapt_on_connect&quot;</span></code>:</dt>
+<dd><p class="first">The flag to activate immediate data capturing after being connected.</p>
+<p>This parameter should be set only if the effects described below are understood and wanted. If unsure do not set this value.</p>
+<p>When this parameter is set to true, the instance of the speech signal enhancement module requests immediately
+audio data from its connected input (source_pad) after the connection to the audio backbone is being established.</p>
+<p>This is the case once an audio scenario which is using this speech signal enhancement module is activated.
+The captured audio data is only forwarded if requested by a following module (e.g. recognizer), otherwise it will
+be used for internal adaption only.</p>
+<p>If the following module in the backbone indicates that no more data is needed, the speech signal enhancement module
+stops delivering, but does not forward that request to the modules connected to the speech signal enhancement’s input. This
+way the speech signal enhancement module will continue capturing audio data silently to keep an uninterrupted audio stream.
+The default value is <code class="docutils literal notranslate"><span class="pre">false</span></code>. The parameter should be set only if there is a well-founded knowledge about the SDK’s
+audio framework. If unsure, do not change the parameter.</p>
+<p class="last"><strong>Note:</strong> If this parameter is activated, the prompt synced input module has to be placed behind the speech signal enhancement
+module within the audio backbone. The file list feature of audio from file will not work, and the audio from file module may
+not be usable at all, since data is consumed instantly when activating the audio scenario.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ispeechsignalenhancementconfig-signal-statistics-interval">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;signal_statistics_interval&quot;</span></code>:</dt>
+<dd><p class="first">The interval (in milliseconds) how often <code class="docutils literal notranslate"><span class="pre">onSseSignalStatistic()</span></code> is called.</p>
+<p>This value needs to be configured if the desired signal statistic data should be emitted.
+If this value is not defined no signal statistic data are send.
+For SDK users the emission is done via the audio managers “onSseSignalStatistic” listener method.
+For CDFW users a corresponding GCF event is generated.</p>
+<p>The value 0 has a special meaning.
+It will activate the sending of the event at the end of each incoming stream only.
+Please be aware that with adapt_on_connect activated there will be only one incoming stream.</p>
+<p>We recommend values above 1000ms to get meaningful arithmetic mean values and have a low system load.</p>
+<p>The property supports the vh_callback mechanism, meaning that the signal_statistics_interval can be changed during runtime.</p>
+<p><strong>Example:</strong>
+“signal_statistics_interval”: { “vh_callback”: { “name”: “(instance_name)_signal_statistics_interval”, “type”: “integer”, “default”: -1 } }</p>
+<p>it is proposed to expand/replace (instance_name) with the name property of the module,
+defined in the IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p>The SpeechSignalEnhancement module evaluates the signal_statistics_interval each time the scenario it is used in is activated
+(in more detail when its input is connected).</p>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it.
+Setting the vh_callback default value makes the vh_callback to return always a valid number.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property signal_statistics_interval is handled like not defined at all and the signal_statistics_interval default value “-1” is used.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ispeechsignalenhancementconfig-active-acoustic-zones">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;active_acoustic_zones&quot;</span></code>:</dt>
+<dd><p class="first">The acoustic zones the sse uses to build its mixed output signal.</p>
+<p>This configuration parameter is required for the zone suppression feature of the sequential MultiZone UseCase.</p>
+<p>For this feature it is necessary to define which zones go to the mixed data stream for the recognizer doing the wake up word recognition (e.g. asr_0).</p>
+<p>This configuration parameter influences the first sse output channel only.</p>
+<p>The property supports the vh_callback mechanism, meaning that the active acoustic zones can be changed during runtime.</p>
+<p><strong>Example:</strong>
+“active_acoustic_zones”: { “vh_callback”: { “name”: “(instance_name)_active_acoustic_zones”, “type”: “array”, “default”: [] } }</p>
+<p>It is proposed to expand/replace (instance_name) with the name property of the module,
+defined in the IAudioModuleConfig, to ease log analysis and ensure unique dynamic names.</p>
+<p><strong>Note:</strong>
+It is recommended, that no recognition is running when this configuration parameter is changed.</p>
+<p>The SpeechSignalEnhancement module evaluates the active_acoustic_zones as follows:</p>
+<ul class="simple">
+<li>when the module is created</li>
+<li>when the subsequent module requests data (in more detail when its output starts a session, like done when starting the recognizer with VoConHigh 5)</li>
+<li>when data is processed every 250ms</li>
+</ul>
+<p>The default parameter in the vh_callback is optional and can be set if the user sees a need for it.
+Setting the vh_callback default value makes the vh_callback to return always a valid value.</p>
+<p class="last">If this vh_callback default value is not set and nothing is set from outside the vh_callback will return nothing.
+In that case the property active_acoustic_zones is handled like not defined at all.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ispeechsignalenhancementconfig-reset-timing">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;reset_timing&quot;</span></code>:</dt>
+<dd><p class="first">Define what type of reset has to be done between two successive audio streams.</p>
+<p>This value defines a list with two elements (A,B).
+Each defines a timespan in ms. The value A has to be less or equal to the value B
+otherwise the SSE module will refuse to load that configuration value and abort creation.
+Additionally to that the values 0 and -1 are permitted.
+With 0 the mentioned reset type is performed always without evaluating any timestamps.
+With -1 the mentioned reset type is disabled and not performed.</p>
+<p>Inside of the speech signal enhancement module the time passed between
+two successive incoming audio data streams is measured, if needed to determine which reset type has to be performed.</p>
+<p>Two values are defined with that configuration parameter A (the first value) and B (the second value).</p>
+<ul class="simple">
+<li>If the measured timespan is greater than B a full reset is done</li>
+<li>If the measured timespan is greater than A but smaller than or equal to B a partial reset (type 2) is done</li>
+<li>If the measured timespan is smaller than or equal to A nothing is done</li>
+</ul>
+<p>The internal default values are 0 for A and 5000 for B. That means the following:
+If the measured timespan is greater than the B’s 5000ms a full reset is performed
+otherwise a partial reset (type 2) is performed always at the beginning of each incoming data stream.</p>
+<p>Those default values were agreed with the acoustic team building the Speech Signal Enhancement (SSE) core library.
+There is no general need to change those configuration values. This documentation does show only that the possibility exists.
+If unsure please let the defaults in place.</p>
+<p><strong>Note:</strong> Setting those values to 0,0 or -1,0 triggers a full reset at the beginning of each data stream.
+Please check very carefully if that is really intended.</p>
+<p><strong>Note:</strong> Setting those values to 0,-1 triggers a partial reset (type 2) at the beginning of each data stream.
+Please check very carefully if that is really intended.</p>
+<p><strong>Note:</strong> Setting those values to -1,-1 prevents full or partial type 2 resets at the beginning of each data stream.
+That means that there are no resets at all. Please check very carefully if that is really intended.</p>
+<p class="last"><strong>Note:</strong> If adaptOnConnect is activated, the speech signal enhancement module will have
+one audio data stream at the input only as long as the audio scenario is active.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ispeechsignalenhancementconfig-activate-tuning-port">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;activate_tuning_port&quot;</span></code>:</dt>
+<dd><p class="first">parameter used to activate the tuning port</p>
+<p>The speech signal enhancement module provides an interface to access and tune the sse core component instance during runtime.
+The high level interface opens a TCP server on a configurable port to connect with the <code class="docutils literal notranslate"><span class="pre">SSE/ICC</span> <span class="pre">Tuning</span> <span class="pre">Tool</span></code>.</p>
+<p>Since the tune commands are sent to the sse core component instance together with incoming audio data,
+it is vital for the tuning interface that audio data is flowing.</p>
+<p>Therefore see also parameter <code class="docutils literal notranslate"><span class="pre">&quot;adapt_on_connect&quot;</span></code>.</p>
+<p class="last">The tuning interface can simply be activated by setting this parameter to a TCP port number (integer) greater than zero.
+The standard TCP port for the <cite>SSE/ICC Tuning Tool</cite> is 2012.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ispeechsignalenhancementconfig-prompt-start-info-trigger">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;prompt_start_info_trigger&quot;</span></code>:</dt>
+<dd><p class="first">parameter used to define when to notify the sse core component instance that a prompt is going to be played</p>
+<p>This value defines when to notify the sse core component instance that a prompt is going to be played.</p>
+<p>This value shall only be changed following direct recommendations of the acoustic expert team.</p>
+<p>If unsure do not change.</p>
+<blockquote class="last">
+<div><p id="promptstartinfotype"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> promptStartInfoType <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+define the prompter information type.     This enumeration defines the different prompter information types which can be used to notify the sse core component instance that a prompt is going to be played</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;PROMPT_FIRST_WRITE&quot;</span></code>: the 1rst chunk of a prompt left the audio output</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;PROMPT_FIRST_CONFIRMATION&quot;</span></code>: the confirmation that the 1rst chunk of a prompt was processed, reached the audio output</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+</div>
+<div class="section" id="itoplevelaudioconfig-the-top-level-audio-configuration-structure">
+<span id="itoplevelaudioconfig"></span><h1>ITopLevelAudioConfig - The top-level audio configuration structure.</h1>
+<p>The top-level audio configuration structure.</p>
+<p>This configuration class describes the top-level configuration structure in the audio namespace.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="34%" />
+<col width="7%" />
+<col width="41%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The version key, fixed to “AudioMgr 1.0”.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>Label describing the content / version of the JSON file.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;audio_scenario&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iaudioscenarioconfig">IAudioScenarioConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level audio scenario configuration.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;audio_plugin&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iaudiopluginconfig">IAudioPluginConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level audio plugin configuration.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;module_config&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iaudiomoduleconfig">IAudioModuleConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level audio module configuration.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;audio_format&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iaudioformatconfig">IAudioFormatConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level audio format configuration.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="itoplevelaudioconfig-version">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;</span></code>:</dt>
+<dd>The version key, fixed to “AudioMgr 1.0”.</dd>
+</dl>
+<dl class="docutils" id="itoplevelaudioconfig-label">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;</span></code>:</dt>
+<dd>Label describing the content / version of the JSON file.</dd>
+</dl>
+<dl class="docutils" id="itoplevelaudioconfig-audio-scenario">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;audio_scenario&quot;</span></code>:</dt>
+<dd>The top-level audio scenario configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelaudioconfig-audio-plugin">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;audio_plugin&quot;</span></code>:</dt>
+<dd>The top-level audio plugin configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelaudioconfig-module-config">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;module_config&quot;</span></code>:</dt>
+<dd>The top-level audio module configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelaudioconfig-audio-format">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;audio_format&quot;</span></code>:</dt>
+<dd>The top-level audio format configuration.</dd>
+</dl>
+</div>
+<div class="section" id="itoplevelconfig-interface-for-top-level-configuration-classes">
+<span id="itoplevelconfig"></span><h1>ITopLevelConfig - Interface for top-level configuration classes.</h1>
+<p>Interface for top-level configuration classes.</p>
+<p>All top-level configuration classes in all components are derived from this class.</p>
+<p>If multiple instances of a certain configuration type are allowed,
+the type is required to support a “name” property in order to identify the instance.</p>
+</div>
+<div class="section" id="iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">
+<span id="iuserjsonconfig"></span><h1>IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</h1>
+<p>Defines a verbatim block of json that is used by VoCon High as is.</p>
+<p>This is for example used to pass json configuration block on to VoCon Hybrid that need to configured
+by users of Vocon High. The Connection Info object in ASR is an example of this.</p>
+<p>This object lists not specific attributes because any valid json object can be used here, so the number, types
+and names of attributes are not limited.</p>
+</div>
+<div class="section" id="iaudioscenarioconfig-the-audio-scenario-configuration">
+<span id="iaudioscenarioconfig"></span><h1>IAudioScenarioConfig - The audio scenario configuration.</h1>
+<p>Super type: <a class="reference internal" href="#itoplevelconfig">ITopLevelConfig</a></p>
+<p>The audio scenario configuration.</p>
+<p>The IAudioScenarioConfig interface is used to represent the configuration of an audio scenario,
+i.e. the definition of a set of audio paths (source-sink connections) that can be activated together using the audio manager.</p>
+<p>An audio scenario configuration needs to define two items.</p>
+<ul class="simple">
+<li>First, a unique name. This name needs to be used to activate the audio scenario during runtime via IAudioManager.activateScenario(name).</li>
+<li>Second, an audio path definition, which is a list of source sink connections defined in an array. For such a connection a list with two elements is used. The first element is the name of an audio source, the second element the name of an audio sink.</li>
+</ul>
+<p>The array of source-sink lists is building the “audiopaths” configuration parameter. Imagine there is a producer named “mod1”, a processor named “mod2” and a consumer named “mod3”. The definition of the audio path connecting those three modules would look as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;mod1&quot;</span><span class="p">,</span> <span class="s2">&quot;mod2&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;mod2&quot;</span><span class="p">,</span> <span class="s2">&quot;mod3&quot;</span><span class="p">]</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>The names in that list must match the ones used in the application program when creating a modules instance or refer to a built-in module implementation. Let us assume, for example, that an application creates a prompter instance with the name myprompter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance</span><span class="o">.</span><span class="n">prompter</span><span class="o">.</span><span class="n">IPrompter</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">&quot;myprompter&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">errorListener</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then this same name myprompter needs to be used in the audio JSON configuration file to define the audio path, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;myprompter&quot;</span><span class="p">,</span> <span class="s2">&quot;default_speaker&quot;</span><span class="p">]</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>This example defines an audio path where the <code class="docutils literal notranslate"><span class="pre">myprompter</span></code> source module produces audio data that shall be passed to the consumer module <code class="docutils literal notranslate"><span class="pre">default_speaker</span></code>
+which is here supposed to refer to the built-in <code class="docutils literal notranslate"><span class="pre">AudioOutput</span></code> implementation.
+This built-in module will be started automatically by the audio manager with the name <code class="docutils literal notranslate"><span class="pre">&quot;default_speaker&quot;</span></code> if configured as shown and not already present.</p>
+<p>Each audio scenario must define at least one source sink connection, using valid module names.
+Given these audio path definitions the audio manager will set up the required connections for the audio data flow between the modules.
+Thus, the possibility to define different audio scenarios allows a very flexible configuration of audio processing chains within the audio manager.</p>
+<p>Only configured audio scenarios can be activated at the audio manager’s interface. Handing an unknown scenario name will lead to an error.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="29%" />
+<col width="10%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the audio scenario.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;audiopaths&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">[</span></code> String <code class="docutils literal notranslate"><span class="pre">]</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>yes</td>
+<td>The audio paths of this audio scenario.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iaudioscenarioconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the audio scenario.</p>
+<p class="last">This name is used for referencing this audio scenario when activating it through the audio manager API.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iaudioscenarioconfig-audiopaths">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;audiopaths&quot;</span></code>:</dt>
+<dd><p class="first">The audio paths of this audio scenario.</p>
+<p>An audio path is defined as a list of 2-element lists.</p>
+<p>The following naming scheme is used to define a connection in that 2-element lists.</p>
+<p>Each sink or source pad is referenced by the name of its module, then followed by a colon (“:”) and
+the name of the sink or source pad itself.
+The syntax is module_name:source_pad_name respectively module_name:sink_pad_name.</p>
+<p><strong>Note:</strong> The colon delimiter therefore cannot be used as part of any module name, sink pad name or source pad name.</p>
+<p>For modules having just one sink and/or source pad the name of the sink or source pad does not have to be defined,
+since the modules name is already a unique key then.</p>
+<p class="last">For more complex modules with multiple sink and source pads the audio path configuration needs to use
+the colon delimiter syntax module_name:source_pad_name respectively module_name:sink_source_name.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="iaudiopluginconfig-the-audio-plug-in-configuration">
+<span id="iaudiopluginconfig"></span><h1>IAudioPluginConfig - The audio plug-in configuration.</h1>
+<p>Super type: <a class="reference internal" href="#itoplevelconfig">ITopLevelConfig</a></p>
+<p>The audio plug-in configuration.</p>
+<p>The IAudioPluginConfig interface is used to represent the loadable plugins.</p>
+<p>This is important if the built-in “Encoder” module should use a customer encoder implementation, for instance.
+Since a plugin is only ready to be used in the modules configuration, if it is one of the “known plugin types” listed below and configured in the plugins section.</p>
+<p>Adding configurations for other plugin types than listed below will be ignored.</p>
+<ul class="simple">
+<li>Encoder</li>
+</ul>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="28%" />
+<col width="10%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>type of the plug-in which shall be loaded.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;lib_name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>library file name which shall be loaded.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iaudiopluginconfig-type">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;type&quot;</span></code>:</dt>
+<dd><p class="first">type of the plug-in which shall be loaded.</p>
+<p class="last">This name is used to define the type of the plug-in this entry is for.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iaudiopluginconfig-lib-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;lib_name&quot;</span></code>:</dt>
+<dd><p class="first">library file name which shall be loaded.</p>
+<p>This name is used for referencing the library which contains the dedicated plug-in implementation.</p>
+<p class="last">A plug-in library name may contain an absolute (i.e. starting with / or [A-Za-z]:[/]), a relative or none path information.
+In the latter two cases the platform specific search strategy (e.g. LD_LIBRARY_PATH on Linux) is used.
+In case a library name does not contain a platform specific shared object precedence (e.g. lib) or extension (e.g. .so), it is automatically added.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="iaudiomoduleconfig-the-audio-module-configuration">
+<span id="iaudiomoduleconfig"></span><h1>IAudioModuleConfig - The audio module configuration.</h1>
+<p>Super type: <a class="reference internal" href="#itoplevelconfig">ITopLevelConfig</a></p>
+<p>The audio module configuration.</p>
+<p>The IAudioModuleConfig interface is used to represent the generic configuration of audio modules.
+The derived audio module (configurations) inherit the <code class="docutils literal notranslate"><span class="pre">name</span></code> property defined here.</p>
+<p>It is possible to add dedicated module configurations to the audio manager’s configuration file.</p>
+<p>This is important if the built-in “AudioInput”/”AudioOutput” should be used, for instance.
+Since a module is only ready for automated internal startup, if it is one of the “known modules”
+listed below and configured in the modules section.</p>
+<p>Adding configurations for other module types than the “known modules” listed below will cause an error while loading this configuration.</p>
+<ul class="simple">
+<li>AudioBuffer</li>
+<li>AudioDecoder</li>
+<li>AudioEncoder</li>
+<li>AudioFromFile</li>
+<li>AudioInput</li>
+<li>AudioOutput</li>
+<li>PromptSyncedInput (FW only)</li>
+<li>AudioSegmentation</li>
+<li>AudioSignalAnalysis (FW only)</li>
+<li>SampleRateConverter</li>
+<li>SpeechSignalEnhancement</li>
+<li>AudioStreamDistributor</li>
+<li>AudioToFile</li>
+</ul>
+<p>Currently known module types are listed as “sub types”, see the documentation of the sub-types for
+the list of type-specific properties.</p>
+<p><strong>Note:</strong> Configuring modules of those types and referencing their names in the audio path of a scenario
+will allow the implicit creation of a module instance if no module with that name is present so far.
+The implicit creation is done during the preparation step of an audio scenario activation.
+Please choose the names for your modules carefully to avoid name conflicts.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="31%" />
+<col width="11%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the audio module.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iaudiomoduleconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the audio module.</p>
+<p class="last">This name has to be unique. For instance it is used to reference this module from audio scenarios (audio paths).</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="ichunkpoolconfig-chunkpool-configuration">
+<span id="ichunkpoolconfig"></span><h1>IChunkPoolConfig - ChunkPool configuration.</h1>
+<p>ChunkPool configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="19%" />
+<col width="16%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;chunk_count&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 100</td>
+<td>The initial number of chunks per audio format that are allocated.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;chunk_realloc_count&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 50</td>
+<td>The number of audio chunks used for reallocations.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;chunk_threshold&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 2024</td>
+<td>Threshold for dynamic versus static allocation within an audio chunk.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;marker_count&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 100</td>
+<td>The initial number of audio markers that gets allocated.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;marker_realloc_count&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 100</td>
+<td>The the number of audio markers used for reallocations.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ichunkpoolconfig-chunk-count">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;chunk_count&quot;</span></code>:</dt>
+<dd><p class="first">The initial number of chunks per audio format that are allocated.</p>
+<p class="last">This number of audio chunks of a certain audio format gets allocated the first time a
+reserve is made for this audio format. The number of allocated chunks will never fall
+below this value, even if all reservations are cleared.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ichunkpoolconfig-chunk-realloc-count">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;chunk_realloc_count&quot;</span></code>:</dt>
+<dd><p class="first">The number of audio chunks used for reallocations.</p>
+<p class="last">This number of audio chunks of a certain audio format gets allocated when the number of
+reservations exceeds the current number of allocations. The same number is also used for
+decreasing the number of allocated chunks when reservations are cleared.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ichunkpoolconfig-chunk-threshold">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;chunk_threshold&quot;</span></code>:</dt>
+<dd><p class="first">Threshold for dynamic versus static allocation within an audio chunk.</p>
+<p class="last">This value only takes effect for chunks carrying encoded audio data. If the chunk size
+is below the threshold it is tried to re-use already allocated memory while bigger audio
+chunks are allocated dynamically. For PCM audio data a complete static approach is used.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ichunkpoolconfig-marker-count">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;marker_count&quot;</span></code>:</dt>
+<dd><p class="first">The initial number of audio markers that gets allocated.</p>
+<p class="last">This number of audio markers gets allocated the first time a marker is requested.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ichunkpoolconfig-marker-realloc-count">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;marker_realloc_count&quot;</span></code>:</dt>
+<dd><p class="first">The the number of audio markers used for reallocations.</p>
+<p class="last">This number of audio markers gets allocated when an audio marker is requested and no
+more unused marker is available.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="iaudioformatconfig-the-audio-format-configuration">
+<span id="iaudioformatconfig"></span><h1>IAudioFormatConfig - The audio format configuration.</h1>
+<p>The audio format configuration.</p>
+<p>This configuration can be referenced with (<code class="docutils literal notranslate"><span class="pre">&quot;uses&quot;</span></code>) from other parts of the configuration using the <code class="docutils literal notranslate"><span class="pre">name</span></code> key.
+The name of audio format has to be unique.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="22%" />
+<col width="30%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The name of the audio format.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;sample_rate&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The sampling rate in Hz.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;samples_per_channel&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The number of units per channel.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;channel_count&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The number of channels.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;encoding&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> Encoding <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no, default value is ENCODING_PCM_16BIT</td>
+<td>The encoding type.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;container&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> Container <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>no, default value is CONTAINER_NONE</td>
+<td>The container type.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iaudioformatconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the audio format.</p>
+<p class="last">This key is used for referencing this audio format from other parts of the configuration.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-sample-rate">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sample_rate&quot;</span></code>:</dt>
+<dd>The sampling rate in Hz.</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-samples-per-channel">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;samples_per_channel&quot;</span></code>:</dt>
+<dd><p class="first">The number of units per channel.</p>
+<p class="last">This key defines the samples per channel for plain PCM data (ENCODING_PCM_16BIT) without a container (CONTAINER_NONE).
+In all other cases it defines bytes per channel.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-channel-count">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;channel_count&quot;</span></code>:</dt>
+<dd>The number of channels.</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-encoding">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;encoding&quot;</span></code>:</dt>
+<dd><p class="first">The encoding type.</p>
+<blockquote class="last">
+<div><p id="encoding"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> Encoding <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ENCODING_USER&quot;</span></code>: user specific encoding type, unknown by the system</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ENCODING_PCM_16BIT&quot;</span></code>: Signed 16Bit PCM raw data</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ENCODING_OPUS&quot;</span></code>: OPUS encoding</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;ENCODING_MP3&quot;</span></code>: MP3 encoding</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="iaudioformatconfig-container">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;container&quot;</span></code>:</dt>
+<dd><p class="first">The container type.</p>
+<blockquote class="last">
+<div><p id="container"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> Container <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;CONTAINER_USER&quot;</span></code>: user specific container type, unknown by the system</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;CONTAINER_NONE&quot;</span></code>: No container used/desired</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;CONTAINER_OGG&quot;</span></code>: OGG container</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_SpeechSignalEnhancement_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_SpeechSignalEnhancement_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a></li>
+<li><a class="reference internal" href="#ispeechsignalenhancementconfig-the-configuration-of-the-speech-signal-enhancement-module">ISpeechSignalEnhancementConfig - The configuration of the speech signal enhancement module.</a></li>
+<li><a class="reference internal" href="#itoplevelaudioconfig-the-top-level-audio-configuration-structure">ITopLevelAudioConfig - The top-level audio configuration structure.</a></li>
+<li><a class="reference internal" href="#itoplevelconfig-interface-for-top-level-configuration-classes">ITopLevelConfig - Interface for top-level configuration classes.</a></li>
+<li><a class="reference internal" href="#iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</a></li>
+<li><a class="reference internal" href="#iaudioscenarioconfig-the-audio-scenario-configuration">IAudioScenarioConfig - The audio scenario configuration.</a></li>
+<li><a class="reference internal" href="#iaudiopluginconfig-the-audio-plug-in-configuration">IAudioPluginConfig - The audio plug-in configuration.</a></li>
+<li><a class="reference internal" href="#iaudiomoduleconfig-the-audio-module-configuration">IAudioModuleConfig - The audio module configuration.</a></li>
+<li><a class="reference internal" href="#ichunkpoolconfig-chunkpool-configuration">IChunkPoolConfig - ChunkPool configuration.</a></li>
+<li><a class="reference internal" href="#iaudioformatconfig-the-audio-format-configuration">IAudioFormatConfig - The audio format configuration.</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_SpeechSignalEnhancement_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../SDK_SpeechSignalEnhancement_UserGuide.html" title="previous chapter">CERENCE SDK - SPEECH SIGNAL ENHANCEMENT USER’S GUIDE</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/audio_module_sse_configuration_api_ref.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

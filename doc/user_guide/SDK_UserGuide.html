@@ -1,0 +1,273 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CERENCE SDK - USER’S GUIDE</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CSDK_v2 release info" href="user_guide/csdk_release_notes.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="doc-title">
+<h1>CERENCE SDK - USER’S GUIDE</h1>
+<div class="line-block">
+<div class="line">© 2020 Cerence, Inc. All rights reserved.</div>
+<div class="line">Published by Cerence, Inc.</div>
+<div class="line">15 Wayside Road, Burlington, Massachusetts 01803, U.S.A.</div>
+</div>
+<p>Cerence, Inc. provides this document without representation or warranty of any kind. The
+information in this document is subject to change without notice and
+does not represent a commitment by Cerence, Inc. The software and/or databases described in this document are furnished under a license
+agreement and may be used or copied only in accordance with the terms of such license agreement. Without
+limiting the rights under copyright reserved herein, and except as permitted by such license agreement, no part of
+this document may be reproduced or transmitted in any form or by any means, including, without limitation,
+electronic, mechanical, photocopying, recording, or otherwise, or transferred to information storage and retrieval
+systems, without the prior written permission of Cerence, Inc.</p>
+<p>Cerence and the Cerence logo are trademarks or registered trademarks of Cerence, Inc. or its affiliates in the United States and/or other countries. All other trademarks referenced
+herein are the property of their respective owners.</p>
+<div class="section" id="csdk-release-notes">
+<h2>CSDK Release Notes</h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/csdk_release_notes.html">CSDK_v2 release info</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/csdk_change_history.html">What’s new in CSDK_v2</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>This Software Development Kit (SDK) provides access to Cerence’s state of the art
+speech technology software through high-level application programming interfaces (API)
+that can be used for developing embedded and hybrid speech applications.</p>
+<p>The following components are included:</p>
+<ul class="simple">
+<li>ASR: high-level API framework layer providing access to both Embedded ASR and Cloud ASR on Cerence Cloud Services</li>
+<li>Prompter: high-level API framework layer providing access to both Cerence <abbr title="Text To Speech">TTS</abbr> Embedded and Cerence Cloud <abbr title="Text To Speech">TTS</abbr> on Cerence Cloud Services</li>
+<li>Audio: audio framework providing high-level audio management for all audio processing modules</li>
+<li>Common: General functionality needed by all components, e.g. processing of JSON configurations, logging</li>
+<li>CloudServices: component that provides connection with Cerence Cloud Services, used by ASR and Prompter components</li>
+</ul>
+<p>Application developers working with the SDK have the flexibility to use either single
+components or combine them into complex speech dialog applications. Each component comes with its
+own documentation and sample programs which will be a good starting point for your own implementations.</p>
+<p>The SDK is available for the following standard build platforms
+(see readme files of platform-specific packages for build details):</p>
+<ul class="simple">
+<li>Android</li>
+<li>iOS</li>
+<li>Linux</li>
+<li>Windows</li>
+</ul>
+<p>Porting to other platforms can be offered by Cerence Professional Services if the target system meets the <a class="reference external" href="../system_requirements/Porting_Requirements_CDFW_CSDK.pdf">CSDK Porting Requirements</a>.</p>
+<p>SDK packages for the single platforms have differences with respect to content and structure.
+This document describes the common concepts of all packages, platform-specific details are described in
+additional documents in the single packages.</p>
+<div class="section" id="contents-of-the-sdk">
+<h3>Contents of the SDK</h3>
+<p>The SDK includes the libraries of the components, API header files, documentation,
+sample programs and development tools.</p>
+<div class="section" id="libraries-and-headers">
+<h4>Libraries and Headers</h4>
+<p>Details can be found in the additional documentation of the platform-specific SDK packages.</p>
+</div>
+<div class="section" id="documentation">
+<h4>Documentation</h4>
+<p>The SDK contains a user guide for each component:</p>
+<ul class="simple">
+<li><a class="reference external" href="./asr/SDK_Asr5_UserGuide.html">ASR User’s Guide</a></li>
+<li><a class="reference external" href="./audio/SDK_Audio_UserGuide.html">Audio User’s Guide</a></li>
+<li><a class="reference external" href="./cloudservices/SDK_CloudServices_UserGuide.html">CloudServices User’s Guide</a></li>
+<li><a class="reference external" href="./common/SDK_Common_UserGuide.html">Common User’s Guide</a></li>
+<li><a class="reference external" href="./prompter/SDK_Prompter_UserGuide.html">Prompter User’s Guide</a></li>
+</ul>
+</div>
+<div class="section" id="samples">
+<h4>Samples</h4>
+<p>The SDK contains sample programs as source code that demonstrate how to use the API.</p>
+<p>Note that the main purpose of the sample programs and the included sample data
+is to illustrate how speech applications can be implemented using the APIs of the SDK.
+The sample code and the use case configurations are not meant as best-practice recommendations regarding
+voice user interface design and implementation. They are provided as examples that can be used as starting point for
+the implementation of your own applications.</p>
+<p>Language specific data for the samples are included for testing purposes in American English (ENU).
+Other languages are available on request as separate ASR and TTS language packages.</p>
+<p>Details how to compile and run the samples can be found in the additional documentation of the platform-specific SDK packages.</p>
+</div>
+</div>
+<div class="section" id="logging">
+<h3>Logging</h3>
+<p>All SDK components provide a logger which can be configured flexibly with a JSON configuration file.
+See <a class="reference external" href="./common/SDK_Common_UserGuide.html">Common User’s Guide</a>.</p>
+</div>
+<div class="section" id="json-configuration">
+<h3>JSON Configuration</h3>
+<p>All SDK components need to be configured with JSON (JavaScript Object Notation) files.
+Each component has its own specific set of JSON configuration parameters which are described
+within the component-specific user guides.</p>
+<p>JSOn configuration files need to read in by the application using the common_IConfiguration API
+described in the document <a class="reference external" href="./common/SDK_Common_UserGuide.html">Common User’s Guide</a>.</p>
+</div>
+<div class="section" id="threading-model-of-sdk-components">
+<h3>Threading Model of SDK Components</h3>
+<p>SDK components are multithreaded.
+All threads that are created by SDK components are described in the document <a class="reference external" href="./common/SDK_Common_UserGuide.html">Common User’s Guide</a>.</p>
+<p>Note that thread priorities need to be configured properly by system integrators to ensure a good performance on the target system.</p>
+</div>
+<div class="section" id="free-and-open-source-software-foss">
+<h3>Free and Open Source Software (FOSS)</h3>
+<p>SDK components rely on particular open source software packages.
+The copyright and licensing information for these packages are included in the document <a class="reference external" href="../open_source_license/CDFW_OpenSourceDeclaration.pdf">SDK Open-Source</a>.</p>
+</div>
+<div class="section" id="references">
+<h3>REFERENCES</h3>
+<ul class="simple">
+<li><a class="reference external" href="./asr/SDK_Asr5_UserGuide.html">ASR User’s Guide</a></li>
+<li><a class="reference external" href="./audio/SDK_Audio_UserGuide.html">Audio User’s Guide</a></li>
+<li><a class="reference external" href="./cloudservices/SDK_CloudServices_UserGuide.html">CloudServices User’s Guide</a></li>
+<li><a class="reference external" href="./common/SDK_Common_UserGuide.html">Common User’s Guide</a></li>
+<li><a class="reference external" href="./prompter/SDK_Prompter_UserGuide.html">Prompter User’s Guide</a></li>
+<li><a class="reference external" href="../open_source_license/CDFW_OpenSourceDeclaration.pdf">SDK Open-Source</a></li>
+<li><a class="reference external" href="../system_requirements/Porting_Requirements_CDFW_CSDK.pdf">CSDK Porting Requirements</a></li>
+</ul>
+</div>
+<div class="section" id="version-history">
+<h3>VERSION HISTORY</h3>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="5%" />
+<col width="5%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>REVISION</em></th>
+<th class="head"><em>DATE</em></th>
+<th class="head"><em>DESCRIPTION</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1.0</td>
+<td>26.07.2019</td>
+<td>initial version</td>
+</tr>
+<tr class="row-odd"><td>2.0</td>
+<td>29.11.2019</td>
+<td>adapted to Cerence</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CERENCE SDK - USER’S GUIDE</a><ul>
+<li><a class="reference internal" href="#csdk-release-notes">CSDK Release Notes</a></li>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#contents-of-the-sdk">Contents of the SDK</a><ul>
+<li><a class="reference internal" href="#libraries-and-headers">Libraries and Headers</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#samples">Samples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#json-configuration">JSON Configuration</a></li>
+<li><a class="reference internal" href="#threading-model-of-sdk-components">Threading Model of SDK Components</a></li>
+<li><a class="reference internal" href="#free-and-open-source-software-foss">Free and Open Source Software (FOSS)</a></li>
+<li><a class="reference internal" href="#references">REFERENCES</a></li>
+<li><a class="reference internal" href="#version-history">VERSION HISTORY</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="user_guide/csdk_release_notes.html" title="next chapter">CSDK_v2 release info</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SDK_UserGuide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

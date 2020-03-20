@@ -1,0 +1,229 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CERENCE SDK - PROMPTER USER’S GUIDE</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Types of the Prompter" href="user_guide/prompter_intro.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="doc-title">
+<h1>CERENCE SDK - PROMPTER USER’S GUIDE</h1>
+<div class="line-block">
+<div class="line">© 2020 Cerence, Inc. All rights reserved.</div>
+<div class="line">Published by Cerence, Inc.</div>
+<div class="line">15 Wayside Road, Burlington, Massachusetts 01803, U.S.A.</div>
+</div>
+<p>Cerence, Inc. provides this document without representation or warranty of any kind. The
+information in this document is subject to change without notice and
+does not represent a commitment by Cerence, Inc. The software and/or databases described in this document are furnished under a license
+agreement and may be used or copied only in accordance with the terms of such license agreement. Without
+limiting the rights under copyright reserved herein, and except as permitted by such license agreement, no part of
+this document may be reproduced or transmitted in any form or by any means, including, without limitation,
+electronic, mechanical, photocopying, recording, or otherwise, or transferred to information storage and retrieval
+systems, without the prior written permission of Cerence, Inc.</p>
+<p>Cerence and the Cerence logo are trademarks or registered trademarks of Cerence, Inc. or its affiliates in the United States and/or other countries. All other trademarks referenced
+herein are the property of their respective owners.</p>
+<div class="section" id="scope-of-document">
+<h2>Scope Of Document</h2>
+<p>The main scope of this <abbr title="Software Development Kit">SDK</abbr> documentation is to serve as user guide
+for engineers who use Cerence <abbr title="Software Development Kit">SDK</abbr> to develop and deliver project-specific applications.</p>
+</div>
+<div class="section" id="overview">
+<h2>Overview</h2>
+<p>This document describes the speech output (Prompter) component of the Cerence <abbr title="Software Development Kit">SDK</abbr>.
+The <abbr title="Software Development Kit">SDK</abbr> Prompter <abbr title="Application Programming Interface">API</abbr> provides a high-level <abbr title="Application Programming Interface">API</abbr> abstraction on top of the Cerence Text-To-Speech (<abbr title="Text To Speech">TTS</abbr>) engine
+providing access to both Cerence <abbr title="Text To Speech">TTS</abbr> Embedded and Cerence Cloud <abbr title="Text To Speech">TTS</abbr>.</p>
+<p>In the following sections we give an overview of the high-level Prompter interface that the <abbr title="Software Development Kit">SDK</abbr>
+provides on top of the embedded and cloud TTS engines. This user guide focuses on describing the basic usage
+and concepts of the Prompter <abbr title="Application Programming Interface">API</abbr>.</p>
+<p>For the full description of prompter interfaces see the <abbr title="Application Programming Interface">API</abbr> reference documenation of the <abbr title="Software Development Kit">SDK</abbr> Prompter component
+which is included in the Cerence <abbr title="Software Development Kit">SDK</abbr> package at <code class="file docutils literal notranslate"><span class="pre">doc/api_reference/prompter/</span></code>.
+There is a separate folder for each supported programming language
+in which the reference documentation can be accessed via the mainpage <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+<p>The C <abbr title="Application Programming Interface">API</abbr> documentation is available at <a class="reference external" href="../../api_reference/prompter/c/index.html">doc/api_reference/prompter/c/index.html</a>.</p>
+<p>In addition, the <abbr title="Software Development Kit">SDK</abbr> package contains a Prompter sample program and sample configurations that illustrate how to use the <abbr title="Application Programming Interface">API</abbr>.
+Together with the overview in this document the sample program will be a good starting point for your own implementations.</p>
+</div>
+<div class="section" id="document-conventions">
+<h2>Document Conventions</h2>
+<p><abbr title="Application Programming Interface">API</abbr> call examples in this document are shown in C syntax.</p>
+</div>
+<div class="section" id="developing-applications">
+<h2>Developing Applications</h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/prompter_intro.html">Types of the Prompter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/prompter_intro.html#creating-and-configuring-iprompter-instances">Creating and Configuring IPrompter Instances</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_intro.html#adding-iprompter-instances-to-audio-paths">Adding IPrompter Instances to Audio Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/prompter_intro.html#id4">Using the Prompter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_intro.html#runtime-activation-of-a-usecase">Runtime Activation of a Usecase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_intro.html#playing-prompts">Playing Prompts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_intro.html#playing-prompts-by-format">Playing Prompts By Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_intro.html#destroying-iprompt-and-iprompter-instances">Destroying IPrompt and IPrompter Instances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_intro.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/prompter_configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_configuration.html#json-configuration"><abbr title="JavaScript Object Notation">JSON</abbr> Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_configuration.html#json-configuration-examples"><abbr title="JavaScript Object Notation">JSON</abbr> Configuration Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_configuration.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/prompter_advanced_usage.html">Advanced Prompter <abbr title="Application Programming Interface">API</abbr> Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_advanced_usage.html#runtime-activation-of-individual-voice-config-keys">Runtime Activation of Individual voice_config Keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_advanced_usage.html#pausing-and-resuming-the-iprompter-instance">Pausing and Resuming the IPrompter Instance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_advanced_usage.html#get-available-speech-configurations">Get Available Speech Configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_advanced_usage.html#skip-to-a-text-marker">Skip to a Text Marker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_advanced_usage.html#id6">Playing Encoded Audio Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/prompter_advanced_usage.html#references">References</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References</h2>
+<div class="section" id="cerence-tts-embedded">
+<span id="references-cerence-tts"></span><h3>Cerence <abbr title="Text To Speech">TTS</abbr> Embedded</h3>
+<ul class="simple">
+<li><a class="reference download internal" download="" href="_downloads/12d1ac4b340c0b8ffcdb8bb804dd9f04/ve_ugpr.pdf"><code class="xref download docutils literal notranslate"><span class="pre">Cerence</span> <span class="pre">TTS</span> <span class="pre">Embedded</span> <span class="pre">User's</span> <span class="pre">Guide</span></code></a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="version-history">
+<h2>Version History</h2>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="5%" />
+<col width="5%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>REVISION</em></th>
+<th class="head"><em>DATE</em></th>
+<th class="head"><em>DESCRIPTION</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1.0</td>
+<td>04.06.2019</td>
+<td>initial version</td>
+</tr>
+<tr class="row-odd"><td>1.1</td>
+<td>16.07.2019</td>
+<td>Describe API extensions to set the <code class="docutils literal notranslate"><span class="pre">timbre</span></code> of a voice</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CERENCE SDK - PROMPTER USER’S GUIDE</a><ul>
+<li><a class="reference internal" href="#scope-of-document">Scope Of Document</a></li>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#document-conventions">Document Conventions</a></li>
+<li><a class="reference internal" href="#developing-applications">Developing Applications</a></li>
+<li><a class="reference internal" href="#references">References</a><ul>
+<li><a class="reference internal" href="#cerence-tts-embedded">Cerence <abbr title="Text To Speech">TTS</abbr> Embedded</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#version-history">Version History</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="user_guide/prompter_intro.html" title="next chapter">Types of the Prompter</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SDK_Prompter_UserGuide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,1326 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>C API</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Examples" href="../chapters/examples.html" />
+    <link rel="prev" title="Non-functional aspects to consider when using Cerence ASR" href="non_functional_aspects.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="c-api">
+<span id="id1"></span><h1>C API</h1>
+<p>This section specifically talks about the C API. The APIs for Java
+(Android) and Objective-C are very similar to the C API.</p>
+<div class="section" id="concepts">
+<h2>Concepts</h2>
+<div class="section" id="strings-string-lists-and-lists-of-string-lists">
+<span id="index-0"></span><h3>Strings, string lists and lists of string lists</h3>
+<p>The Cerence ASR API uses in many places a custom string
+implementation, called <code class="docutils literal notranslate"><span class="pre">nuance_common_String</span></code>. The API is very simple:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_String</span> <span class="o">*</span><span class="nf">nuance_common_String_create</span> <span class="p">(</span><span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">str</span><span class="p">);</span>
+
+<span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="nf">nuance_common_String_c_str</span> <span class="p">(</span><span class="k">const</span> <span class="n">nuance_common_String</span> <span class="o">*</span><span class="n">instance</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">nuance_common_String_destroy</span> <span class="p">(</span><span class="n">nuance_common_String</span> <span class="o">*</span><span class="n">instance</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">create</span></code> function will create a String object from a regular C
+string, and the <code class="docutils literal notranslate"><span class="pre">destroy</span></code> function will clean up the String object.</p>
+<p>In order to retrieve the contents of a String object, you can use the
+function <code class="docutils literal notranslate"><span class="pre">nuance_common_String_c_str</span></code> function.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>In addition to the String data type, there are also custom data types
+for lists of strings, and lists of string lists:
+<code class="docutils literal notranslate"><span class="pre">nuance_common_StringList</span></code> and <code class="docutils literal notranslate"><span class="pre">nuance_common_StringListList</span></code>.</p>
+<p>They are used in certain API functions; for example, the
+<code class="docutils literal notranslate"><span class="pre">IAsrManager_getPaths</span></code> function shown below:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IAsrManager_getPaths</span><span class="p">(</span>
+   <span class="k">const</span> <span class="n">nuance_asr5_IAsrManager</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+   <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
+   <span class="n">nuance_common_StringList</span> <span class="o">**</span><span class="n">paths</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This function returns (a subset of) the ASR data file paths configured in an
+ASR manager, for example using the <code class="docutils literal notranslate"><span class="pre">asr_paths.json</span></code> configuration
+file.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_StringList</span> <span class="o">*</span> <span class="nf">nuance_common_StringList_create</span><span class="p">(</span>
+      <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="k">const</span> <span class="o">*</span><span class="n">list</span><span class="p">,</span>
+      <span class="n">LH_S32</span> <span class="n">length</span>
+<span class="p">);</span>
+
+<span class="n">LH_S32</span> <span class="nf">nuance_common_StringList_count</span><span class="p">(</span><span class="k">const</span> <span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">list</span><span class="p">)</span>
+
+<span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">nuance_common_StringList_get</span><span class="p">(</span>
+      <span class="k">const</span> <span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">list</span><span class="p">,</span>
+      <span class="n">LH_S32</span> <span class="n">index</span>
+<span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">nuance_common_StringList_destroy</span><span class="p">(</span><span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">list</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>API references:</p>
+<ul class="simple">
+<li><a class="reference external" href="../../../../api_reference/asr/c/group___string.html">String</a></li>
+<li><a class="reference external" href="../../../../api_reference/asr/c/group___string_list.html">StringList</a></li>
+<li><a class="reference external" href="../../../../api_reference/asr/c/group___string_list_list.html">StringListList</a></li>
+</ul>
+</div>
+<div class="section" id="callback-functions">
+<span id="index-1"></span><h3>Callback functions</h3>
+<div class="section" id="principle">
+<h4>Principle</h4>
+<p>Callback functions are functions that can be “injected” into Cerence
+ASR components, to perform a task for the main program, when the
+component asks it to.</p>
+<p>A typical example of a callback in the Cerence ASR API is the
+<code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code> function. This function is used in
+conjunction with an <code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> component, where it responds to
+requests for dynamically configurated values to the <code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code>
+component, i.e. values that that are not pre-defined in the JSON
+configuration, but that are specified as values that are to be looked
+up at run-time (see section <a class="reference internal" href="non_functional_aspects.html#dynamic-configuration"><span class="std std-ref">Dynamic configuration at runtime</span></a>).</p>
+<p>The following image shows a (simplified) lifecycle of an
+<code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code> callback object:</p>
+<a class="reference internal image-reference" href="../../_images/application_callback.png"><img alt="../../_images/application_callback.png" class="align-center" src="../../_images/application_callback.png" style="width: 50%;" /></a>
+<ol class="arabic">
+<li><p class="first">In this step, the callback object is created. The secion
+<a class="reference internal" href="#callback-creation"><span class="std std-ref">Example: an IApplicationCallback</span></a> explains this in detail.</p>
+</li>
+<li><p class="first">In step 2, the callback is passed to a new <code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code>
+object. The configuration object will read the JSON configuration.
+Any keys that have <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code> values will at run-time be
+looked up by calling the application callback function, and
+returning the value that is returned by the application callback
+function.</p>
+</li>
+<li><p class="first">Step 3 is where another object, one that was created with the
+<code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> object as one of its arguments, uses the
+configuration object created above to retrieve the (dynamic) value
+for a specific key. The configuration object will call the
+<code class="docutils literal notranslate"><span class="pre">execute</span></code> function in the application callback to retrieve the
+actual value.</p>
+<p>The implementation of the <code class="docutils literal notranslate"><span class="pre">execute</span></code> function is provided by you,
+the system developer. This allows you to determine how the
+configuration system should retrieve the configuration value for
+the specific key.</p>
+</li>
+<li><p class="first">When the configuration object is no longer needed, it should be
+destroyed, along with the callback object that was used with it.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="example-an-iapplicationcallback">
+<span id="callback-creation"></span><h4>Example: an <code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code></h4>
+<div class="section" id="function-implementation">
+<h5>Function implementation</h5>
+<p>The specification for the function signature of
+<code class="docutils literal notranslate"><span class="pre">&lt;IApplicationCallback&gt;.execute</span></code> is given as a C <code class="docutils literal notranslate"><span class="pre">typedef</span></code> in the
+<code class="docutils literal notranslate"><span class="pre">nds_common/IApplicationCallback.h</span></code> header file:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="nf">nuance_common_ResultCode</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_common_IApplicationCallback_execute</span><span class="p">)</span>
+<span class="p">(</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="n">nuance_common_IApplicationCallback_FunctionName</span> <span class="n">functionName</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+  <span class="n">nuance_common_String</span> <span class="o">**</span><span class="n">results</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This is the function that will be called at run-time to resolve the
+configuration value of the key that is passed in in the <code class="docutils literal notranslate"><span class="pre">args</span></code>
+argument. A concrete implementation might look like this:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">appcallback_execute</span><span class="p">(</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="n">nuance_common_IApplicationCallback_FunctionName</span> <span class="n">functionName</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+  <span class="n">nuance_common_String</span> <span class="o">**</span><span class="n">results</span>
+<span class="p">)</span> <span class="p">{</span>
+  <span class="p">...</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s">&quot;SomeKey&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">*</span><span class="n">results</span> <span class="o">=</span> <span class="n">nuance_common_String_create</span><span class="p">(</span><span class="s">&quot;SomeValue&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="vtable-setup">
+<h5><code class="docutils literal notranslate"><span class="pre">vtable</span></code> setup</h5>
+<p>In principle, this function could be passed directly to the
+<code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> create function. However, for consistency with
+listeners (see below) and the other APIs, an intermediate step is
+added where the pointers to the callback function implementation are
+added to a storage struct, which is called a <code class="docutils literal notranslate"><span class="pre">vtable</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">vtable_nuance_common_IApplicationCallback</span> <span class="o">*</span><span class="n">appcb_funcs</span><span class="p">;</span>
+
+<span class="n">appcb_funcs</span> <span class="o">=</span> <span class="p">(</span><span class="n">vtable_nuance_common_IApplicationCallback</span><span class="o">*</span><span class="p">)</span>
+                <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">vtable_nuance_common_IApplicationCallback</span><span class="p">));</span>
+<span class="n">appcb_funcs</span><span class="o">-&gt;</span><span class="n">execute</span> <span class="o">=</span> <span class="n">appcallback_execute</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>In the final statement in this block, the function pointer to the
+implementation of the callback function (<code class="docutils literal notranslate"><span class="pre">appcallback_execute</span></code>) is
+assigned to the <code class="docutils literal notranslate"><span class="pre">execute</span></code> slot in the
+<code class="docutils literal notranslate"><span class="pre">vtable_nuance_common_IApplicationCallback</span></code>.</p>
+</div>
+<div class="section" id="id2">
+<h5>Callback creation</h5>
+<p>This storage struct is then used to create the actual
+<code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code> object:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_IApplicationCallback</span><span class="o">*</span> <span class="n">appcb</span><span class="p">;</span>
+<span class="n">appcb</span> <span class="o">=</span> <span class="n">nuance_common_IApplicationCallback_create</span><span class="p">(</span>
+            <span class="n">appcb_funcs</span><span class="p">,</span>
+            <span class="nb">NULL</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cleanup">
+<h5>Cleanup</h5>
+<p>When the callback is no more needed, it should be cleaned up. If the
+<code class="docutils literal notranslate"><span class="pre">vtable</span></code> was allocated dynamically, it should be cleaned up as well:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_IApplicationCallback_destroy</span><span class="p">(</span><span class="n">appcb</span><span class="p">);</span>
+<span class="n">free</span><span class="p">(</span><span class="n">appcb_funcs</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="listeners">
+<span id="listener-details"></span><span id="index-2"></span><h3>Listeners</h3>
+<p>Because of its asynchronous nature, the concepts of listeners is
+leveraged heavily in the Cerence ASR API. Many longer-running tasks within
+the API are designed to be started, and then run to conclusion on
+their own. In order to communicate internal state changes to the
+part of the system that started the task, the task makes use of listeners.</p>
+<p>A listener is an implementation of a pre-defined interface.  Cerence
+ASR does not know what the system will want to do when certain events
+happen, so it cannot implement the functions that will handle these
+events; this has to be done by you, the developers of the system that
+uses Cerence ASR to handle its speech recognition needs.</p>
+<p>What Cerence ASR can do, is define which events it will report to the
+system that uses it, and what information it will include when it
+reports the events. The listener interface specifies which functions
+should be implemented by the system, and which parameters they must
+accept.</p>
+<p>In practice, listeners are very similar to callback functions, as
+defined above. Whereas callback functions are single functions that
+are passed to an object, a listener is a set of callback functions
+that are grouped together</p>
+<div class="section" id="example-irecognizerlistener">
+<h4>Example: <code class="docutils literal notranslate"><span class="pre">IRecognizerListener</span></code></h4>
+<p>The recognizer listener (type <code class="docutils literal notranslate"><span class="pre">IRecognizerListener</span></code>, defined in
+header file <code class="docutils literal notranslate"><span class="pre">nds_asr5/IRecognizerListener.h</span></code>), specifies that 4
+types of events must be handled: regular events, warnings, errors, and
+results. By using different callback functions for parts of the
+listener interface, the component can pass different arguments to the
+callback. The corresponding <code class="docutils literal notranslate"><span class="pre">typedef</span></code> definitions are the following:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span> <span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IRecognizerListener_onEvent</span><span class="p">)</span> <span class="p">(</span>
+     <span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+     <span class="n">nuance_asr5_RecogEvent</span> <span class="n">event</span><span class="p">,</span>
+     <span class="n">LH_S32</span> <span class="n">timeMarker</span><span class="p">,</span>
+     <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">message</span>
+ <span class="p">);</span>
+
+<span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IRecognizerListener_onWarning</span><span class="p">)</span> <span class="p">(</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">nuance_asr5_RecognizerError</span> <span class="n">warning</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">message</span>
+<span class="p">);</span>
+
+<span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IRecognizerListener_onError</span><span class="p">)</span> <span class="p">(</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">nuance_asr5_RecognizerError</span> <span class="n">error</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">message</span>
+<span class="p">);</span>
+
+<span class="k">typedef</span> <span class="nf">void</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IRecognizerListener_onResult</span><span class="p">)</span> <span class="p">(</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">result</span><span class="p">,</span>
+    <span class="n">nuance_asr5_ResultType</span> <span class="n">resultType</span><span class="p">,</span>
+    <span class="n">LH_BOOL</span> <span class="n">isFinal</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>These type definitions are used internally, in the <code class="docutils literal notranslate"><span class="pre">vtable</span></code>
+definition and in the implementation of the <code class="docutils literal notranslate"><span class="pre">IRecognizer</span></code>
+functions. As a user of Cerence ASR you will not need to use them in your
+code. However, they do specify the signature that your callback
+function implementations will have, so will need to be familiar with
+them.</p>
+<p>An implementation the <code class="docutils literal notranslate"><span class="pre">onEvent</span></code> callback will look like this:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">reclistener_onEvent</span> <span class="p">(</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">nuance_asr5_RecogEvent</span> <span class="n">event</span><span class="p">,</span>
+    <span class="n">LH_S32</span> <span class="n">timeMarker</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">message</span>
+<span class="p">)</span> <span class="p">{</span>
+<span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This function will then implement the functionality that is required
+to be performed in response to an event, for example updating a
+display element (say, showing a “speaking” icon when an
+<code class="docutils literal notranslate"><span class="pre">SPEECH_DETECTED</span></code> event occurs, and hiding it when a
+<code class="docutils literal notranslate"><span class="pre">SILENCE_DETECTED</span></code> event occurs).</p>
+</div>
+<div class="section" id="vtable">
+<h4><code class="docutils literal notranslate"><span class="pre">vtable</span></code></h4>
+<p>Again, once the function implementations are written, their
+implementations have to be provided to Cerence ASR. As before, the
+callback functions are grouped in <code class="docutils literal notranslate"><span class="pre">vtable</span></code>-s. A <code class="docutils literal notranslate"><span class="pre">vtable</span></code> or
+virtual function table is a concept borrowed from programming language
+implementations, where it is used to support run-time provision of
+function implementations.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">vtable</span></code> is a table of function pointers, which can be passed to a
+listener creation function as one parameter. This allows a set of
+function pointers to be passed in at once. The <code class="docutils literal notranslate"><span class="pre">vtable</span></code> also defines
+the order in which the function pointers are listed.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">vtable</span></code> for the <code class="docutils literal notranslate"><span class="pre">IRecognizerListener</span></code> is defined as follows:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_vtable_nuance_asr5_IRecognizerListener</span>
+<span class="p">{</span>
+    <span class="n">FUNC_nuance_asr5_IRecognizerListener_onEvent</span> <span class="n">onEvent</span><span class="p">;</span>
+    <span class="n">FUNC_nuance_asr5_IRecognizerListener_onResult</span> <span class="n">onResult</span><span class="p">;</span>
+    <span class="n">FUNC_nuance_asr5_IRecognizerListener_onError</span> <span class="n">onError</span><span class="p">;</span>
+    <span class="n">FUNC_nuance_asr5_IRecognizerListener_onWarning</span> <span class="n">onWarning</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">vtable_nuance_asr5_IRecognizerListener</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>When you create such a <code class="docutils literal notranslate"><span class="pre">vtable</span></code> in your code, this could looks as follows:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">vtable_nuance_asr5_IRecognizerListener</span> <span class="n">vtab</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">reclistener_onEvent</span><span class="p">,</span>
+  <span class="n">reclistener_onResult</span><span class="p">,</span>
+  <span class="n">reclistener_onError</span><span class="p">,</span>
+  <span class="n">reclistener_onWarning</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">in this example, the <code class="docutils literal notranslate"><span class="pre">vtable</span></code> is allocated statically. If
+you do this, make sure that it will live long enough to last the
+full lifetime of the listener! Notably, if you create a <code class="docutils literal notranslate"><span class="pre">vtable</span></code>
+inside a function using a normal local variable (not a pointer to a
+dynamically-allocated memory block), the <code class="docutils literal notranslate"><span class="pre">vtable</span></code> will live on
+the stack, and be cleaned up as soon as the function returns!</p>
+</div>
+</div>
+<div class="section" id="creating-the-listener">
+<h4>Creating the listener</h4>
+<p>After creating the <code class="docutils literal notranslate"><span class="pre">vtable</span></code>, you can then call
+<code class="docutils literal notranslate"><span class="pre">IRecognizerListener_create</span></code> using this <code class="docutils literal notranslate"><span class="pre">vtable</span></code>. The return value
+of the call to <code class="docutils literal notranslate"><span class="pre">create</span></code> is a pointer to an <code class="docutils literal notranslate"><span class="pre">IRecognizerListener</span></code>
+object that can be in turn passed to the recognizer when it is created.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizerListener</span> <span class="o">*</span><span class="n">reclistener</span> <span class="o">=</span>
+  <span class="n">nuance_asr5_IRecognizerListener_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">vtab</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="destroying-the-listener">
+<h4>Destroying the listener</h4>
+<p>The recognizer listener occupies memory, which means that it must be
+destroyed when it is not needed any more in the system. This is done
+by calling the destroy function for it:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizerListener_destroy</span><span class="p">(</span><span class="n">recListener</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="callbacks-and-listeners-considerations-w-r-t-threading">
+<span id="index-3"></span><h3>Callbacks and listeners: considerations w.r.t. threading</h3>
+<p>As can be seen from the figure shown above, the task calling a
+listener’s callback functions will often run in a different thread
+from the thread where the listener, and the task, were created. This
+means that some care is required when communicating back statuses or
+data to the thread set up a task.</p>
+<p>If this communication is done in a “naive” way, e.g. using variables
+shared between the two threads, there is a risk that both threads will
+attempt to read or write the variable at the same time. To avoid this,
+callback functions should use critical sections when accessing such
+variables.</p>
+<p>So, the implementations of these listeners and callbacks—as provided
+by the application implementer—need to be thread safe. There is one
+exception: <code class="docutils literal notranslate"><span class="pre">IErrorListener</span></code> is synchronized internally.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">No Cerence ASR API methods should be called from these listener and callback
+implementations.</p>
+</div>
+</div>
+</div>
+<div class="section" id="basic-recognition-api-call-walkthrough">
+<h2>Basic recognition: API call walkthrough</h2>
+<p>The following walk-through describes schematically which components
+should be used in which order. Note that this walk-through just lists
+function calls, it doesn’t specify what needs to be done for specific
+return codes or error conditions.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>First up, initialize the logging system. Note that, even if you don’t
+use the logging system (by not defining any loggers in the JSON
+configuration), you should still initialize it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ILogging_getInstance</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Then, initialize the system manager, and if needed also the Cloud manager:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ISystemManager_create</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+<span class="n">nuance_cloudservices_ICloudManager_create</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p id="audio-component-registration">The audio system should be set up next. First, create the audio
+manager. When the manager is ready, for all components that will be
+used, the corresponding factory needs to be registered with the audio
+manager. This includes the components used by the internal audio
+paths. Concretely, if you use cloud recognition, you will have to
+register factories for the internally used components (sample rate
+converter, SSE, opus encoder,…):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_audio_IAudioManager_create</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+
+<span class="n">nuance_audio_IAudioFromFile_registerFactory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">nuance_audio_IAudioManager_registerAudioInputAdapterFactory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">nuance_audio_IAudioInput_registerFactory</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After setting up the audio manager, it’s time to load the
+configuration from the JSON files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_IConfiguration_createWithValidation</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">nuance_asr5_IAsrManager_create</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We also need a recognition listener. This is code you write, to handle
+recognition events and results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizerListener_create</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>After creating the recognizer listener, create the recognizer itself:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_create</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Create all applications you will use with the recognizer. Call
+<code class="docutils literal notranslate"><span class="pre">IApplication_create</span></code> once for each application in the configuration
+that you want to use. You specify the application by name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IApplication_create</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If you use dynamic content consumers, you should initialize them, and
+start the preparation of the data. This should be ready before the
+recognition loop starts. Like for applications, the following calls
+have to be done for each DCC that you want to use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IDynamicContentConsumer_createFromSource</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+<span class="n">nuance_asr5_IDynamicContentConsumer_startDataPreparationFromCopFile</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p id="audio-scenario-activation">Just before starting the recognition loop, you need to activate the
+audio scenario that is to be used for this recognition session. Also,
+you activate the ASR application(s) that you want to be active when
+recognition starts. This can for example be an application that
+listens for a wake-up word:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+<span class="n">nuance_asr5_IAsrManager_setApplications</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Then, start the recognition loop:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_start</span><span class="p">(</span><span class="n">recognizer</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Recognition runs in separate threads, so from the perspective of the
+thread where recognition is started, it runs in the background. The
+recognizer will report events and results through the recognizer
+listener. If the event and/or results are needed in the main
+application thread, you will have to implement a (thread-safe!)
+communication mechanism.</p>
+<p>The sample code included in the SDK (see here:
+<a class="reference internal" href="../chapters/tools_and_sample_code.html#one-shot-wuw-sample"><span class="std std-ref">one-shot wake-up word sample</span></a>) uses an event queue to relay events and
+results from the recognizer listener back to the main application loop.</p>
+<p>When the main loop decides it’s time to stop the recognition, the call
+sequence is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_stop</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Make sure all logging messages are properly output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ILogging_flush</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Then, clean up all components:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_destroy</span><span class="p">(...);</span>
+
+<span class="c1">// call for all configuration objects in the application</span>
+<span class="n">nuance_common_IConfiguration_destroy</span><span class="p">(...);</span>
+<span class="n">nuance_asr5_IApplication_destroy</span><span class="p">(...);</span>
+
+<span class="c1">// call for all DCCs</span>
+<span class="n">nuance_asr5_IDynamicContentConsumer_destroy</span><span class="p">(...);</span>
+
+<span class="n">nuance_asr5_IAsrManager_destroy</span><span class="p">(...);</span>
+<span class="n">nuance_audio_IAudioManager_destroy</span><span class="p">(...);</span>
+<span class="n">nuance_cloudservices_ICloudManager_destroy</span><span class="p">(...);</span>
+<span class="n">nuance_common_ISystemManager_destroy</span><span class="p">(...);</span>
+</pre></div>
+</div>
+<p>Clean up the recognizer listener that we used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizerListener_destroy</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>And finally, clean up the logger:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ILogging_deleteInstance</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="api-details">
+<h2>API details</h2>
+<div class="section" id="configuration">
+<h3>Configuration</h3>
+<p>Configuration in Cerence ASR is kept in JSON files. The API contains a
+dedicated configuration reader, that loads all JSON configuration
+files, and assembles the final configuration into a single
+object. This object is then used during the initialization of other
+objects, such as the ASR manager, recognizers, ASR applications, and
+dynamic content consumers.</p>
+<p>Creating a configuration object can de done done by using the
+<code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> interface. We specify the path for the JSON configuration
+files, for example: <code class="docutils literal notranslate"><span class="pre">.../data/asr/config</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">IConfiguration</span> <span class="o">*</span><span class="n">configuration</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">IApplicationCallback</span><span class="o">*</span> <span class="n">callback</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">MyApplicationCallbackImpl</span><span class="p">));</span>
+<span class="p">...</span>
+<span class="n">nuance_common_IConfiguration_create</span><span class="p">(</span><span class="s">&quot;.../data/asr/config&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">configuration</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note the <code class="docutils literal notranslate"><span class="pre">callback</span></code> argument. This argument contains an
+application callback. If the configuration
+contains dynamic sections, i.e. JSON keys for which the value must
+be retrieved at runtime, then whenever the system queries the
+configuration object for the value of such a key, this callback
+function will be called to retrieve the actual value. See sections
+<a class="reference internal" href="non_functional_aspects.html#dynamic-configuration"><span class="std std-ref">Dynamic configuration at runtime</span></a> and <a class="reference internal" href="../../json/callbacks.html#callbacks"><span class="std std-ref">Callbacks Configuration Options</span></a> for details.</p>
+<p>The code block above shows how the <code class="docutils literal notranslate"><span class="pre">_create</span></code> function is used;
+this is however only one of several functions that can create
+<code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> objects:</p>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_create</span></code></p>
+<p>This function takes a directory name as its argument. It will then
+scan this directory for <code class="docutils literal notranslate"><span class="pre">.json</span></code> files, read them all, and
+create a single, consolidated configuration object from all the
+JSON data found in the <code class="docutils literal notranslate"><span class="pre">.json</span></code> files.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_createFromFiles</span></code></p>
+<p>Instead of a directory name, this function takes a list of file
+names to read. All files are read, and the JSON contents is stored
+in a single configuration object.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_createFromString</span></code></p>
+<p>This function creates a configuration object from a JSON string.</p>
+</li>
+</ul>
+<p>The three functions above have <code class="docutils literal notranslate"><span class="pre">WithValidation</span></code> variants
+(<code class="docutils literal notranslate"><span class="pre">createWithValidation</span></code>, <code class="docutils literal notranslate"><span class="pre">createFromFilesWithValidation</span></code> and
+<code class="docutils literal notranslate"><span class="pre">createFromStringWithValidation</span></code>). These take an extra boolean
+argument that specifies whether validation information should be
+reported in the log. This additional validation does not affect the
+resulting configuration object.</p>
+<p>API references:</p>
+<ul class="simple">
+<li><a class="reference external" href="../../../../api_reference/asr/c/group___i_configuration.html">IConfiguration</a></li>
+<li><a class="reference external" href="../../../../api_reference/asr/c/group___i_application_callback.html">IApplicationCallback</a></li>
+</ul>
+<p>Note that you have to destroy the configuration object (and the
+application callback, if applicable) yourself when it is not needed
+any more:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_IConfiguration_destroy</span><span class="p">(</span><span class="n">configuration</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="system-manager-and-audio-manager">
+<h3>System manager and Audio manager</h3>
+<p>Given the configuration object, it is possible to create a system
+manager, and an audio manager, which must be ready before the ASR
+manager can be created.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ISystemManager</span><span class="o">*</span> <span class="n">systemMgr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_common_ISystemManager_create</span><span class="p">(</span><span class="s">&quot;MAIN&quot;</span><span class="p">,</span> <span class="n">testConfiguration</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">systemMgr</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When the system manager is ready, the audio manager can be
+created. If desired, an audio manager listener can be created
+first, (<code class="docutils literal notranslate"><span class="pre">audioMgrListener</span></code>); however, this argument can be <code class="docutils literal notranslate"><span class="pre">NULL</span></code>
+if the system doesn’t need to respond to audio events.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_audio_IAudioManager</span><span class="o">*</span> <span class="n">testAudio</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_audio_IAudioManager_create</span><span class="p">(</span><span class="s">&quot;AUDIOMAN&quot;</span><span class="p">,</span> <span class="n">systemMgr</span><span class="p">,</span> <span class="n">configuration</span><span class="p">,</span> <span class="n">audioMgrListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">testAudio</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>API references:</p>
+<ul class="simple">
+<li><a class="reference external" href="../../../../api_reference/asr/c/group___i_system_manager.html">ISystemManager</a></li>
+<li><a class="reference external" href="../../../../api_reference/asr/c/group___i_audio_manager.html">IAudioManager</a></li>
+<li><a class="reference external" href="../../../../api_reference/asr/c/group___i_audio_manager_listener.html">IAudioManagerListener</a></li>
+</ul>
+<div class="section" id="audio-manager-listener">
+<h4>Audio manager listener</h4>
+<p>For Cerence SDK users, the only listener function that is relevant
+in the audio manager listener is the <code class="docutils literal notranslate"><span class="pre">onSseSignalStatistic</span></code>
+function. The other functions are either for CDFW use only, or only
+useful with older versions of Cerence ASR/VoCon.</p>
+<p>In order to get SSE signal statistics, the SSE audio module in the
+audio chain must have <code class="docutils literal notranslate"><span class="pre">&quot;signal_statistics_interval&quot;</span></code> in its
+configuration, with a value different from -1. The value is the
+interval time in milliseconds.  The statistics returned by
+<code class="docutils literal notranslate"><span class="pre">onSseSignalStatistic</span></code> conform to the following definition:</p>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="8%" />
+<col width="31%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>Value</em></th>
+<th class="head"><em>SSE Core Documentation</em></th>
+<th class="head"><em>Explanation</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td><strong>NbFrames</strong>: Number of frames over which the statistics were gathered</td>
+<td>Shows the number of sse core blocks this signal statistic covers. To judge the amount of samples this stands for, value 11 was added</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td><strong>SampleClipCnt</strong>: Number of clipped samples</td>
+<td>Shows how many samples in the interval this statistic covers were clipped / out of range</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td><strong>SampleMax</strong>: Greatest sample value encountered</td>
+<td>Shows the maximum sample value in the interval this statistic covers</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td><strong>SampleMin</strong>: Smallest sample value encountered</td>
+<td>Shows the minimum sample value in the interval this statistic covers</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td><strong>RMSMax</strong>: Greatest root mean square (RMS) of all samples for a frame</td>
+<td>Shows the maximum RMS value calculated for one sse core block in the interval this statistic covers</td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td><strong>RMSMin</strong>: Smallest root mean square (RMS) of all samples for a frame</td>
+<td>Shows the minimum RMS value calculated for one sse core block in the interval this statistic covers</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td><strong>RMSAvg</strong>: Average root mean square (RMS) of all samples for a frame</td>
+<td>Shows the average of all RMS values calculated for the sse core blocks in the interval this statistic covers</td>
+</tr>
+<tr class="row-odd"><td>8, 9, 10</td>
+<td><strong>Reserved for future use</strong></td>
+<td>— (values have currently no meaning)</td>
+</tr>
+<tr class="row-even"><td>11</td>
+<td><strong>—</strong> (value is not returned by Nuance SSE core)</td>
+<td>(derived from value 1) Shows the number of samples this statistic covers</td>
+</tr>
+<tr class="row-odd"><td>12</td>
+<td><strong>—</strong> (value is not returned by Nuance SSE core)</td>
+<td>(derived from value 5) Shows the maximum dB value calculated for one sse core block in the interval this statistic covers</td>
+</tr>
+<tr class="row-even"><td>13</td>
+<td><strong>—</strong> (value is not returned by Nuance SSE core)</td>
+<td>(derived from value 6) Shows the minimum dB value calculated for one sse core block in the interval this statistic covers</td>
+</tr>
+<tr class="row-odd"><td>14</td>
+<td><strong>—</strong> (value is not returned by Nuance SSE core)</td>
+<td>(derived from value 7) Shows the average of all dB values calculated for the sse core blocks in the interval this statistic covers</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note</strong> that the statistics data that are returned represent the
+statistics for the defined time interval only. The statistics data
+is not accumulated over time.  If a single statistic for the whole
+audio scenario life time is required then the
+<code class="docutils literal notranslate"><span class="pre">&quot;signal_statistics_interval&quot;</span></code> parameter can be set to 0.</p>
+</div>
+<div class="section" id="audio-module-registration">
+<h4>Audio module registration</h4>
+<p>Before activating an audio scenario on the audio manager, it must
+know how to create all the objects that will be part of the audio
+scenarios configured in <code class="docutils literal notranslate"><span class="pre">audioconfig.json</span></code>. This means that all
+audio components referenced in the audio configuration must be
+registered with the audio manager.</p>
+<p>To do this, all audio modules have a <code class="docutils literal notranslate"><span class="pre">_registerFactory</span></code> function
+that must be called, with the audio manager as its argument. For example:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_audio_IAudioFromFile_registerFactory</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>(In real code, the return code for this call should be checked, to
+make sure that the module was registered successfully.)</p>
+<p>This is true for internal audio scenarios as well, such as the
+“cloud” audio path (<a class="reference internal" href="audio_setup_and_configuration.html#cloud-internal-audio"><span class="std std-ref">Audio processing path for Cloud ASR</span></a>). If you use remote
+recognition you will have to register these components’ factories
+in order to support the audio scenarios created for them:</p>
+<ul class="simple">
+<li>IAudioInput</li>
+<li>IOpusEncoder</li>
+<li>IAudioEncoder</li>
+<li>ISpeechSignalEnhancement</li>
+<li>IAudioBuffer</li>
+<li>IOggPacker</li>
+<li>ISampleRateConverter</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h4>Audio scenario activation</h4>
+<p>Activating an audio scenario is a simple API call:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_audio_IAudioManager_activateScenario</span><span class="p">(</span><span class="n">audioMgr</span><span class="p">,</span> <span class="s">&quot;&lt;audioScenarioName&gt;&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="asr-manager">
+<h3>ASR manager</h3>
+<div class="section" id="creation">
+<h4>Creation</h4>
+<p>With that configuration available, we can create an AsrManager
+object. It takes as input a name, a configuration object, an audio
+object, an error listener, and instance of <code class="docutils literal notranslate"><span class="pre">IAsrManager</span></code>. This
+connects the AsrManager to the microphone:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance</span><span class="p">.</span><span class="n">asr5</span><span class="p">.</span><span class="n">IAsrManager</span><span class="o">*</span> <span class="n">asrManager</span><span class="p">;</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_asr5_IAsrManager_create</span><span class="p">(</span><span class="s">&quot;asrManager&quot;</span><span class="p">,</span> <span class="n">testConfiguration</span><span class="p">,</span> <span class="n">testAudio</span><span class="p">,</span> <span class="n">asrManagerListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">asrManager</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The name has to match what was specified in
+<strong>audioconfig.json</strong>. Coming back to the earlier example, we have to
+use <code class="docutils literal notranslate"><span class="pre">asrManager</span></code> as the name:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span> <span class="nt">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span> <span class="s2">&quot;mic_input&quot;</span><span class="p">,</span> <span class="s2">&quot;asrManager&quot;</span> <span class="p">]</span> <span class="p">]</span> <span class="p">}</span>
+</pre></div>
+</div>
+<p>Using the content given here, this configures a default audio input
+from microphone and creates an audio path from that to a component
+named <code class="docutils literal notranslate"><span class="pre">asrManager</span></code>.</p>
+<p>More details on setting up audio routing, implementing your own
+audio driver and much more information on audio in general are
+available in the section <a class="reference internal" href="audio_setup_and_configuration.html#audio-setup-and-config"><span class="std std-ref">Audio setup and configuration</span></a> and in the
+<a class="reference external" href="../../../audio/SDK_Audio_UserGuide.html">audio SDK user guide</a>.</p>
+</div>
+<div class="section" id="destroying">
+<h4>Destroying</h4>
+<p>The AsrManager can be destroyed as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IAsrManager_destroy</span><span class="p">(</span><span class="n">asrManager</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-language">
+<h4>Setting Language</h4>
+<p>It is possible to switch between different folder configuration
+languages in order to redirect the paths for language dependent data
+(contexts, CLC, ACMOD, etc.).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">%LANG%</span></code> placeholder can be used in the paths in the
+<code class="docutils literal notranslate"><span class="pre">asr_paths.json</span></code> config file as follows. This makes it possible to
+separate out language-specific content:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;asr_paths&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;sem3&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;./sem3/%LANG%&quot;</span> <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The language can be set as follows:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_asr5_IAsrManager_setLanguage</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IAsrManager</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">language</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>It is important to make sure all recognizers, applications and DCCs
+objects are destroyed before setting a language. Otherwise, an ERROR
+will be returned.</p>
+</div>
+</div>
+<div class="section" id="recognizers">
+<h3>Recognizers</h3>
+<div class="section" id="id4">
+<h4>Creation</h4>
+<p>Recognizer objects are created by the system. The creation process
+takes as input a name, asrManager object, a listener object, and
+instance of <code class="docutils literal notranslate"><span class="pre">IRecognizer</span></code>. Cerence ASR supports using several
+recognizers withing the same system. When using multiple recognizers,
+their names must be unique.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer</span><span class="o">*</span> <span class="n">recognizer1</span><span class="p">;</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_asr5_IRecognizer_create</span><span class="p">(</span><span class="s">&quot;asrRecognizer1&quot;</span><span class="p">,</span> <span class="n">asrManager</span><span class="p">,</span> <span class="n">recognizerListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">recognizer1</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The application can start the recognizer without the need to set any
+contexts.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_start</span><span class="p">(</span><span class="n">recognizer1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id5">
+<h4>Destroying</h4>
+<p>The Recognizer can be destroyed as follows:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_destroy</span><span class="p">(</span><span class="n">recognizer1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-relative-time">
+<h4>Get Relative Time</h4>
+<p>The recognizer can return the relative time since the recognition
+session started:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_getRelativeTime</span><span class="p">(</span><span class="n">recognizer1</span><span class="p">,</span> <span class="n">timeStamp</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The caller can optionally pass a time stamp to <code class="docutils literal notranslate"><span class="pre">IRecognizer_getRelativeTime</span></code>:</p>
+<ul class="simple">
+<li>if <code class="docutils literal notranslate"><span class="pre">timeStamp</span></code> is -1, the returned time is the difference between
+the current wall clock time and the wall clock time when recognizer
+started.</li>
+<li>if <code class="docutils literal notranslate"><span class="pre">timeStamp</span></code> is more than -1, the returned time is the difference
+between the given <code class="docutils literal notranslate"><span class="pre">timeStamp</span></code> and the wall clock time when
+recognizer started.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="applications">
+<h3>Applications</h3>
+<div class="section" id="id6">
+<h4>Creation</h4>
+<p>An ASR application contains the ASR/NLU configuration for a given
+ASR/NLU task. Contexts can be shared among different ASR applications
+and in case of non-ODL they should be loaded in memory only once.  The
+system can set multiple ASR applications on a recognizer and pass the
+time when they should be taken into account. Cerence ASR will then
+rewind the audio to this time.  ASR applications have the capability
+to route the audio received from mic to another target than local
+recognizer, for example a cloud server. When doing this, the ASR
+application can pass the audio start time and audio end time so that
+only the audio between these two time stamps will be routed.</p>
+<p>The system can create an ASR application object. It takes as input an
+asrManager object, the ASR application name as configured in
+<strong>application.json</strong>, a listener object, and an instance of
+<code class="docutils literal notranslate"><span class="pre">IApplication</span></code>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IApplication</span><span class="o">*</span> <span class="n">application1</span><span class="p">;</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_asr5_IApplication_create</span><span class="p">(</span><span class="n">asrManager</span><span class="p">,</span> <span class="s">&quot;APP_CNC&quot;</span><span class="p">,</span> <span class="n">applicationListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">application1</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>When an ASR application is created, the user is notified with the
+number of initialized ASR inputs that are preconfigured in this ASR
+application.  The <code class="docutils literal notranslate"><span class="pre">IApplicationListener.onEvent()</span></code> function is
+called, with a <code class="docutils literal notranslate"><span class="pre">NUANCE_ASR5_APPLICATION_CREATE_COMPLETED</span></code> event and
+a message containing the number of successfully initialized ASR
+inputs.</p>
+</div>
+<div class="section" id="setting-asr-applications">
+<h4>Setting ASR applications</h4>
+<p>In order to set contexts, the system must create a list of ASR
+applications and recognizer objects, and pass these lists to Cerence
+ASR as follows. This will set the applications on AsrManager, and wait
+for all contexts to be ready. When the contexts are ready, they will
+be loaded on the recognizer(s).  The system can set an empty list of
+ASR applications; this will remove all previous ASR applications from
+the recognizer. All contexts that were set before are removed as well
+. In this case, no result will be generated, and the system will only
+receive events concerning the presence or absence of speech.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="o">*</span> <span class="n">recognizer</span> <span class="o">=</span> <span class="s">&quot;asrRecognizer1&quot;</span><span class="p">;</span>
+<span class="n">LH_CHAR</span> <span class="o">**</span><span class="n">appList</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">applications</span><span class="p">;</span>
+
+<span class="n">applist</span> <span class="o">=</span> <span class="p">(</span><span class="n">LH_CHAR</span><span class="o">**</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">LH_CHAR</span><span class="o">*</span><span class="p">));</span>
+<span class="n">applist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;APP_CNC&quot;</span><span class="p">;</span>
+
+<span class="n">nuance</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">StringList</span> <span class="n">applications</span> <span class="o">=</span>
+    <span class="n">nuance_common_StringList_create</span><span class="p">(</span><span class="n">appList</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_asr5_IAsrManager_setApplications</span><span class="p">(</span><span class="n">asrManager</span><span class="p">,</span>
+                 <span class="n">applications</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">recognizer</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The system can start the recognizer after the call to <code class="docutils literal notranslate"><span class="pre">setApplication</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_start</span>
+</pre></div>
+</div>
+<p>The system will receive recognition events after setting the ASR
+applications and starting the recognition session.</p>
+<div class="section" id="delayed-search-loading">
+<span id="index-4"></span><h5>Delayed Search Loading</h5>
+<p>If the user adds a DCC to the <code class="docutils literal notranslate"><span class="pre">dccs_to_wait_for</span></code> list, the dynamic
+search that uses it, and all related static searches (host and other
+static guests) will be connected and added to the recognizer only when
+the DCC finishes.  This synchronization does not block
+<code class="docutils literal notranslate"><span class="pre">setApplications</span></code> call.</p>
+<p>The top level searches that do not depend on the DCC will start
+to deliver results as soon as they are ready.</p>
+<p>The delayed search loading will be cancelled by:</p>
+<ul class="simple">
+<li>a subsequent call to <code class="docutils literal notranslate"><span class="pre">setApplications</span></code> on the same recognizer.</li>
+<li>stopping the recognizer.</li>
+<li>aborting the DCC. (In this case, the rest of the searches will be connected and added to the recognizer)</li>
+</ul>
+<p>Special Notes:</p>
+<ul class="simple">
+<li>If the search that is being preparated is a guest of the top level host, then
+the host and all the rest of the guests should wait for this
+dynamic context to be ready before adding it to the engine.</li>
+<li>If the DCC data preparation takes longer than the configured
+engine ring buffer, then faulty recognition should be expected.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="id7">
+<h4>Destroying</h4>
+<p>The Application can be destroyed as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IApplication_destroy</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-search-at-run-time">
+<h4>Adding search at run-time</h4>
+<p>Searches that become available, or that are changed, after the ASR
+application has been created, can still be added to the
+application. The ASR application can start when a search is not ready
+before recognition, and at the same time loading and verifying these
+searches does not add latency to the recognition process.  The system
+is informed about the search status via the error listener.</p>
+<p>For adding one or multiple searches in a path of the application, the
+API provides the following methods.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_addWithPath</span>
+<span class="p">(</span>
+<span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+<span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+<span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span><span class="p">,</span>
+<span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">pathsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">npathsList</span><span class="p">,</span>
+<span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">configsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nconfigsList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>the parameter <code class="docutils literal notranslate"><span class="pre">type</span></code> should be <code class="docutils literal notranslate"><span class="pre">&quot;search&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">namesList</span></code> is the search name list
+to be added, and <code class="docutils literal notranslate"><span class="pre">pathsList</span></code> is the path lists to where the searchs should
+be added. A full path is composed of 3 segments: input name, search
+name and connection name:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;|input|&lt;input name&gt;|search|&lt;search name&gt;|connection|&lt;connection name&gt;&quot;</span>
+</pre></div>
+</div>
+<p>It is possible to add the search as a top level search inside an
+input. If only the input name is provided in the path, then the
+<code class="docutils literal notranslate"><span class="pre">path</span></code> format is defined using the following rule:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;|input|&lt;input name&gt;&quot;</span>
+</pre></div>
+</div>
+<p>It is possible to add guest (slot or merged type) searches inside
+hosts. In this case, the path(s) to the location(s) of such guest(s)
+need to be provided, according to the following rule:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;|search|&lt;host search name&gt;|connection|&lt;slot name&gt;&quot;</span>
+<span class="s2">&quot;|search|&lt;host search name&gt;|connection|merge&quot;</span>
+</pre></div>
+</div>
+<p>The path can have multiple levels, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;|search|CTX_HOST_CALL_NAME_EMPTY_SLOT|connection|call_name#contact|search|CTX_HOST_CONTACT|slot|contact#name&quot;</span>
+</pre></div>
+</div>
+<p>The parameter <code class="docutils literal notranslate"><span class="pre">&quot;configsList&quot;</span></code> is the new configuration list to be
+added/updated.  The configuration is optional. If provided, it must be
+a JSON string, which must follow the ASR JSON configuration schema
+(IBaseSearchConfig).</p>
+<p>In some cases the system receives static search, to be added at
+run-time, from third party suppliers.  In this situation there is no
+configuration available for the search.  The following methods will
+allow to generate configurations and add search:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_addFilesWithPath</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span><span class="p">,</span>
+  <span class="n">LH_BOOL</span> <span class="n">isFilePath</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">pathsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">npathsList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The adding step does the same search processing that is normally only
+done during recognition:</p>
+<ul class="simple">
+<li>load search from the namesList list into memory</li>
+<li>validate whether the guest search can be set on host search</li>
+<li>notify the application about warnings that occur during these preloading steps</li>
+</ul>
+<p>Notes:</p>
+<ul class="simple">
+<li>the guest is not actually set on the host search at this point. This
+step is done when actually starting the recognition.</li>
+<li>only search names are supported in configuration, file names
+will not be supported anymore. In case of autogeneration the search
+name will be the same as provided file name/path.</li>
+</ul>
+</div>
+<div class="section" id="removing-search">
+<h4>Removing search</h4>
+<p>It is possible to remove search from an application. Doing this will
+remove the search from memory and configuration.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">remove</span></code> API function on the IApplication interface is provided
+to remove search from a application.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_remove</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Notes:</p>
+<ul class="simple">
+<li>Addition and removal of a search takes effect only after the
+<code class="docutils literal notranslate"><span class="pre">&lt;AsrManager&gt;.setApplications</span></code> interface call, with the impacted
+ASR applications as parameters</li>
+<li>You can only use the search name in order to remove it. In case of
+autogeneration the search name will be the same as provided file
+name/path.</li>
+<li>Removing a search from an application will remove the search from
+all inputs</li>
+<li>If a search is shared among applications, the search must be
+removed from all applications in order to free the memory it uses;
+only the last remove call will actually free the memory</li>
+<li>It is not necessary to explicitly add a search in order to be able
+to remove it</li>
+<li>If a recognition is performed on the same recognizer after
+removing one or more search, these search will not be reloaded</li>
+<li>Removing a host search that has a guest search will remove the guest
+search from configuration</li>
+<li>Non-existing searches will be ignored</li>
+<li>A LOG_INFO entry will be added to the log for all successfully removed searches</li>
+</ul>
+</div>
+<div class="section" id="adding-input-at-run-time">
+<h4>Adding input at run-time</h4>
+<p>Inputs that become available, or that are changed, after the ASR
+application has been created, can still be added to the
+application. The ASR application can start when an input is not ready
+before recognition, and at the same time loading and verifying these
+inputs does not add latency to the recognition process.  The system
+is informed about the input status via the error listener.</p>
+<p>Notes:</p>
+<ul class="simple">
+<li>Currently, addition and removal of inputs is only supporting for
+“asr” type inputs. Other input types, e.g. “cloud”,
+are not supported.</li>
+<li>Adding inputs is not supported after starting the recognition.</li>
+</ul>
+<p>For adding an input in the config pool, and to an ASR application, the
+API provides the following methods.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_add</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">configsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nconfigsList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The parameter <code class="docutils literal notranslate"><span class="pre">type</span></code> should be <code class="docutils literal notranslate"><span class="pre">&quot;input&quot;</span></code>; <code class="docutils literal notranslate"><span class="pre">namesList</span></code> is the
+list of input names to be added; <code class="docutils literal notranslate"><span class="pre">configsList</span></code> is the new
+configuration to be added/updated.  The configuration must be a JSON
+string, following the ASR JSON configuration schema
+(IBaseInputConfig).</p>
+<p>Note: this method adds/updates the configuration in the config pool,
+and it will also add the input to the ASR application.</p>
+<p>The addition step does the same input processing that is normally only done during recognition:</p>
+<ul class="simple">
+<li>load input from the namesList list into memory</li>
+<li>validate whether input can be added into this ASR application</li>
+<li>notify the application about warnings that occur during these preloading steps</li>
+</ul>
+<p>Notes:</p>
+<ul class="simple">
+<li>if the same top-level input is added into multiple applications,
+and this input use the same search, there will be only one result
+returned.</li>
+</ul>
+</div>
+<div class="section" id="removing-input">
+<h4>Removing input</h4>
+<p>It is possible to remove “asr” input from an ASR application. Doing this
+will remove these inputs from memory and configuration.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">remove</span></code> API function on the IApplication interface is provided
+to remove input from a application.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_remove</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Notes:</p>
+<ul class="simple">
+<li>The addition/removal of the input takes effect after the call to
+<code class="docutils literal notranslate"><span class="pre">&lt;AsrManager&gt;.setApplications</span></code>, with the impacted applications
+as parameters</li>
+<li>Only the name of the input can be used in order to remove it.</li>
+<li>Removing an input from an application will remove the input from all inputs</li>
+<li>If an input is shared among several ASR applications, the input
+must be removed from all ASR applications in order to free up the
+memory it uses; only the last remove call will actually free the memory</li>
+<li>It is not necessary to explicitly add an input in order to be able
+to remove it</li>
+<li>If a recognition is performed on the same recognizer after
+removing one or more input, these input will not be reloaded</li>
+<li>Non-existing input will be ignored</li>
+<li>A LOG_INFO entry will be added to the log for all successfully removed inputs</li>
+</ul>
+</div>
+<div class="section" id="modifying-domains-configuration-at-run-time">
+<h4>Modifying domains configuration at run-time</h4>
+<p>See <a class="reference internal" href="nlu_applications.html#nlu-applications"><span class="std std-ref">NLU applications</span></a>.</p>
+</div>
+</div>
+<div class="section" id="cloud-manager">
+<h3>Cloud manager</h3>
+<div class="section" id="id8">
+<h4>Creation</h4>
+<p>If you want to use remote recognition on the Cerence cloud, you need a
+cloud manager. Creating a cloud manager is straightforward: you pass
+in a system manager, and a configuration object, and you get back an
+initialized cloud manager:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_cloudservices_ICloudManager</span> <span class="o">*</span><span class="n">cloudMgr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_cloudservices_ICloudManager_create</span><span class="p">(</span>
+        <span class="s">&quot;CLOUD_MAIN&quot;</span><span class="p">,</span>
+        <span class="n">systemMgr</span><span class="p">,</span>
+        <span class="n">configuration</span><span class="p">,</span>
+        <span class="o">&amp;</span><span class="n">cloudMgr</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id9">
+<h4>Cleanup</h4>
+<p>When no longer needed, the cloud manager must be cleaned up:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_cloudservices_ICloudManager_destroy</span><span class="p">(</span><span class="n">cloudMgr</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="starting-a-recognition">
+<h3>Starting a recognition</h3>
+<p>When a recognizer has been created and the data providers are
+running, we can schedule recognition tasks.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IRecognizer_start</span><span class="p">(</span><span class="n">recognizer</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Cerence ASR will notify the application once recognition actually
+starts via the <code class="docutils literal notranslate"><span class="pre">recognizerListener</span></code> implementation.  The result
+formats are described here: <a class="reference internal" href="results.html#result-formats"><span class="std std-ref">Result types</span></a>.  For optimization
+purposes, top-level contexts at the search level or domain level may
+be merged into one search.  This operation is implicitly triggered
+at recognition time if more than one top-level context has the same
+merge context name.  The following configuration shows an example of
+such a naming schema:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;APP_TOPLEVEL_FIELDCTX&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;input&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;INPUT_TOPLEVEL_FIELDCTX&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;asr&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">[</span>
+                            <span class="p">{</span>
+                                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Field1/merge=MergedFields&quot;</span><span class="p">,</span>
+                                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+                                <span class="nt">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;vde_ctx_odl_0.fcf&quot;</span>
+                                <span class="p">}</span>
+                            <span class="p">},</span>
+                            <span class="p">{</span>
+                                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Field2/merge=MergedFields&quot;</span><span class="p">,</span>
+                                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+                                <span class="nt">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;vde_ctx_odl_1.fcf&quot;</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+                        <span class="p">]</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">C API</a><ul>
+<li><a class="reference internal" href="#concepts">Concepts</a><ul>
+<li><a class="reference internal" href="#strings-string-lists-and-lists-of-string-lists">Strings, string lists and lists of string lists</a></li>
+<li><a class="reference internal" href="#callback-functions">Callback functions</a><ul>
+<li><a class="reference internal" href="#principle">Principle</a></li>
+<li><a class="reference internal" href="#example-an-iapplicationcallback">Example: an <code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code></a><ul>
+<li><a class="reference internal" href="#function-implementation">Function implementation</a></li>
+<li><a class="reference internal" href="#vtable-setup"><code class="docutils literal notranslate"><span class="pre">vtable</span></code> setup</a></li>
+<li><a class="reference internal" href="#id2">Callback creation</a></li>
+<li><a class="reference internal" href="#cleanup">Cleanup</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#listeners">Listeners</a><ul>
+<li><a class="reference internal" href="#example-irecognizerlistener">Example: <code class="docutils literal notranslate"><span class="pre">IRecognizerListener</span></code></a></li>
+<li><a class="reference internal" href="#vtable"><code class="docutils literal notranslate"><span class="pre">vtable</span></code></a></li>
+<li><a class="reference internal" href="#creating-the-listener">Creating the listener</a></li>
+<li><a class="reference internal" href="#destroying-the-listener">Destroying the listener</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#callbacks-and-listeners-considerations-w-r-t-threading">Callbacks and listeners: considerations w.r.t. threading</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#basic-recognition-api-call-walkthrough">Basic recognition: API call walkthrough</a></li>
+<li><a class="reference internal" href="#api-details">API details</a><ul>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#system-manager-and-audio-manager">System manager and Audio manager</a><ul>
+<li><a class="reference internal" href="#audio-manager-listener">Audio manager listener</a></li>
+<li><a class="reference internal" href="#audio-module-registration">Audio module registration</a></li>
+<li><a class="reference internal" href="#id3">Audio scenario activation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#asr-manager">ASR manager</a><ul>
+<li><a class="reference internal" href="#creation">Creation</a></li>
+<li><a class="reference internal" href="#destroying">Destroying</a></li>
+<li><a class="reference internal" href="#setting-language">Setting Language</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#recognizers">Recognizers</a><ul>
+<li><a class="reference internal" href="#id4">Creation</a></li>
+<li><a class="reference internal" href="#id5">Destroying</a></li>
+<li><a class="reference internal" href="#get-relative-time">Get Relative Time</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#applications">Applications</a><ul>
+<li><a class="reference internal" href="#id6">Creation</a></li>
+<li><a class="reference internal" href="#setting-asr-applications">Setting ASR applications</a><ul>
+<li><a class="reference internal" href="#delayed-search-loading">Delayed Search Loading</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id7">Destroying</a></li>
+<li><a class="reference internal" href="#adding-search-at-run-time">Adding search at run-time</a></li>
+<li><a class="reference internal" href="#removing-search">Removing search</a></li>
+<li><a class="reference internal" href="#adding-input-at-run-time">Adding input at run-time</a></li>
+<li><a class="reference internal" href="#removing-input">Removing input</a></li>
+<li><a class="reference internal" href="#modifying-domains-configuration-at-run-time">Modifying domains configuration at run-time</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cloud-manager">Cloud manager</a><ul>
+<li><a class="reference internal" href="#id8">Creation</a></li>
+<li><a class="reference internal" href="#id9">Cleanup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#starting-a-recognition">Starting a recognition</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="../chapters/using_the_csdk_ddfw.html">Using Cerence ASR</a><ul>
+      <li>Previous: <a href="non_functional_aspects.html" title="previous chapter">Non-functional aspects to consider when using Cerence ASR</a></li>
+      <li>Next: <a href="../chapters/examples.html" title="next chapter">Examples</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

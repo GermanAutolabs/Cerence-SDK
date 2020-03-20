@@ -1,0 +1,257 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Cerence ASR Components</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Audio setup and configuration" href="audio_setup_and_configuration.html" />
+    <link rel="prev" title="High-level description" href="high_level_description.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="cerence-asr-components">
+<span id="vocon-components"></span><h1>Cerence ASR Components</h1>
+<div class="section" id="signal-processing">
+<span id="index-0"></span><h2>Signal Processing</h2>
+<p>Signal processing is the process of converting samples into feature vectors. In
+Cerence ASR signal processing is implemented in the FX feature-extraction object
+of the API. This recognizer front-end functionality, which is activated before
+the actual search technology, comprises the following software components:</p>
+<ul class="simple">
+<li>Continuous unsupervised adaptation to audio-channel characteristics. Enables
+robust performance with different types of audio hardware, such as microphones
+and accounts for acoustic differences between speakers.</li>
+<li>Noise-suppression algorithms, which make Cerence ASR an excellent fit for noisy
+environments, especially automobiles. Combining Cerence ASR with the Speech Signal
+Enhancement (SSE) block will boost performance even further.</li>
+<li>Signaling of speech signal events or special conditions to the
+application, including speech and silence detection, notification of
+a bad speech signal (too loud, too silent), and real-time
+VU-meter. You can operate Cerence ASR with only speech detection
+enabled thereby reduce CPU load drastically.</li>
+<li>Flexible signal processing, configurable to operate under different timing
+constraints. Because the front-end is separated from the back-end, you can run
+both modules in parallel threads.</li>
+</ul>
+</div>
+<div class="section" id="language-models">
+<span id="index-1"></span><h2>Language Models</h2>
+<p><code class="docutils literal notranslate"><span class="pre">ASR</span></code> engine configuration is the process of specifying to the recognizer the
+set of utterances that are recognizable at any time. Typically, you configure
+small to medium command and control tasks with grammars, while dictation and NLU
+tasks required statistical language models (SLM) trained from data. Configuration of
+Cerence ASR, which is exceptionally flexible and powerful, has the following features:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Configuration with contexts containing statistical language models.</li>
+<li>Configuration via compiled binary contexts generated from grammars.</li>
+<li>Compilation can be off-line but also on the platform (dynamic data). *</li>
+<li>Combination of models using extension mechanisms like slots and merging.</li>
+</ul>
+</div></blockquote>
+<p>For the creation of language models refer to the <a class="reference external" href="../../../../../../../tools/vocon_v5_1_0/doc/vocon/sdk/index.html" title="(in VoCon Application Development Tools v5.1)"><code class="xref any docutils literal notranslate"><span class="pre">VoCon</span> <span class="pre">Tools</span> <span class="pre">Documentation</span></code></a>.</p>
+</div>
+<div class="section" id="search-algorithms">
+<span id="index-2"></span><h2>Search Algorithms</h2>
+<p>ASR search algorithms have the following characteristics:</p>
+<ul class="simple">
+<li>Support for continuous speech input, which means that the speaker doesn’t have
+to pause between words when giving complex commands.</li>
+<li>Support for n-best alternatives in results where not just the best result is
+returned. For each alternative, confidence levels enable the application to
+implement rejection or user-confirmation when in doubt. Other information,
+including speech segmentation, is also available in results.</li>
+</ul>
+<p>Cerence ASR uses a single search algorithm which can handle all tasks. Typical tasks
+include:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Messaging dictation</li>
+<li>Command and control</li>
+<li>Recognition of lists of items.</li>
+<li>Music search</li>
+</ul>
+</div></blockquote>
+<p>All these tasks are modelled using either SLM or grammar data.</p>
+<p>The search can be guided by configuring non-default values for a set of parameters. This list contains the set of parameters that can be configurated for the search: <a class="reference external" href="../external/configuration.html#ivpsearchconfig">search parameters</a>.</p>
+</div>
+<div class="section" id="lexical-models">
+<span id="index-3"></span><h2>Lexical Models</h2>
+<p>For a word to be recognized, its orthographic transcription must be converted to
+phonetic symbols by successive transcriptions of the word. This is done via the
+so called <strong>Common Linguistic Component</strong> (CLC). The Cerence ASR lexical model has
+the following features:</p>
+<ul class="simple">
+<li>Lexical chain that allows fully automatic transcription, precise manual
+control of transcription and combinations thereof in any grammar or recognition
+context.</li>
+<li>Phoneme-based recognizer that allows any word to be recognized without
+previous training.</li>
+<li><strong>L&amp;H+</strong> is used as a phonetic alphabet. As an ASCII encoding of the IPA
+phonetic alphabet, <code class="docutils literal notranslate"><span class="pre">L&amp;H+</span></code> shares the representation power and language coverage of
+IPA.</li>
+<li>Automatic generation of phonetic transcriptions: The Grapheme to Phoneme (G2P) subsystem.</li>
+<li>Cerence ASR has several data sources to control phonetic transcription generation:<ul>
+<li>Common linguistic component (CLC) buffers. The CLC component is a technology
+for providing phonetic transcriptions for previously unseen words. It is
+available for general purpose (<code class="docutils literal notranslate"><span class="pre">cfg3</span></code>) and for specific domains
+(<code class="docutils literal notranslate"><span class="pre">mpthreevadml</span></code>). The CLC module also can be configured for multi-lingual
+transcription.</li>
+<li>Dictionaries are used to control transcriptions or store user-trained words.
+Transcriptions provided in dictionaries or explicitly set in grammars can be
+configured to prevail over automatic transcriptions.</li>
+</ul>
+</li>
+</ul>
+<p>For the creation of lexical models refer to the <a class="reference external" href="../../../../../../../tools/vocon_v5_1_0/doc/vocon/sdk/index.html" title="(in VoCon Application Development Tools v5.1)"><code class="xref any docutils literal notranslate"><span class="pre">VoCon</span> <span class="pre">Tools</span> <span class="pre">Documentation</span></code></a>.</p>
+</div>
+<div class="section" id="acoustic-models">
+<span id="index-4"></span><h2>Acoustic Models</h2>
+<p>The Cerence ASR engine supports multiple languages with the following
+acoustic-model features:</p>
+<ul class="simple">
+<li><em>Language independent code</em>: Support for different languages
+consists of adding language-specific data files to the system.</li>
+<li><em>Speaker independence</em>: Out of the box, the recognition engine
+provides excellent recognition with no speaker-adaptation required. This is
+achieved via speaker-independent acoustic models, that are trained on a large
+variety of speech produced by different speakers, and by unsupervised online
+speaker adaptation at every recognition.</li>
+<li><em>Choice of languages</em>: Cerence ASR supports currently 36 languages
+and Cerence is continually working to develop more. For an up-to-date
+portfolio of current and planned language support, please contact Cerence.
+<code class="docutils literal notranslate"><span class="pre">Cerence</span> <span class="pre">SDK</span></code> ships without a supported language; you can install languages as
+add-on packages in the <code class="docutils literal notranslate"><span class="pre">SDK</span></code>. An <code class="docutils literal notranslate"><span class="pre">American</span> <span class="pre">English</span></code> will be included when
+obtaining an SDK.</li>
+<li><em>Scalable acoustic models</em>: <code class="docutils literal notranslate"><span class="pre">Cerence</span> <span class="pre">SDK</span></code> <em>may</em> come with several acoustic
+models for each language. By choosing different models, it is possible to
+trade-off speed and memory footprint to gain better accuracy.</li>
+<li><em>Environment optimization</em>: Models are optimized for in-car
+environments while maintaining good performance in office environments. In
+addition, the <code class="docutils literal notranslate"><span class="pre">Cerence</span> <span class="pre">ASR</span></code> engine can explicitly detect and reject common
+environmental noises like coughs, lip smacks, door slams and button clicks.</li>
+</ul>
+</div>
+<div class="section" id="semantic-classification">
+<span id="index-5"></span><h2>Semantic Classification</h2>
+<p>Cerence SDK comes with a component for semantic classification of recognition
+results. Usually, the semantic classification is done after recognition with
+statistical language models.</p>
+<p>Cerence ASR supports configure Sem3 NLU in applications. For more information please
+refer to <a class="reference internal" href="nlu_applications.html#nlu-applications"><span class="std std-ref">NLU applications</span></a>.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Cerence ASR Components</a><ul>
+<li><a class="reference internal" href="#signal-processing">Signal Processing</a></li>
+<li><a class="reference internal" href="#language-models">Language Models</a></li>
+<li><a class="reference internal" href="#search-algorithms">Search Algorithms</a></li>
+<li><a class="reference internal" href="#lexical-models">Lexical Models</a></li>
+<li><a class="reference internal" href="#acoustic-models">Acoustic Models</a></li>
+<li><a class="reference internal" href="#semantic-classification">Semantic Classification</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="../chapters/using_the_csdk_ddfw.html">Using Cerence ASR</a><ul>
+      <li>Previous: <a href="high_level_description.html" title="previous chapter">High-level description</a></li>
+      <li>Next: <a href="audio_setup_and_configuration.html" title="next chapter">Audio setup and configuration</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
