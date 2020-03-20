@@ -1,0 +1,350 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CERENCE SDK - COMMON USER’S GUIDE</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Logging System Overview" href="user_guide/logging_intro.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="doc-title">
+<h1>CERENCE SDK - COMMON USER’S GUIDE</h1>
+<div class="line-block">
+<div class="line">© 2020 Cerence, Inc. All rights reserved.</div>
+<div class="line">Published by Cerence, Inc.</div>
+<div class="line">15 Wayside Road, Burlington, Massachusetts 01803, U.S.A.</div>
+</div>
+<p>Cerence, Inc. provides this document without representation or warranty of any kind. The
+information in this document is subject to change without notice and
+does not represent a commitment by Cerence, Inc. The software and/or databases described in this document are furnished under a license
+agreement and may be used or copied only in accordance with the terms of such license agreement. Without
+limiting the rights under copyright reserved herein, and except as permitted by such license agreement, no part of
+this document may be reproduced or transmitted in any form or by any means, including, without limitation,
+electronic, mechanical, photocopying, recording, or otherwise, or transferred to information storage and retrieval
+systems, without the prior written permission of Cerence, Inc.</p>
+<p>Cerence and the Cerence logo are trademarks or registered trademarks of Cerence, Inc. or its affiliates in the United States and/or other countries. All other trademarks referenced
+herein are the property of their respective owners.</p>
+<div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>This document describes the common component of the SDK.</p>
+<p>The common component provides 3 main functionalities:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#id2">System Manager</a></li>
+<li><a class="reference internal" href="#loading-json-configuration">Loading JSON configuration</a></li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h2>Document conventions</h2>
+<p>API call examples in this document are shown in C syntax.</p>
+</div>
+<div class="section" id="system-manager">
+<span id="id2"></span><h2><a class="reference internal" href="#id2">System Manager</a></h2>
+<p>The system manager is responsible for the instantiation and configuration of all common components (e.g. logging, threading, timer).
+Each application must create a system manager instance with the API <code class="docutils literal notranslate"><span class="pre">nuance_common_ISystemManager_create</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMMON_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="n">nuance_common_ISystemManager_create</span>
+<span class="p">(</span>
+    <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span>
+    <span class="n">const</span> <span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
+    <span class="n">nuance_common_ISystemManager</span> <span class="o">**</span><span class="n">systemManager</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+<p>The function takes as input parameter <code class="docutils literal notranslate"><span class="pre">config</span></code> an IConfiguration object instance which contains the JSON configuration of the common component,
+see <a class="reference internal" href="#id3">JSON Configuration of Common Component</a>.
+The IConfiguration object needs to be created by the application as described in
+<a class="reference internal" href="#loading-json-configuration">Loading JSON configuration</a>.</p>
+</div>
+<div class="section" id="loading-json-configuration">
+<h2><a class="reference internal" href="#loading-json-configuration">Loading JSON configuration</a></h2>
+<p>All components are configured via JSON configuration files or strings. These JSON configurations need to be read into <code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> objects at
+application runtime.
+This functionality is provided by the common component class <code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> class offers 3 options to create IConfiguration objects from JSON configurations:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_create</span></code>: reads all JSON files from a given directory</li>
+<li><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_createFromString</span></code>: reads a list of JSON formated configuration strings</li>
+<li><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_createFromFiles</span></code>: reads all JSON files from a given file list</li>
+</ul>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_create*</span></code> methods only load the configurations into memory and do some basic syntax checks.
+But they do not perform any configuration itself. That is only done when the resulting <code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration</span></code> object is used as a parameter
+at the create methods of the other SDK objects, like <code class="docutils literal notranslate"><span class="pre">nuance_common_ISystemManager_create</span></code> or <code class="docutils literal notranslate"><span class="pre">nuance_audio_IAudioManager_create</span></code>.
+The configuration object of <code class="docutils literal notranslate"><span class="pre">Common</span></code> has to be passed to the <code class="docutils literal notranslate"><span class="pre">nuance_common_ISystemManager_create</span></code> method (see <a class="reference internal" href="#id2">System Manager</a>).</p>
+<p>In addition to the 3 basic methods the <code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> class also offers corresponding <code class="docutils literal notranslate"><span class="pre">WithValidation</span></code> methods which perform extended checking
+of the JSON files against their JSON schema definition (see JSON configuration descriptions of each component):</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_createWithValidation</span></code>: reads all JSON files from a given directory and performs JSON schema validation</li>
+<li><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_createFromStringWithValidation</span></code>: reads a list of JSON formated configuration strings and performs JSON schema validation</li>
+<li><code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_createFromFilesWithValidation</span></code>: reads all JSON files from a given file list and performs JSON schema validation</li>
+</ul>
+<p>These API functions hava an additional boolean parameter <code class="docutils literal notranslate"><span class="pre">validate</span></code> which can be used to switch on/off the JSON schema validation during loading, for example:</p>
+<div class="literal-block-wrapper docutils container" id="code-c-iconfiguration-createfromfileswithvalidation">
+<div class="code-block-caption"><span class="caption-text">Example how to load JSON files with schema validation</span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;IConfiguration.h&quot;</span><span class="cp"></span>
+
+<span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">char</span> <span class="o">*</span><span class="n">jsonDirPath</span> <span class="o">=</span> <span class="s">&quot;../../data/prompter/config&quot;</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">numOfConfigFiles</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">prompterConfigFile</span> <span class="o">=</span> <span class="s">&quot;prompterconfig.json&quot;</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">audioConfigFile</span> <span class="o">=</span> <span class="s">&quot;audioconfig.json&quot;</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">loggerConfigFile</span> <span class="o">=</span> <span class="s">&quot;loggerconfig.json&quot;</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">configFiles</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">prompterConfigFile</span><span class="p">,</span> <span class="n">audioConfigFile</span><span class="p">,</span> <span class="n">loggerConfigFile</span> <span class="p">};</span>
+
+<span class="cm">/* Read in the JSON configuration files, here the validate parameter is set to 1(true). */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_common_IConfiguration_createFromFilesWithValidation</span><span class="p">(</span><span class="n">jsonDirPath</span><span class="p">,</span> <span class="n">configFiles</span><span class="p">,</span> <span class="n">numOfConfigFiles</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">);</span>
+
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>If an invalid JSON file is read by an createWithValidation call then an error message will be sent to configured log consumers, for example:</p>
+<div class="literal-block-wrapper docutils container" id="code-json-invalid">
+<div class="code-block-caption"><span class="caption-text">Example of invalid JSON configuration (wrong key “audiopath”, must be “audiopaths”)</span></div>
+<div class="highlight-none notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span></span>...
+&quot;audio_scenario&quot;: [{
+  &quot;name&quot;:       &quot;simplePromptingScenario&quot;,
+  &quot;audiopath&quot;: [ [&quot;prompter&quot;, &quot;default_speaker&quot;] ]
+}],
+...
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>Reading a file with this wrong configuration will create an error message like this:</p>
+<div class="literal-block-wrapper docutils container" id="code-c-error-createfromfileswithvalidation">
+<div class="code-block-caption"><span class="caption-text">Example of error message due to loading invalid JSON file</span></div>
+<div class="highlight-none notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span></span>...
+Failed to parse file &#39;../../data/prompter/config/audioconfig.json&#39; [855]
+00:00.032 ERROR: [14944] nuance.common.JsonCheck   ../../data/prompter/config/audioconfig.json (line 6, col 19: unknown featurename given: audiopath [793]
+00:00.032 ERROR: [14944] nuance.common.JsonCheck   ../../data/prompter/config/audioconfig.json (line 7, col 5): required features are missing: audiopaths [793]
+...
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>It is recommended to switch on JSON validation during development time, because it will allow to identify errors in JSON configuration files more easily.
+For final deployment of an application the <code class="docutils literal notranslate"><span class="pre">validate</span></code> parameter may be set to <code class="docutils literal notranslate"><span class="pre">false</span></code> to save processing time for JSON files which should have been
+verified as valid before deploying them anyway.</p>
+<div class="section" id="destroying-iconfiguration-objects">
+<h3>Destroying IConfiguration Objects</h3>
+<p>Once a <code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration</span></code> object is not needed anymore it has to be destroyed by the application with <code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_destroy</span></code>.</p>
+<p>Destroying IConfiguration objects can be done safely when all desired create calls, which require this configuration object, are done.</p>
+</div>
+</div>
+<div class="section" id="logging">
+<h2><a class="reference internal" href="#logging">Logging</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/logging_intro.html">Logging System Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/logging_intro.html#initialize-logging">Initialize Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/logging_intro.html#general-logging">General Logging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#module-names">Module names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#log-zones">Log zones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#json-configuration">JSON Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#logged-text-content">Logged text content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#buffer-overrun">Buffer overrun</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/logging_intro.html#id1">Audio Logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/logging_intro.html#use-logging">Use Logging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#sending">Sending</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#receiving">Receiving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/logging_intro.html#modifying">Modifying</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="threading">
+<h2>Threading</h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/csdk_threads.html">SDK Threads</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/csdk_threads.html#started-threads">Started threads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/csdk_threads.html#thread-life-time">Thread life-time</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/csdk_threads.html#thread-priority-categorization">Thread priority categorization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/csdk_threads.html#setting-thread-priorities">Setting thread priorities</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="json-configuration-of-common-component">
+<span id="id3"></span><h2><a class="reference internal" href="#id3">JSON Configuration of Common Component</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/common_configuration.html">Configuration Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#itoplevelcommonconfig-the-top-level-configuration-structure-of-the-common-component">ITopLevelCommonConfig - The top-level configuration structure of the common component.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#iloggerconfig-the-logger-configuration">ILoggerConfig - The logger configuration.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#iloggertextfilterconfig-the-text-filter-configuration">ILoggerTextFilterConfig - The text filter configuration.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#iloggingconsumerconfig-the-logging-consumer-configuration">ILoggingConsumerConfig - The logging consumer configuration.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#idltconfig">IDltConfig - The DLT (Diagnostic Log and Trace) configuration.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#ikeyvaluepoolparametersconfig-the-configuration-of-key-value-pool-parameters">IKeyValuePoolParametersConfig - The configuration of key value pool parameters.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#ikeyparametersconfig-the-configuration-of-one-key-that-can-be-set-in-a-key-value-pool">IKeyParametersConfig - The configuration of one key that can be set in a key value pool.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#ithreadparametersconfig-the-configuration-of-thread-parameters">IThreadParametersConfig - The configuration of thread parameters.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#ithreadparameterssporadicconfig-the-configuration-of-the-sporadic-scheduling-policy">IThreadParametersSporadicConfig - The configuration of the Sporadic Scheduling policy.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#ithreadparametersadaptiveconfig-the-configuration-of-the-adaptive-partitioning-strategy">IThreadParametersAdaptiveConfig - The configuration of the Adaptive Partitioning strategy.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#ivariablesconfig-variables-that-can-be-used-within-json-files">IVariablesConfig - Variables that can be used within JSON files.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#irunnerpoolconfig-runnerpool-configuration">IRunnerPoolConfig - RunnerPool configuration.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_guide/common_configuration.html#idltconsumerparamsconfig">IDltConsumerParamsConfig - The configuration to define DLT-specific consumer params.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/common_configuration.html#defining-variables-in-json-configurations">Defining Variables in JSON Configurations</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="id4">
+<h2>VERSION HISTORY</h2>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="5%" />
+<col width="5%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>REVISION</em></th>
+<th class="head"><em>DATE</em></th>
+<th class="head"><em>DESCRIPTION</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1.0</td>
+<td>05.06.2019</td>
+<td>initial version</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CERENCE SDK - COMMON USER’S GUIDE</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#id1">Document conventions</a></li>
+<li><a class="reference internal" href="#system-manager">System Manager</a></li>
+<li><a class="reference internal" href="#loading-json-configuration">Loading JSON configuration</a><ul>
+<li><a class="reference internal" href="#destroying-iconfiguration-objects">Destroying IConfiguration Objects</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#threading">Threading</a></li>
+<li><a class="reference internal" href="#json-configuration-of-common-component">JSON Configuration of Common Component</a></li>
+<li><a class="reference internal" href="#id4">VERSION HISTORY</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="user_guide/logging_intro.html" title="next chapter">Logging System Overview</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SDK_Common_UserGuide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

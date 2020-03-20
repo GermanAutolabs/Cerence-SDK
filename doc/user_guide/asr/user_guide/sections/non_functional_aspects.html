@@ -1,0 +1,1472 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Non-functional aspects to consider when using Cerence ASR</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="C API" href="c_api.html" />
+    <link rel="prev" title="Remote applications" href="remote_applications.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="non-functional-aspects-to-consider-when-using-cerence-asr">
+<h1>Non-functional aspects to consider when using Cerence ASR</h1>
+<div class="section" id="manager-components">
+<span id="id1"></span><h2>Manager components</h2>
+<p>Many aspects of Cerence ASR are governed by so-called “manager”
+components. When they are created, they receive a configuration
+component. They will then prepare all components necessary to realize
+the configuration specification, and possibly also do other operations
+needed at initialization time.</p>
+<p>Manager components are singleton components; there is expected to be
+at most one instance of each manager component. These are the manager
+components in use in Cerence ASR today. See also the <a class="reference internal" href="c_api.html#c-api"><span class="std std-ref">C API</span></a> section
+for an illustration of the C initialization sequence:</p>
+<ul>
+<li><p class="first">ISystemManager</p>
+<p>The system manager is responsible for setting up and managing common
+components in the system. This includes logging, threading and
+timing components. It should be the first component that is created
+when setting up a recognition system, after loading the
+configuration. The signature is as follows; all arguments are
+mandatory:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_common_ISystemManager_create</span><span class="p">(</span>
+      <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span>
+      <span class="k">const</span> <span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
+      <span class="n">nuance_common_ISystemManager</span> <span class="o">**</span><span class="n">systemManager</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>API reference: <a class="reference external" href="../../../../api_reference/asr/c/group___i_system_manager.html">ISystemManager</a></p>
+</li>
+<li><p class="first">ICloudManager</p>
+<p>The cloud manager is only required in systems that use remote
+recognition. It handles the configuration of components that are
+used for sending NCS cloud commands, such as CloudServices
+components, connection info, etc. The cloud manager requires a valid
+system manager, and the configuration data:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_cloudservices_ICloudManager_create</span><span class="p">(</span>
+      <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span>
+      <span class="n">nuance_common_ISystemManager</span> <span class="o">*</span><span class="n">systemManager</span><span class="p">,</span>
+      <span class="k">const</span> <span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
+      <span class="n">nuance_cloudservices_ICloudManager</span> <span class="o">**</span><span class="n">cloudManager</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>API reference: <a class="reference external" href="../../../../api_reference/asr/c/group___i_cloud_manager.html">ICloudManager</a></p>
+</li>
+<li><p class="first">IAudioManager</p>
+<p>The audio manager handles creation of all components involved in
+audio chains (audio input, codecs, audio buffering, SSE,…) It will
+create all the audio paths as defined in the JSON configuration
+(typically <code class="docutils literal notranslate"><span class="pre">audioconfig.json</span></code>).</p>
+<p>Creating the audio manager requires a valid system manager, and the
+audio configuration. Optionally you can also use an audio manager
+listener to get notified of audio events. The signature of the audio
+manager creation function is this one:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_audio_IAudioManager_create</span><span class="p">(</span>
+      <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span>
+      <span class="n">nuance_common_ISystemManager</span> <span class="o">*</span><span class="n">systemManager</span><span class="p">,</span>
+      <span class="k">const</span> <span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
+      <span class="n">nuance_audio_IAudioManagerListener</span> <span class="o">*</span><span class="n">listener</span><span class="p">,</span>
+      <span class="n">nuance_audio_IAudioManager</span> <span class="o">**</span><span class="n">audioManager</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If no audio manager listener is required, you can use NULL as the
+argument value:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">resultCode</span> <span class="o">=</span> <span class="n">nuance_audio_IAudioManager_create</span><span class="p">(</span><span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">systemMgr</span><span class="p">,</span> <span class="n">audioConfiguration</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">audioMgr</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>See section <a class="reference internal" href="audio_setup_and_configuration.html#audio-setup-and-config"><span class="std std-ref">Audio setup and configuration</span></a> for more details on audio
+components and audio configuration.</p>
+<p>API reference: <a class="reference external" href="../../../../api_reference/asr/c/_i_audio_manager_8h.html">IAudioManager</a></p>
+</li>
+<li><p class="first">IAsrManager</p>
+<p>This manager is responsible for creating the components that relate
+directly to speech recognition. The most important ones are ASR
+applications (<code class="docutils literal notranslate"><span class="pre">IApplication</span></code>), recognizers (<code class="docutils literal notranslate"><span class="pre">IRecognizer</span></code>) and
+dynamic content consumers (DCC, <code class="docutils literal notranslate"><span class="pre">IDynamicContentConsumer</span></code>).</p>
+<p>The ASR manager creation function has the following signature:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_asr5_IAsrManager_create</span><span class="p">(</span>
+      <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span>
+      <span class="k">const</span> <span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span><span class="p">,</span>
+      <span class="n">nuance_cloudservices_ICloudManager</span> <span class="o">*</span><span class="n">cloudManager</span><span class="p">,</span>
+      <span class="n">nuance_audio_IAudioManager</span> <span class="o">*</span><span class="n">audioManager</span><span class="p">,</span>
+      <span class="n">nuance_asr5_IAsrManagerListener</span> <span class="o">*</span><span class="n">listener</span><span class="p">,</span>
+      <span class="n">nuance_asr5_IAsrManager</span> <span class="o">**</span><span class="n">theInstance</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>(API reference: <a class="reference external" href="../../../../api_reference/asr/c/_i_asr_manager_8h.html">IAsrManager</a> )</p>
+<p>It requires a name, a configuration component and an audio manager
+at the minimum. The listener argument may be NULL if the system is
+not interested in event notifications from the ASR manager, and if
+no cloud recognition is done, the cloud manager parameter
+(<code class="docutils literal notranslate"><span class="pre">cloudManager</span></code>) may be NULL:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">returnCode</span> <span class="o">=</span> <span class="n">nuance_asr5_IAsrManager_create</span><span class="p">(</span><span class="s">&quot;&lt;name&gt;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">asrConfiguration</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">audioMgr</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">asrMgr</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This manager also coordinates the recognition process, using the
+function <code class="docutils literal notranslate"><span class="pre">nuance_asr5_IAsrManager_setApplications</span></code> (and variants),
+which controls the setup of the search space for the active
+recognizer(s). (See <a class="reference internal" href="applications.html#vocon-applications"><span class="std std-ref">Applications</span></a>.)</p>
+</li>
+</ul>
+</div>
+<div class="section" id="logging">
+<h2>Logging</h2>
+<p>The sections below provide an overview of the most commonly used
+features of the logging system.</p>
+<p>For full logger documentation, please refer to the logging section of the
+NDS_Common user guide: <a class="reference external" href="../../../common/user_guide/logging_intro.html">logging_intro.html</a></p>
+<div class="section" id="logging-mechanism">
+<h3>Logging mechanism</h3>
+<p>This figure shows the architecture of the CSDK logging system:</p>
+<a class="reference internal image-reference" href="../../_images/csdk_logging_system.png"><img alt="../../_images/csdk_logging_system.png" class="align-center" src="../../_images/csdk_logging_system.png" style="width: 75%;" /></a>
+<p>The logging system runs in a separate thread from the rest of the
+system. Modules in the system send their log messages to a message
+queue. The logging system then processes the messages one by one from
+this queue, and sends them on to their final destinations. A
+destination is a so-called “log consumer”, which will send a message
+to a specific log stream.</p>
+<p>Log streams can be streams like <code class="docutils literal notranslate"><span class="pre">stdout</span></code> or <code class="docutils literal notranslate"><span class="pre">stderr</span></code>, or
+disk-based files. There can be as many log streams as you want in your
+system, and each can be configured to only receive a subset of all log
+messages, based on the following criteria:</p>
+<ul class="simple">
+<li>Every message that is logged, is tagged with a specific prefix that
+indicates the place where the message originated. This prefix is
+called the “module”. A log consumer can log messages from one of
+more different modules.</li>
+<li>Every message this is logged, is also tagged with a log
+“zone”. Zones correspond to some extent with “log levels” in other
+logging frameworks. An important distinction is, though, that
+“zones” are not hierarchically ordered, but can be combined as
+desired for a log consumer. It is, for example, possible for a
+consumer to log all errors, and all debug messages.</li>
+</ul>
+<p>The possibility to configure each log consumer for any combination of
+modules, and for any combination of log zones, provides for a very
+flexible logging mechanism.</p>
+</div>
+<div class="section" id="logger-configuration">
+<h3>Logger configuration</h3>
+<p>The logger is configured in a JSON file, typically called
+<code class="docutils literal notranslate"><span class="pre">logging.json</span></code>. It is part of the Common services, so the file
+should include the version number of the common services:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;version&quot;</span> <span class="o">:</span> <span class="s">&quot;Common 1.0&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>All the logger configuration resides under the key <code class="docutils literal notranslate"><span class="pre">logger</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;logger&quot;</span> <span class="o">:</span> <span class="p">{</span>
+  <span class="s">&quot;text_buffer_entries&quot;</span> <span class="o">:</span> <span class="mi">1000000</span><span class="p">,</span>
+  <span class="s">&quot;consumers&quot;</span><span class="o">:</span> <span class="p">[{</span>
+    <span class="p">...</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p id="index-0">The value of the <code class="docutils literal notranslate"><span class="pre">text_buffer_entries</span></code> key specifies how large the
+log buffer can be. The log buffer collects log messages before they
+are handled by logging system itself. Having a buffer that is too
+small may result in “buffer overrun” messages in the log (<code class="docutils literal notranslate"><span class="pre">Log</span> <span class="pre">data</span>
+<span class="pre">buffer</span> <span class="pre">overrun!</span>&#160; <span class="pre">Module:</span> <span class="pre">...</span></code>). When this happens, no more log
+messages are recorded until there is space again in the log buffer.</p>
+<p id="index-1">The key <code class="docutils literal notranslate"><span class="pre">consumers</span></code> groups all of the configured
+log consumers, which will filter and output the log messages to their
+configured destinations.</p>
+<p>Here is an example of a logging configuration file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;logger&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;text_buffer_entries&quot;</span> <span class="p">:</span> <span class="mi">1000000</span><span class="p">,</span>
+    <span class="nt">&quot;consumers&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;stdout Logger&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;output&quot;</span> <span class="p">:</span> <span class="s2">&quot;stdout&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;not_modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;zones&quot;</span> <span class="p">:</span> <span class="s2">&quot;LOG_FATAL|LOG_ERROR|LOG_WARNING|LOG_CORE_INFO|LOG_EXTERNAL_FUNC&quot;</span><span class="p">,</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;error to file&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;output&quot;</span> <span class="p">:</span> <span class="s2">&quot;./ErrorsAndWarnings.log&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;not_modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;zones&quot;</span> <span class="p">:</span> <span class="s2">&quot;LOG_ERROR|LOG_FATAL|LOG_WARNING&quot;</span>
+    <span class="p">}]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In this example, two log consumers are defined: one that logs fatal,
+error, etc messages to the screen, and one that only logs fatal
+errors, errors, and warnings to a file.</p>
+<div class="section" id="zones">
+<span id="index-2"></span><h4>Zones</h4>
+<p>The set of required zones for a log consumer is specified in a string, where
+the different zones are separated using a pipe symbol (“|”).</p>
+<p>These are the zones that can be used in the configuration:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Zone</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>LOG_FATAL</td>
+<td>All events that are a show stopper for the running application</td>
+</tr>
+<tr class="row-odd"><td>LOG_ERROR</td>
+<td>All events that are error conditions but recoverable</td>
+</tr>
+<tr class="row-even"><td>LOG_WARNING</td>
+<td>Information that is useful to check the correct functionality</td>
+</tr>
+<tr class="row-odd"><td>LOG_PERFORMANCE_WARNING</td>
+<td>Information that the system performance is worse than expected</td>
+</tr>
+<tr class="row-even"><td>LOG_CORE_INFO</td>
+<td>Special core information, e.g. threads started/stopped, used files and versions.
+This log zone has a low message volume.</td>
+</tr>
+<tr class="row-odd"><td>LOG_INFO</td>
+<td>More information that is useful to check the correct functionality</td>
+</tr>
+<tr class="row-even"><td>LOG_EXTERNAL_FUNC</td>
+<td>Trace entry and exit of external functions</td>
+</tr>
+<tr class="row-odd"><td>LOG_EXTERNAL_PARAM</td>
+<td>Trace parameters of external functions</td>
+</tr>
+<tr class="row-even"><td>LOG_INTERNAL_FUNC</td>
+<td>Trace entry and exit of internal functions</td>
+</tr>
+<tr class="row-odd"><td>LOG_INTERNAL_PARAM</td>
+<td>Trace parameters of internal functions</td>
+</tr>
+<tr class="row-even"><td>LOG_ALL_TEXT</td>
+<td>LOG_FATAL|LOG_ERROR|LOG_WARNING|LOG_PERFORMANCE_WARNING|LOG_CORE_INFO|LOG_INFO|
+LOG_EXTERNAL_FUNC|LOG_EXTERNAL_PARAM|LOG_INTERNAL_FUNC|LOG_INTERNAL_PARAM</td>
+</tr>
+<tr class="row-odd"><td>LOG_DATA</td>
+<td>Trace binary data of the configured modules</td>
+</tr>
+<tr class="row-even"><td>LOG_TIMING_ANALYSIS</td>
+<td>Log timing of audio chunks for detailed offline analysis.</td>
+</tr>
+</tbody>
+</table>
+<p>Apart from the “usual” levels fatal, error, info, and warning, there
+are a set of other possible zones, for example to tag warnings that
+only apply when performance is suffering, core messages, function
+parameters, and binary data.</p>
+</div>
+<div class="section" id="modules">
+<span id="index-3"></span><h4>Modules</h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">modules</span></code> key is used to specify a set of application
+modules. Log messages from these modules will be handled by this
+consumer. Conversely, the <code class="docutils literal notranslate"><span class="pre">not_modules</span></code> allows to specify specific
+modules from which log messages should <em>not</em> be handled. Again, the
+<code class="docutils literal notranslate"><span class="pre">modules</span></code> and <code class="docutils literal notranslate"><span class="pre">not_modules</span></code> strings are given as a “|”-separated string.</p>
+<p>These are the modules that exist in the system:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="76%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Module</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>nuance.audio</td>
+<td>Activates log messages for all audio modules</td>
+</tr>
+<tr class="row-odd"><td>nuance.asr5</td>
+<td>Activates log messages for the ASR component</td>
+</tr>
+<tr class="row-even"><td>nuance.cloudservices</td>
+<td>Activates log messages for the cloud services component</td>
+</tr>
+<tr class="row-odd"><td>nuance.common</td>
+<td>Activates log messages for the common component</td>
+</tr>
+<tr class="row-even"><td>nuance.pal</td>
+<td>Activates log messages for all PAL modules</td>
+</tr>
+<tr class="row-odd"><td>nuance.prompter</td>
+<td>Activates log messages for the prompter component</td>
+</tr>
+<tr class="row-even"><td>“”</td>
+<td>empty string value activates log messages for all components</td>
+</tr>
+</tbody>
+</table>
+<p>Note that module naming for logging is hierarchical. The above
+prefixes distinguish the main modules in the CSDK.</p>
+<p>It is possible to use more specialized module names to limit the range
+of log messages. As a rule, modules use as their logging keys the
+prefix followed by their class names:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance</span><span class="p">.</span><span class="n">asr5</span><span class="p">.</span><span class="n">IApplication</span>
+<span class="n">nuance</span><span class="p">.</span><span class="n">asr5</span><span class="p">.</span><span class="n">IRecognizer</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>This makes it possible to log messages from specific component
+classes. In fact, this mechanism carries over to configuration item
+names as well. You can qualify a module name with a class name, and
+also a configured name, using a kind of “dot-notation”:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">module_prefix</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">component_name</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">configured_name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance</span><span class="p">.</span><span class="n">cloudservices</span><span class="p">.</span><span class="n">CloudCommander</span><span class="p">.</span><span class="n">rec_csHttp</span>
+</pre></div>
+</div>
+<p>The following snippet will log messages that originate in the
+CloudCommander class instance that has the name <code class="docutils literal notranslate"><span class="pre">rec_csHttp</span></code>, but
+not in any other CloudCommander class instances:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CS message log&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;output&quot;</span> <span class="p">:</span> <span class="s2">&quot;./cloudservices-log.txt&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;nuance.cloudservices.CloudCommander.rec_csHttp&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;not_modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;zones&quot;</span> <span class="p">:</span> <span class="s2">&quot;LOG_ALL_TEXT&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note, though, that <code class="docutils literal notranslate"><span class="pre">not_modules</span></code> has precedence: if
+<code class="docutils literal notranslate"><span class="pre">nuance.cloudservices.CloudCommander</span></code> is in <code class="docutils literal notranslate"><span class="pre">not_modules</span></code>, then
+all messages from any <code class="docutils literal notranslate"><span class="pre">CloudCommander</span></code> will be suppressed, even if
+specific instances are listed in <code class="docutils literal notranslate"><span class="pre">modules</span></code>. This example will still
+suppress all CloudCommander messages, despite having <code class="docutils literal notranslate"><span class="pre">rec_csHttp</span></code>
+listed in the <code class="docutils literal notranslate"><span class="pre">modules</span></code> string:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CS message log&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;output&quot;</span> <span class="p">:</span> <span class="s2">&quot;./cloudservices-log.txt&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;nuance.cloudservices|nuance.cloudservices.CloudCommander.rec_csHttp&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;not_modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;nuance.cloudservices.CloudCommander&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;zones&quot;</span> <span class="p">:</span> <span class="s2">&quot;LOG_ALL_TEXT&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="audio-logging">
+<h3>Audio logging</h3>
+<p>It is possible to use the logging system to log audio data, in
+addition to textual log messages. Most components that handle audio have
+specific hooks from which audio can be logged. These hooks are called
+“pads” in the Audio SDK. Please refer to the Audio SDK user’s guide
+for full information.</p>
+<p id="index-4">There are two types of pads in audio components: sinks (for incoming
+audio) and sources (for outgoing audio). An AudioOutput component
+(e.g. toward a speaker) will have only a sink-pad. An AudioInput
+component (from a file or microphone) will only have a source-pad. And
+a component such as SSE will have both a sink-pad and a source-pad.
+To log the audio that a recognizer gets, we connect a log consumer to
+its sink-pad.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">nuance.audio.SinkPad</span></code> logs its audio data in the
+<code class="docutils literal notranslate"><span class="pre">LOG_DATA</span></code> zone (for binary data), as 16-bit PCM data. In order to
+log audio from a specific recognizer, we use the dot-notation for
+specifying the recognizer:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance</span><span class="p">.</span><span class="n">audio</span><span class="p">.</span><span class="n">SinkPad</span><span class="p">.</span><span class="o">&lt;</span><span class="n">component_name</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">pad_name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>If a component only has one pad name, then it can be omitted. For
+example, for a recognizer, there is only a pad for logging the
+incoming audio, so the correct syntax is:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance</span><span class="p">.</span><span class="n">audio</span><span class="p">.</span><span class="n">SinkPad</span><span class="p">.</span><span class="n">rec</span>
+</pre></div>
+</div>
+<p>A fully configured audio log consumer for a recognizer looks like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;AudioLoggingWuwConsumer&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;output&quot;</span> <span class="p">:</span> <span class="s2">&quot;./tmp_cache/AudioLogging_%DATE_TIME%.pcm&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;max_file_size&quot;</span><span class="p">:</span> <span class="mi">-1</span><span class="p">,</span>
+  <span class="nt">&quot;max_files_number&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nt">&quot;enable_backup_log&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;nuance.audio.SinkPad.rec&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;not_modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;zones&quot;</span> <span class="p">:</span> <span class="s2">&quot;LOG_DATA&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The output file name in this example contains a <code class="docutils literal notranslate"><span class="pre">%DATE_TIME%</span></code> time
+placeholder. This placeholder will be replaced when the logger starts
+logging a new stream of audio. If the file name does not contain this
+placeholder, it will be overwritten each time a new audio stream
+starts. If it does contain the placeholder, a new file will be
+created for each stream (because the name will be unique due to
+timestamp).</p>
+<p id="index-5">These are the placeholders that you can use in the name of the logger
+output file:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">%DATE_TIME%</span></code> - this placeholder is replaced by a time stamp that
+contains the current date and time. The format used is this:
+YYYY-MM-DD_HH-MM-SS. This is the file creation time, and it is
+accurate to within 1 second.</li>
+<li><code class="docutils literal notranslate"><span class="pre">%TIME_MS%</span></code> - this placeholder is replaced by a time stamp that
+contains the current time since the process started (format:
+HH-MM-SS-MS). This is the time stamp of the first entry written into
+the file, and it is accurate to one microsecond.</li>
+</ul>
+<p id="index-6">It is also possible to log audio for specific ASR applications,
+instead of all audio for the recognizer.  The logged audio ranges from
+the time when recognition starts (which is determined by
+<code class="docutils literal notranslate"><span class="pre">startTimeMs</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">&lt;IAsrManager&gt;.setApplication</span></code>
+interface), to the time when recognition ends, which happens if
+trailing silence is detected, when the time in the <code class="docutils literal notranslate"><span class="pre">endTimeMs</span></code>
+parameter in <code class="docutils literal notranslate"><span class="pre">&lt;IAsrManager&gt;.setApplication</span></code> is reached, or when
+audio input is stopped.</p>
+<p>Note: the “trailing silence” used for determining the end of audio
+logging is not the same trailing silence that is set on the search
+context using an ASR parameter. The trailing silence referred to here
+is set in the JSON configuration for the recognizer, using the
+<code class="docutils literal notranslate"><span class="pre">&quot;trailing_silence_threshold&quot;</span></code> key:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;recognizer&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rec&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;asr_engine&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;trailing_silence_threshold&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Similarly to the example above, we also use the dot-notation for
+specifying the application:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance</span><span class="p">.</span><span class="n">asr5</span><span class="p">.</span><span class="n">AudioLoggingSourceWrapper</span><span class="p">.</span><span class="o">&lt;</span><span class="n">recognizer_name</span><span class="o">&gt;</span><span class="p">.</span><span class="o">&lt;</span><span class="n">application_name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>An example JSON configuration is almost the same as the example above,
+just using a different module specification:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;AudioLoggingWuwConsumer&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;output&quot;</span> <span class="p">:</span> <span class="s2">&quot;./tmp_cache/AudioLogging_APP_WUW_%DATE_TIME%.pcm&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;max_file_size&quot;</span><span class="p">:</span> <span class="mi">-1</span><span class="p">,</span>
+  <span class="nt">&quot;max_files_number&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="nt">&quot;enable_backup_log&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nt">&quot;modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;nuance.asr5.AudioLoggingSourceWrapper.testRecognizer.APP_WUW&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;not_modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;zones&quot;</span> <span class="p">:</span> <span class="s2">&quot;LOG_DATA&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p id="index-7">In order to faithfully log audio, it is important to make sure that a
+buffer of sufficient size is allocated to buffer to samples. This is
+done using the key <code class="docutils literal notranslate"><span class="pre">data_buffer_size_per_channel</span></code> in the <code class="docutils literal notranslate"><span class="pre">logger</span></code>
+configuration block:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;logger&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;...&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;data_buffer_size_per_channel&quot;</span> <span class="p">:</span> <span class="mi">500000</span><span class="p">,</span>
+    <span class="nt">&quot;...&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cloud-logging">
+<h3>Cloud logging</h3>
+<p>It is also possible to log messages to the cloud server. The messages
+will then be stored on the server, where they can be retrieved from
+the database. Note that logging to the cloud happens outside of the
+logging system, but uses the CloudServices mechanisms.</p>
+<p>The goal of logging client data to the server, is to make it possible
+to improve the remote server’s language model. Models can be
+periodically retrained, and having metadata from the client to augment
+data passed to the server with the original ASR request, helps to
+expand the set of data available for model retraining.</p>
+<p>There are two ways to log information to the cloud
+server. The first way is to send the information as part of a
+recognition command. The second way is to send a separate logging
+command.</p>
+<p>Sending log info as part of a recognition command is done by including
+a <code class="docutils literal notranslate"><span class="pre">LOG_CONTENT</span></code> sub-dictionary of the <code class="docutils literal notranslate"><span class="pre">REQUEST_INFO</span></code> in the
+remote recognition query:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;REQUEST_INFO&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;json&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;start&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="nt">&quot;end&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="nt">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;appserver_data&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;LOG_CONTENT&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The JSON dictionary that is the value of <code class="docutils literal notranslate"><span class="pre">LOG_CONTENT</span></code> is then
+stored on the server, where it can be retrieved from the logs.</p>
+<p>Sending a separate log command can be done by configuring an ASR
+application that uses a log command in its query. For example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;APP_CLOUD_LOGGING&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;cloud_services_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CLOUD_LOG&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_LOG_REVISION_CMD&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;connection_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST_CONNINFO&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;param&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_CONTENT&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;LOG_CONTENT&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;json&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>When this application is activated on a recognizer, the query command will be
+executed, and the log message will be sent to the server.</p>
+<p>It is possible to group several ASR recognitions and log events. This
+is done by including a <code class="docutils literal notranslate"><span class="pre">application_session_id</span></code> key in the log
+content JSON dictionary. The value should be a client-generated
+GUID. Using the same GUID for the session ID in subsequent
+recognitions or log revision events tells the server that they belong
+to the same recognition session.</p>
+<p>It is also possible to send audio data as part of a LOG_REVISION
+command. For details, refer to the CloudServices SDK manual.</p>
+</div>
+</div>
+<div class="section" id="threads">
+<span id="index-8"></span><h2>Threads</h2>
+<p>Cerence ASR makes use of threads to run operations in parallel. There are
+a number of threads for speech recognition, and also a set of threads
+that do other tasks. For example, the logging system runs in a
+separate thread.</p>
+<div class="section" id="asr-threads">
+<h3>ASR threads</h3>
+<p>By default, when Cerence ASR is initialized, the following threads are created:</p>
+<blockquote>
+<div><ul class="simple">
+<li>ASR5_Worker0</li>
+<li>ASR5_Worker1</li>
+<li>ASR5_Worker2</li>
+<li>ASR5_Worker3</li>
+<li>ASR5_Dispatcher</li>
+<li>ASR5_FatalListener</li>
+</ul>
+</div></blockquote>
+<p>The number of worker threads that are created is defined in the
+configuration file <code class="docutils literal notranslate"><span class="pre">liquid_config.json</span></code>. It is possible to change
+the number of workers, but it is generally advised to leave the
+default configuration in place.</p>
+</div>
+<div class="section" id="background-operations">
+<h3>Background operations</h3>
+<p>Some make use of threads to run background operations</p>
+<ul>
+<li><p class="first">IAsrManager:</p>
+<p>The call to <code class="docutils literal notranslate"><span class="pre">nuance_asr5_IAsrManager_create</span></code> uses two worker
+threads to delay loading of specific configuration parts in the
+background. The threads are called <code class="docutils literal notranslate"><span class="pre">ASR5_CFG</span></code> and <code class="docutils literal notranslate"><span class="pre">ASR5_CLOUD</span></code>.
+They load application configurations, and set up delayed-load
+searches for the recognizer when
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IAsrManager_setApplications</span></code> is called in the
+background.</p>
+</li>
+<li><p class="first">IDynamicContentConsumer:</p>
+<p>Performs the grapheme-to-phoneme (G2P) conversion process, for
+dynamically-loaded vocabulary items, in the background.</p>
+</li>
+<li><p class="first">ICloudCommander:</p>
+<p>uses a background thread to send cloud commands to NCS, and to
+receive the response.</p>
+</li>
+</ul>
+<p>These background tasks are implemented using the IBackgroundOperation
+interface, which can be used to control the behavior of the background
+operations. The IBackgroundOperation interface has operations to query
+the status of the operation (running, aborted, failed,…), to wait
+for task completion (with or without timeout), etc.</p>
+<p>(API reference: <a class="reference external" href="../../../../api_reference/asr/c/group___i_background_operation.html">IBackgroundOperation</a>)</p>
+</div>
+<div class="section" id="thread-pools-priorities">
+<span id="index-9"></span><h3>Thread pools &amp; priorities</h3>
+<p>Dynamic content consumers make use of two thread pools to schedule
+background operations:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The DCC creation pool (called <code class="docutils literal notranslate"><span class="pre">dcc_creation</span></code>)</li>
+<li>The DCC data preparation pools (called <code class="docutils literal notranslate"><span class="pre">dcc_data_preparation</span></code>)</li>
+</ul>
+</div></blockquote>
+<p>The system can control how many threads each pool should contain, and
+can also specify the priority (low or normal) of the threads in the
+data preparation pool. The JSON configuration for these thread pools
+is part of the recognizer’s configuration:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;recognizer&quot;</span><span class="o">:</span> <span class="p">[{</span>
+  <span class="p">...,</span>
+  <span class="s">&quot;thread_pool&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s">&quot;dcc_creation&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;max_number&quot;</span><span class="o">:</span> <span class="o">&lt;</span><span class="n">maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">threads</span><span class="o">&gt;</span><span class="p">,</span>
+      <span class="s">&quot;name&quot;</span><span class="o">:</span> <span class="s">&quot;DCC_CREATION&quot;</span>
+    <span class="p">},</span>
+    <span class="s">&quot;dcc_data_preparation&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s">&quot;low_priority&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s">&quot;max_number&quot;</span><span class="o">:</span> <span class="o">&lt;</span><span class="n">maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">threads</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s">&quot;name&quot;</span><span class="o">:</span> <span class="s">&quot;DCC_LOW&quot;</span>
+      <span class="p">},</span>
+      <span class="s">&quot;normal_priority&quot;</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s">&quot;max_number&quot;</span><span class="o">:</span> <span class="o">&lt;</span><span class="n">maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">threads</span><span class="o">&gt;</span><span class="p">,</span>
+        <span class="s">&quot;name&quot;</span><span class="o">:</span> <span class="s">&quot;DCC_NORMAL&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}]</span>
+</pre></div>
+</div>
+<p>Note the existence of a low-priority pool and a normal-priority pool
+in the <code class="docutils literal notranslate"><span class="pre">dcc_data_preparation</span></code> category. If, for a specific dynamic
+content consumer, the priority is not explicitly configured, it will
+automatically receive normal priority.</p>
+<p>For DCC creation, all threads in the pool have the same priority
+(NORMAL).</p>
+<p id="index-10">When a DCC is created or when data preparation is started on a DCC,
+Cerence ASR will grab an available thread from the corresponding pool and
+assign it to the task at hand.  By default the size of the thread
+pools is 1.  This means that at any point in time there will only be
+one active DCC thread for creation and maximum two (low and normal
+priority) DCC threads for data preparation.  In other words, DCC tasks
+of the same priority will be executed sequentially.</p>
+<p>In the DCC JSON configuration file, the application can specify the
+priority of its thread:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;dynamic_content_consumer&quot;</span><span class="o">:</span> <span class="p">[{</span>
+    <span class="p">...,</span>
+    <span class="s">&quot;thread_priority&quot;</span><span class="o">:</span> <span class="s">&quot;(LOW|NORMAL)&quot;</span>
+<span class="p">}]</span>
+</pre></div>
+</div>
+<p>Note that all these properties are optional. If not set, the default
+values will be used (1 for <code class="docutils literal notranslate"><span class="pre">max_number</span></code> and NORMAL for
+<code class="docutils literal notranslate"><span class="pre">thread_priority</span></code>).</p>
+</div>
+</div>
+<div class="section" id="configuration-concepts">
+<span id="config-concepts"></span><h2>Configuration concepts</h2>
+<div class="section" id="json-files">
+<h3>JSON files</h3>
+<p>Cerence ASR configuration uses the concept of a configuration directory. All
+JSON configuration files are grouped in a directory. Exactly what each
+file contains is fairly flexible.</p>
+<p>Each file must have a <code class="docutils literal notranslate"><span class="pre">version</span></code> tag, that specifies the target
+system for the configuration in that file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;AudioMgr 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;...&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Configuration items for different subsystems cannot be in the same
+file, but it is perfectly OK to split configuration items for a
+subsystem into several files. This makes it possible to make logical
+splits in the configuration to group specific items.</p>
+<p>Typically, configuration is grouped per functional block,
+corresponding to one or a few top-level JSON keys, such as
+<code class="docutils literal notranslate"><span class="pre">applications</span></code>.  For example all ASR applications are combined in
+a file (<code class="docutils literal notranslate"><span class="pre">applications.json</span></code>), all DCCs are in a file (<code class="docutils literal notranslate"><span class="pre">dcc.json</span></code>),
+etc.</p>
+<p>These are the configuration items that cannot be combined in the same
+file:</p>
+<ul>
+<li><p class="first">audio subsystem configuration</p>
+<p>Files containing audio configuration must have</p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;</span> <span class="pre">:</span> <span class="pre">&quot;AudioMgr</span> <span class="pre">1.0&quot;,</span></code></p>
+</li>
+<li><p class="first">common configuration</p>
+<p>This is typically the logging configuration. Files for common
+configuration must have</p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;</span> <span class="pre">:</span> <span class="pre">&quot;Common</span> <span class="pre">1.0&quot;,</span></code></p>
+</li>
+<li><p class="first">ASR configuration</p>
+<p>This is the configuration of the recognition engine, including
+applications, recognizer setup, etc. Files for the ASR
+configuration must have</p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;:</span> <span class="pre">&quot;VoConHigh</span> <span class="pre">5.0&quot;,</span></code></p>
+</li>
+</ul>
+<p>Syntax errors in JSON configuration files will be pointed out in the
+log:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>00:00.031  ERROR:     [4116] nuance.common.JsonCheck                  config/audioconfig.json (line 9, col 6): comma &#39;,&#39; expected or end of object &#39;}&#39;
+</pre></div>
+</div>
+<p>Semantic errors can be trickier to diagnose. Because they don’t cause
+parsing errors, they often don’t cause the system to stop on startup,
+such that these errors may only be diagnosed by checking the logs:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>00:00.531  WARNING:   [10596] nuance.asr5.AsrManager                  Toplevel configuration for component &#39;VoConHigh&#39;, object type &#39;application&#39;, name &#39;WUW&#39; not found!  [491]
+</pre></div>
+</div>
+<p>One way to detect such errors would be to have a log consumer that
+specifically logs warnings and error messages to a separate fie, and
+regularly scan this file for issues:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;logger&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;consumers&quot;</span> <span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;WarningErrorFatalLogConsumer&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;not_modules&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;zones&quot;</span> <span class="p">:</span> <span class="s2">&quot;LOG_WARNING|LOG_ERROR|LOG_FATAL&quot;</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="comments">
+<span id="index-11"></span><h4>Comments</h4>
+<p>By design, JSON does not allow comments in JSON files. This makes it
+uncomfortable to experiment with different configuration settings, and
+to rapidly switch between them.</p>
+<p>The JSON parser used in the CSDK mitigates this somewhat, by allowing
+keys to be commented out. The values for commented keys are ignored
+when the JSON is read and parsed. The way to comment a key, is to
+prefix it with a hash mark (“#”). So, for example, the following key
+will not be taken into account when the JSON is read:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;#applications&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This makes it easy to experiment with several different values for the
+same key, without having to remove them wholesale from the
+configuration file in which they appear.</p>
+<p>This extension also provides a way to enter comments: by using a
+commented, unused key, the key/value pair will be ignored by the
+parser:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;#comment&quot;</span><span class="p">:</span> <span class="s2">&quot;Here we can enter a one-line comment.&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-json-key">
+<span id="literal-json-blocks"></span><span id="index-12"></span><h4>The <code class="docutils literal notranslate"><span class="pre">json</span></code> key</h4>
+<p>In some places in the configuration, a special JSON key <code class="docutils literal notranslate"><span class="pre">json</span></code> is
+used. This key is used in places where the JSON content should be used
+literally. This means that the value of the <code class="docutils literal notranslate"><span class="pre">json</span></code> key is used as-is
+by the code, instead of using individual values out of the JSON
+dictionary.</p>
+<p>An example is the connection info that is included with many cloud
+commands:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;connection_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;automotive-dictation&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span>
+     <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">json</span></code> key here indicates that the request will include the JSON
+dictionary as is; the dictionary</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;automotive-dictation&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>will be included in the HTTPS request:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{&quot;dictation_type&quot;:&quot;automotive-dictation&quot;,&quot;dictation_language&quot;:&quot;eng-USA&quot;}
+</pre></div>
+</div>
+</div>
+<div class="section" id="named-json-sections">
+<span id="named-json-blocks"></span><span id="index-13"></span><h4>Named JSON sections</h4>
+<p>Some parts of the JSON configuration may appear in several places
+throughout the configuration files. An example is the
+<code class="docutils literal notranslate"><span class="pre">connection_info</span></code> block which is required in most Cloud Services
+commands: recognition commands, but also data upload commands, etc.</p>
+<p>In order to avoid repetition of these blocks, they can be given a
+name. For example, the contents of a connection info block can be
+extracted as follows and given a name:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;connection_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST_CONNINFO&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;json&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;automotive-dictation&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is then referenced as follows in the JSON configuration as follows,
+using the <code class="docutils literal notranslate"><span class="pre">uses</span></code> key:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;connection_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST_CONNINFO&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>instead of repeating the literal block each time:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;connection_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;TEST_CONNINFO&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;json&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;automotive-dictation&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>For the full configuration JSON overview, see
+<a class="reference internal" href="../external/configuration.html#vocon5-json-configuration"><span class="std std-ref">Cerence ASR JSON configuration reference</span></a>.</p>
+</div>
+</div>
+<div class="section" id="minimal-configuration">
+<span id="json-minimal-configuration"></span><span id="index-14"></span><h3>Minimal configuration</h3>
+<p>A minimal set of configuration consists of the following files. The file name can be chosen
+freely, they just have to end on <code class="docutils literal notranslate"><span class="pre">.json</span></code> to be loaded by Cerence ASR:</p>
+<div class="section" id="asr-manager-json">
+<span id="index-15"></span><h4>asr_manager.json</h4>
+<p>This is the top level configuration file that defines internal
+configurations of <code class="docutils literal notranslate"><span class="pre">AsrManager</span></code> in Cerence ASR.
+The internal configurations are defined inside liquid config file. This includes threading for example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;asr_manager&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;asrRecognizer&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;liquid_config_file_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;liquid_config.json&quot;</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="asr-paths-json">
+<span id="index-16"></span><h4>asr_paths.json</h4>
+<p>This is the top level configuration file that defines where Cerence ASR can find the
+data it needs. That is, it specifies the path names of data folders. Path names given here
+are relative to the configuration folder. The file has the following contents:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
+  &quot;version&quot; : &quot;VoConHigh 5.0&quot;,
+  &quot;asr_paths&quot; : {
+    &quot;acmod&quot; : &quot;./acmod&quot;,
+    &quot;search&quot; : &quot;./ctx&quot;
+  }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="audioconfig-json">
+<span id="index-17"></span><h4>audioconfig.json</h4>
+<p>The audio configuration file defines the audio paths used in Cerence ASR. A minimal version that
+configures audio for simple recognition from microphone has the following contents:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;AudioMgr 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;audio_scenario&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;mic_input&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;audiopaths&quot;</span> <span class="p">:</span> <span class="p">[[</span>
+      <span class="s2">&quot;mic_input&quot;</span><span class="p">,</span> <span class="s2">&quot;asr&quot;</span>
+    <span class="p">]]</span>
+  <span class="p">}],</span>
+  <span class="nt">&quot;module_config&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;DefaultAudioInput&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;mic_input&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;audio_format&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;uses&quot;</span> <span class="p">:</span> <span class="s2">&quot;16khz_1ch&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}],</span>
+  <span class="nt">&quot;audio_format&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;16khz_1ch&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sample_rate&quot;</span> <span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+    <span class="nt">&quot;samples_per_channel&quot;</span> <span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
+    <span class="nt">&quot;channel_count&quot;</span> <span class="p">:</span> <span class="mi">1</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For a complete overview of possible configuration options in this file, refer to
+the <code class="docutils literal notranslate"><span class="pre">DDFW_AudioManagement_Guide.html</span></code>.</p>
+</div>
+<div class="section" id="application-json">
+<span id="index-18"></span><h4>application.json</h4>
+<p>The application configuration file defines a simple ASR/NLU configuration for a given ASR/NLU task that can be executed.
+A simple version has the following contents:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;application&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;APP_CNC&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;asr&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+          <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CNC_CTX&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;static&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;file_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;modelm_small.fcf&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;LH_SEARCH_PARAM_TSILENCE&quot;</span><span class="p">:</span> <span class="mi">150</span>
+          <span class="p">}</span>
+        <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For a complete overview of possible configuration options in this file, refer to
+the <a class="reference internal" href="../../json/application.html#application-configuration-options"><span class="std std-ref">Application Configuration Options</span></a> documentation.</p>
+<p>These files need to be placed in a common folder, for this example, let us
+assume they have been put in <code class="docutils literal notranslate"><span class="pre">/home/VoCon/sample_data</span></code>. Moreover, the data
+files (acoustic model and search) need to be placed in
+<code class="docutils literal notranslate"><span class="pre">/home/VoCon/sample_data/acmod</span></code> and <code class="docutils literal notranslate"><span class="pre">/home/VoCon/sample_data/search</span></code>
+respectively, since this is what we specified in <code class="docutils literal notranslate"><span class="pre">asr_paths.json</span></code>. The search
+used in the above example is <code class="docutils literal notranslate"><span class="pre">modelm_small.fcf</span></code> (see the <code class="docutils literal notranslate"><span class="pre">filename</span></code> field in
+<code class="docutils literal notranslate"><span class="pre">application.json</span></code>). The acoustic model that is used depends on the search,
+since the search has a dependency to this model compiled into its data. In this
+case, the acoustic model used is <code class="docutils literal notranslate"><span class="pre">acmod6_6000_enu_gen_car_f16_v1_0_1.dat</span></code>.</p>
+</div>
+</div>
+<div class="section" id="typical-configuration">
+<span id="json-typical-configuration"></span><h3>Typical configuration</h3>
+<p>The overall configuration structure, in the CSDK sample, looks like this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>sample
+└──data
+   └──asr
+      ├──config
+      │  ├──asr_paths.json
+      │  ├──audio_config.json
+      │  ├──logger.json
+      │  ├──asr_manager.json
+      │  ├──recognizer.json
+      │  ├──applications.json
+      │  ├──dcc.json
+      │  ├──lexicon.json
+      │  ├──sem3_filters.json
+      │  └──wuw_app.json
+      └──data
+         ├──acmod
+         │  └──acmod6_6000_enu_gen_car_f16_v1_0_1.dat
+         ├──asr
+         │  └──vocon_asr2.dat
+         ├──ctx
+         │  └──*.fcf
+         ├──liquid
+         │  └──liquid_config.json
+         ├──pron
+         │  └──clc
+         │     └──clc_enu_mpthreevadml_v6_0_1.dat
+         ├──sem3
+         │  └──music_simple_v5.s3c
+         └──sound
+            └──enu_f16
+               └──*.wav
+</pre></div>
+</div>
+<p>There are two blocks in this directory structure:</p>
+<ul class="simple">
+<li>the directory <code class="docutils literal notranslate"><span class="pre">sample/asr/config</span></code> contains all JSON configuration files</li>
+<li>the directory <code class="docutils literal notranslate"><span class="pre">sample/asr/data</span></code> contains all data that is needed
+by Cerence ASR to create a functional recognizer based on the JSON
+configuration.</li>
+</ul>
+<p id="asr-path-json">The link between these two blocks is the <code class="docutils literal notranslate"><span class="pre">asr_paths</span></code> top-level JSON
+key. In this example, this is located in the <code class="docutils literal notranslate"><span class="pre">asr_paths.json</span></code> file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;asr_paths&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;asr&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/asr&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sem3&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/sem3&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;liquid&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/liquid&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;acmod&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/acmod&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;clc&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/pron/clc&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;../data/ctx&quot;</span>
+    <span class="p">],</span>
+    <span class="nt">&quot;search_cache&quot;</span><span class="p">:</span> <span class="s2">&quot;./tmp_cache&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">asr_paths</span></code> key defines, for all components of the recognizer,
+which is the base path were external data files are located. As an
+example, consider the acoustic model. In the file <code class="docutils literal notranslate"><span class="pre">recognizer.json</span></code>,
+the recognizer <code class="docutils literal notranslate"><span class="pre">rec</span></code> is defined as follows, with the acoustic model
+begin the file <code class="docutils literal notranslate"><span class="pre">acmod6_6000_enu_gen_car_f16_v1_0_1.dat</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rec&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;asr_engine&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;acmod&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_1.dat&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">asr_paths</span></code> state that the ACMOD data directory is
+<code class="docutils literal notranslate"><span class="pre">../data/acmod</span></code>; this path is interpreted relative to the
+configuration directory where the JSON files are located. When the
+recognizer is created, its acoustic model will then be loaded from the
+combined path
+<code class="docutils literal notranslate"><span class="pre">../data/acmod/acmod6_6000_enu_gen_car_f16_v1_0_1.dat</span></code>.</p>
+<p>The different path prefixes in <code class="docutils literal notranslate"><span class="pre">asr_paths</span></code> are:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">asr</span></code> - this is the static ASR data, typically
+<code class="docutils literal notranslate"><span class="pre">vocon_asr2.dat</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">sem3</span></code> - this contains the SEM3 buffers; typically files with the
+<code class="docutils literal notranslate"><span class="pre">.s3c</span></code> suffix</li>
+<li><code class="docutils literal notranslate"><span class="pre">liquid</span></code> - this contains the ASR internal configuration;
+typically this is a file called <code class="docutils literal notranslate"><span class="pre">liquid_config.json</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">clc</span></code> - this contains all CLC buffers</li>
+<li><code class="docutils literal notranslate"><span class="pre">search</span></code> - this contains all context files (<code class="docutils literal notranslate"><span class="pre">.fcf</span></code>) and language
+models (typically using <code class="docutils literal notranslate"><span class="pre">.dat</span></code> suffix). Note that this is an
+array; it is possible to specify more than one path for context and
+language model files.</li>
+</ul>
+</div>
+<div class="section" id="testing-your-configuration">
+<span id="index-19"></span><h3>Testing your configuration</h3>
+<p>You can easily test many aspects of your system’s JSON configuration
+using the <code class="docutils literal notranslate"><span class="pre">recog_test</span></code> tool included in the Cerence ASR SDK.</p>
+<p>In order to use <code class="docutils literal notranslate"><span class="pre">recog_test</span></code>, you create a specific JSON
+configuration file, which tells <code class="docutils literal notranslate"><span class="pre">recog_test</span></code> where your ASR JSON
+configuration is located, and how it should set up itself:</p>
+<ul>
+<li><p class="first">the audio path to use.</p>
+<p>The audio paths are usually configured in
+<code class="docutils literal notranslate"><span class="pre">audio_config.json</span></code>. The audio path for <code class="docutils literal notranslate"><span class="pre">recog_test</span></code> will
+probably be different from your system’s default audio path. For
+example, your system will use a microphone setup on the target
+platform, whereas <code class="docutils literal notranslate"><span class="pre">recog_test</span></code> may use pre-recorded audio snippets
+from a directory. The</p>
+</li>
+<li><p class="first">which dynamic content to prepare, and where to fetch the data.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">data_preparation</span></code> section lists the DCCs to create and
+prepare, and which data they should load.</p>
+</li>
+<li><p class="first">which ASR applications to include in the recognition.</p>
+<p>This lists the activations, and whether to activate them from the
+start or not. Using conditions, it is possible to specify for
+example that an ASR application should be activated in response to a
+specific result type, etc. Using this mechanism it is possible to
+simulate, to a certain extent, a dialog where several ASR
+applications participate, such as switching from wake-up word
+recognition to command recognition.</p>
+</li>
+</ul>
+<p>Please refer to <a class="reference internal" href="../../tools/recog_test_sample.html#recog-test-config-file"><span class="std std-ref">recog_test configuration file</span></a> for more details on
+creating the <code class="docutils literal notranslate"><span class="pre">recog_test</span></code> configuration.</p>
+</div>
+<div class="section" id="dynamic-configuration-at-runtime">
+<span id="dynamic-configuration"></span><span id="index-20"></span><h3>Dynamic configuration at runtime</h3>
+<div class="section" id="vh-callback">
+<h4><code class="docutils literal notranslate"><span class="pre">vh_callback</span></code></h4>
+<p>JSON configuration is static: the keys and values are specified in
+files. This is not always convenient; some items, for example
+credentials for connecting to a cloud server, should be configured at
+runtime. The mechanism to do this, is using <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code>
+specifications.</p>
+<p>When a configuration component is created, one of the arguments passed
+to it is an <code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>nuance_common_IConfiguration_create(const LH_CHAR *configDir, nuance_common_IApplicationCallback *appCb, nuance_common_IConfiguration **config)
+</pre></div>
+</div>
+<p>In the JSON configuration file, instead of specifying a key’s value
+directly, you specify an identifier that will tip off Cerence ASR that a
+value is not a literal value. This identifier is <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code>. When
+the configuration loader encounters this value, rather than use the
+value directly, it will call the application callback provided in the
+call to <code class="docutils literal notranslate"><span class="pre">nuance_common_IConfiguration_create</span></code>, and that in turn will
+provide the actual value to use.  Additionally, it is possible to
+specify a default value in the JSON file, so if an actual value can’t
+be found by the callback, it can return the default value.</p>
+<p>Note that the callback will be called each time the key is requested
+from the configuration component. So if, during run-time, this value
+is requested 10 times, then the callback will be called 10 times. The
+callback is free to return a different value each time.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>So, in the JSON configuration files, a literal value:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;&lt;key&gt;&quot; : &quot;&lt;value&gt;&quot;
+</pre></div>
+</div>
+<p>can be replaced by a callback reference:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;&lt;key&gt;&quot; : {
+  &quot;vh_callback&quot; : {
+    &quot;name&quot; : &quot;&lt;name passed to application&gt;&quot;,
+    &quot;type&quot; : &quot;&lt;string|array|integer|boolean|json&gt;&quot;,
+    &quot;default&quot; : &quot;&lt;default value&gt;&quot;
+  }
+}
+</pre></div>
+</div>
+<p>This is an example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
+  &quot;version&quot; : &quot;VoConHigh 5.0&quot;,
+  &quot;connection_info&quot; : {
+    &quot;name&quot; : &quot;TEST_CONNINFO&quot;,
+    &quot;json&quot; : {
+      &quot;application_version&quot; : &quot;5.0&quot;,
+      ...
+      &quot;application_session_id&quot; : {
+        &quot;vh_callback&quot; : {
+          &quot;name&quot; : &quot;appl_sess_id&quot;,
+          &quot;type&quot; : &quot;string&quot;,
+          &quot;default&quot; : &quot;afb7bf7gw2g7seg5nw0up2z&quot;
+        }
+      },
+      ...
+      &quot;application_state_id&quot; : &quot;45&quot;
+    }
+  }
+}
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code> declaration for <code class="docutils literal notranslate"><span class="pre">application_session_id</span></code> tells
+Cerence ASR that when it calls the callback, it will receive a string.</p>
+<p>Note that this example combines two concepts: dynamic value lookup,
+and <a class="reference internal" href="#literal-json-blocks"><span class="std std-ref">literal JSON blocks</span></a>. This works as
+you would expect: the value is looked up dynamically, and the JSON
+block is then used as a literal value for the key <code class="docutils literal notranslate"><span class="pre">connection_info</span></code>.</p>
+</div>
+<div class="section" id="callback-implementation">
+<span id="index-21"></span><h4>Callback implementation</h4>
+<p>The application callback responsible for providing dynamic
+configuration values is passed to the <code class="docutils literal notranslate"><span class="pre">create</span></code> function for
+<code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_IConfiguration_create</span><span class="p">(</span><span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">configDir</span><span class="p">,</span>
+                                    <span class="n">nuance_common_IApplicationCallback</span> <span class="o">*</span><span class="n">appCb</span><span class="p">,</span>
+                                    <span class="n">nuance_common_IConfiguration</span> <span class="o">**</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The following is a simple implementation of an
+<code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code> function. When the function is called, the
+key name from the JSON <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code> section is provided in
+argument <code class="docutils literal notranslate"><span class="pre">szArgs</span></code> (in the above example, <code class="docutils literal notranslate"><span class="pre">szArgs</span></code> would contain <code class="docutils literal notranslate"><span class="pre">appl_sess_id</span></code>):</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">config_callback</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">pInst</span><span class="p">,</span>
+                  <span class="n">nuance_common_IApplicationCallback_FunctionName</span> <span class="n">functionName</span><span class="p">,</span>
+                  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">szArgs</span><span class="p">,</span> <span class="n">nuance_common_String</span> <span class="o">**</span><span class="n">ppResults</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">APP_DATA</span><span class="o">*</span> <span class="n">pApp</span> <span class="o">=</span> <span class="p">(</span><span class="n">APP_DATA</span><span class="o">*</span><span class="p">)</span> <span class="n">pInst</span><span class="p">;</span>
+  <span class="n">nuance_common_String</span> <span class="o">*</span><span class="n">pStr</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+
+  <span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_cloudservices_IDictionary_getString</span><span class="p">(</span><span class="n">pApp</span><span class="o">-&gt;</span><span class="n">pCredentials</span><span class="p">,</span> <span class="n">szArgs</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pStr</span><span class="p">);</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="s">&quot;%s: Credentials: %s -&gt; %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+          <span class="n">pApp</span><span class="o">-&gt;</span><span class="n">szAppName</span><span class="p">,</span> <span class="n">szArgs</span><span class="p">,</span> <span class="n">nuance_common_String_c_str</span><span class="p">(</span><span class="n">pStr</span><span class="p">));</span>
+
+  <span class="o">*</span><span class="n">ppResults</span> <span class="o">=</span> <span class="n">pStr</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="n">rc</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This function will retrieve the CloudServices credentials from the
+application data in the <code class="docutils literal notranslate"><span class="pre">APP_DATA</span></code> struct. (The credentials were
+read from file into a dictionary earlier, refer to function
+<code class="docutils literal notranslate"><span class="pre">nuance_cloudservices_IDictionary_createFromJson</span></code> and friends.) The
+callback will then get the string requested in <code class="docutils literal notranslate"><span class="pre">szArgs</span></code> from this
+dictionary, and return the result as the value of the callback call.</p>
+<p>Note that if the configuration would contain other <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code>
+keys than the cloud credentials, then the callback funcion would need
+to handle these as well: there is one callback function per
+configuration component, and must handle all <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code> entries
+in all JSON files in the configuration directory.</p>
+<p id="index-22">Creating the callback is done as follows. First, a vtable struct is
+created, containing a pointer to the implementation function. Then,
+<code class="docutils literal notranslate"><span class="pre">nuance_common_IApplicationCallback_create</span></code> is called:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">APP_DATA</span> <span class="o">*</span><span class="n">pApp</span> <span class="o">=</span> <span class="p">{</span> <span class="p">...</span> <span class="p">};</span>
+<span class="k">const</span> <span class="n">vtable_nuance_common_IApplicationCallback</span> <span class="n">iAppCallback</span> <span class="o">=</span> <span class="p">{</span> <span class="n">config_callback</span> <span class="p">};</span>
+
+<span class="n">pApp</span><span class="o">-&gt;</span><span class="n">appCallback</span> <span class="o">=</span> <span class="n">nuance_common_IApplicationCallback_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">iAppCallback</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pApp</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The variable <code class="docutils literal notranslate"><span class="pre">pApp</span></code> will be passed to the function
+<code class="docutils literal notranslate"><span class="pre">config_callback</span></code> when is called by the
+<code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code>. Installation of the callback is done when the
+<code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code> component is created:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_IConfiguration</span> <span class="o">*</span><span class="n">config</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+<span class="n">nuance_common_IConfiguration_create</span><span class="p">(</span><span class="s">&quot;/home/VoCon/sample_data&quot;</span><span class="p">,</span> <span class="n">pApp</span><span class="o">-&gt;</span><span class="n">appCallback</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p id="index-23">Another option, which is probably simpler if you don’t have complex
+dynamic configuration requirements, is to use a key-value pool. As a
+system developer, you then only have to worry about keeping the values
+in the key-value pool up to date. The <code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code>
+implementation is the part of the key-value pool:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_IKeyValuePool</span> <span class="o">*</span><span class="n">keyValuePool</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+<span class="n">nuance_common_IKeyValuePool_create</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">keyValuePool</span><span class="p">);</span>
+
+<span class="n">nuance_common_IKeyValuePool_setKeyValue</span><span class="p">(</span><span class="s">&quot;paramname&quot;</span><span class="p">;</span> <span class="s">&quot;value&quot;</span><span class="p">);</span>
+<span class="n">nuance_common_IKeyValuePool_setKeyValue</span><span class="p">(</span><span class="s">&quot;other paramname&quot;</span><span class="p">,</span> <span class="s">&quot;other value&quot;</span><span class="p">);</span>
+
+<span class="n">nuance_common_IConfiguration_create</span><span class="p">(</span><span class="s">&quot;/home/VoCon/sample_data&quot;</span><span class="p">,</span> <span class="n">keyValuePool</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">configuration</span><span class="p">);</span>
+
+<span class="n">nuance_asr5_IAsrManager_create</span><span class="p">(</span><span class="s">&quot;asrManager&quot;</span><span class="p">,</span>
+                               <span class="n">nuance_common_IKeyValuePool_as_nuance_common_IApplicationCallback</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+                               <span class="p">,</span> <span class="p">...);</span>
+</pre></div>
+</div>
+<p>From the example, you can see that the key-value pool is passed as the
+<code class="docutils literal notranslate"><span class="pre">IApplicationCallback</span></code> argument to the create function of the
+<code class="docutils literal notranslate"><span class="pre">IConfiguration</span></code>. After doing that, you can still modify the values
+in the key-value pool. Requests for key values after changing a
+value, will then return the new value.</p>
+</div>
+</div>
+</div>
+<div class="section" id="error-handling">
+<h2>Error handling</h2>
+<div class="section" id="return-codes">
+<span id="index-24"></span><h3>Return Codes</h3>
+<p>Methods of Cerence ASR classes return a ResultCode which can have the following
+values:</p>
+<p><code class="docutils literal notranslate"><span class="pre">NUANCE_COMMON_OK</span></code>:</p>
+<p>A method call was successful. If it returns an object, the caller has to ensure
+that it is released when it is no longer needed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NUANCE_COMMON_ERROR</span></code>:</p>
+<p>The method failed, but the overall system is still in a valid state.
+There’s no guarantee that other output parameters have valid values.
+Output parameters with class type will not return an object, the pointer
+may not be dereferenced / destroyed / passed to another function.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NUANCE_COMMON_FATAL</span></code>:</p>
+<p>This error is only returned if Cerence ASR runs out of resources (out of
+memory, file handles, mutex handles). If this error is returned, the
+<code class="docutils literal notranslate"><span class="pre">IRecognizer</span></code> object and all its dependent objects are no longer in
+a valid state. The user has to destroy them. Other <code class="docutils literal notranslate"><span class="pre">IRecognizer</span></code>
+instances are not affected by such an error.</p>
+</div>
+<div class="section" id="asynchronous-error-handling">
+<span id="index-25"></span><h3>Asynchronous Error Handling</h3>
+<p>Asynchronous error handling is being extended such that each API
+object will have its own error listener.  These error listeners are
+now defining <code class="docutils literal notranslate"><span class="pre">onError()</span></code> and <code class="docutils literal notranslate"><span class="pre">onWarning()</span></code> methods.  If an error
+occurs, but it does not prevent the API call from being executed, the
+error listener will be notified with a call to the <code class="docutils literal notranslate"><span class="pre">onWarning()</span></code>
+callback.  An example would be a missing context file while starting
+recognition: the recognition can be started without the missing
+context, so this error is not fatal.</p>
+<p>If a fatal error occurs, an object might become invalid. In that case,
+<code class="docutils literal notranslate"><span class="pre">onError()</span></code> will be called, and the user must destroy the object.</p>
+<p>Error codes are also being extended to give more details about the
+nature of the failure.  The <code class="docutils literal notranslate"><span class="pre">onError()</span></code> and <code class="docutils literal notranslate"><span class="pre">onWarning()</span></code> methods of each
+error listener now take an error enumerator (specific for each API object) and
+an error message.  The error message, if available for a given error
+code, gives more information.</p>
+<p>For details about possible error codes, please see the error
+definitions in the XML files</p>
+<blockquote>
+<div><ul class="simple">
+<li>ApplicationError.xml</li>
+<li>AsrManagerError.xml</li>
+<li>RecognizerError.xml</li>
+<li>DynamicContentConsumerError.xml</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="crc-checking">
+<span id="index-26"></span><h3>CRC checking</h3>
+<p>For CRC checking on input streams there are 2 type categories:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>always check (e.g. AcMod, ..)</li>
+<li>configurable to check or not (e.g. Search, Sem3 Data, ..)</li>
+</ol>
+</div></blockquote>
+<p>When on-demand-loading (ODL) is enabled (e.g. for search, SEM3
+data,…), CRC checking is done only if CRC checking is configured in
+the JSON configuration, and the block size of the input stream is less
+than or equal to 4KB.  For more details on configuring CRC checking
+please refer to the documentation of the particular JSON
+configuration.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Non-functional aspects to consider when using Cerence ASR</a><ul>
+<li><a class="reference internal" href="#manager-components">Manager components</a></li>
+<li><a class="reference internal" href="#logging">Logging</a><ul>
+<li><a class="reference internal" href="#logging-mechanism">Logging mechanism</a></li>
+<li><a class="reference internal" href="#logger-configuration">Logger configuration</a><ul>
+<li><a class="reference internal" href="#zones">Zones</a></li>
+<li><a class="reference internal" href="#modules">Modules</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#audio-logging">Audio logging</a></li>
+<li><a class="reference internal" href="#cloud-logging">Cloud logging</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threads">Threads</a><ul>
+<li><a class="reference internal" href="#asr-threads">ASR threads</a></li>
+<li><a class="reference internal" href="#background-operations">Background operations</a></li>
+<li><a class="reference internal" href="#thread-pools-priorities">Thread pools &amp; priorities</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-concepts">Configuration concepts</a><ul>
+<li><a class="reference internal" href="#json-files">JSON files</a><ul>
+<li><a class="reference internal" href="#comments">Comments</a></li>
+<li><a class="reference internal" href="#the-json-key">The <code class="docutils literal notranslate"><span class="pre">json</span></code> key</a></li>
+<li><a class="reference internal" href="#named-json-sections">Named JSON sections</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#minimal-configuration">Minimal configuration</a><ul>
+<li><a class="reference internal" href="#asr-manager-json">asr_manager.json</a></li>
+<li><a class="reference internal" href="#asr-paths-json">asr_paths.json</a></li>
+<li><a class="reference internal" href="#audioconfig-json">audioconfig.json</a></li>
+<li><a class="reference internal" href="#application-json">application.json</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#typical-configuration">Typical configuration</a></li>
+<li><a class="reference internal" href="#testing-your-configuration">Testing your configuration</a></li>
+<li><a class="reference internal" href="#dynamic-configuration-at-runtime">Dynamic configuration at runtime</a><ul>
+<li><a class="reference internal" href="#vh-callback"><code class="docutils literal notranslate"><span class="pre">vh_callback</span></code></a></li>
+<li><a class="reference internal" href="#callback-implementation">Callback implementation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#error-handling">Error handling</a><ul>
+<li><a class="reference internal" href="#return-codes">Return Codes</a></li>
+<li><a class="reference internal" href="#asynchronous-error-handling">Asynchronous Error Handling</a></li>
+<li><a class="reference internal" href="#crc-checking">CRC checking</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="../chapters/using_the_csdk_ddfw.html">Using Cerence ASR</a><ul>
+      <li>Previous: <a href="remote_applications.html" title="previous chapter">Remote applications</a></li>
+      <li>Next: <a href="c_api.html" title="next chapter">C API</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

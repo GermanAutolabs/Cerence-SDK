@@ -1,0 +1,394 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Logging System Overview</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SDK Threads" href="csdk_threads.html" />
+    <link rel="prev" title="CERENCE SDK - COMMON USER’S GUIDE" href="../SDK_Common_UserGuide.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="logging-system-overview">
+<span id="logging"></span><h1><a class="reference internal" href="#logging-system-overview">Logging System Overview</a></h1>
+<p>The internal logging system of the CSDK consists of logging modules, a logger message queue, a logger message dispatcher
+thread and so called logging consumers.</p>
+<a class="reference internal image-reference" href="../_images/csdk_logging_system.png"><img alt="../_images/csdk_logging_system.png" class="align-center" src="../_images/csdk_logging_system.png" style="width: 696.0px; height: 457.0px;" /></a>
+<p>The logging messages (text and/or data) created by a SW component are enqueued in the logging message queue. In addition
+to the message itself, meta information like the logging module, the logging zone, the file name and the file line number of
+the message origin are stored. Thereby the logging module indicates the “source” SW component of the message. Possible logging
+modules are for instance <cite>nuance.audio</cite>, <cite>nuance.common</cite> or such the like. The logging zone indicates the “type” of a logging
+message with possible values like <cite>FATAL</cite>, <cite>ERROR</cite>, <cite>WARNING</cite> and others. Both parameters (log modules and log zones) can be used to define a
+logging message filter to determine which kind of messages shall be passed to a specific consumer (e.g. only messages of logging
+zone <cite>ERROR</cite> and <cite>FATAL</cite> and only from logging module <cite>nuance.audio</cite>).</p>
+<p>The primary function of the logging message queue is to decouple the logging call from the actual dispatching and processing of
+the message to avoid negative impacts of logging on the runtime behavior. The logging message dispatcher thread
+takes over the part of dispatching the messages of the logging queue to the dedicated logging consumers. Which message is dispatched
+to which consumer is configurable in the logger Json configuration for each consumer individually.</p>
+<p>Finally the internal logging system uses a logging consumer (abbr. “LC”) approach to realize logging outputs of any
+kind whatsoever (e.g. to a file, to a TCP/IP socket, ..). Each instance of such a logging consumer can be configured in the Json
+configuration of the common component. This allows for instance to set a consumer specific configuration (e.g. a file path for
+a file writer consumer) or filter parameters that allow to determine which kind of messages shall be passed to this consumer.
+This approach offers the possibility
+to define logging consumers and their specifically filtered logging output in a flexible manner.</p>
+<p>The logging system provides the following “built-in” log consumers:</p>
+<ul class="simple">
+<li>file consumer</li>
+<li>console output (stdout/stderr) consumer</li>
+<li>DLT (Diagnostic Log and Trace, logging SW from Genivi alliance) consumer</li>
+<li>TCP/IP socket consumer</li>
+<li>TraceClient consumer</li>
+</ul>
+</div>
+<div class="section" id="initialize-logging">
+<h1><a class="reference internal" href="#initialize-logging">Initialize Logging</a></h1>
+<p>There are no dedicated interface calls needed to initialize the logging subsystem.</p>
+<p>The logger is initialized automatically by the system manager when calling <code class="docutils literal notranslate"><span class="pre">nuance_common_ISystemManager_create</span></code>.
+Therefore it is important to load the loggers configuration also to the configuration object which is used to create the system manager,
+see <a class="reference internal" href="../SDK_Common_UserGuide.html#system-manager"><span class="std std-ref">System Manager</span></a>.</p>
+</div>
+<div class="section" id="general-logging">
+<h1><a class="reference internal" href="#general-logging">General Logging</a></h1>
+<div class="section" id="overview">
+<h2>Overview</h2>
+<p>Logging is an important part in the development of a application.
+It can provide precise information about the execution steps of a program.
+In error conditions the analysis of the logger output is often without
+any alternative to understand the reason of the failure.</p>
+</div>
+<div class="section" id="module-names">
+<h2>Module names</h2>
+<p>The components use different logging module names to identify the origin of log messages.
+Logging module names are organized hierarchically,
+a dot is used as separator between top-level modules and sub-level modules.</p>
+<p>The following module names can be set:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="76%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Module</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>nuance.audio</td>
+<td>Activates log messages for all audio modules</td>
+</tr>
+<tr class="row-odd"><td>nuance.asr5</td>
+<td>Activates log messages for the ASR component</td>
+</tr>
+<tr class="row-even"><td>nuance.cloudservices</td>
+<td>Activates log messages for the cloud services component</td>
+</tr>
+<tr class="row-odd"><td>nuance.common</td>
+<td>Activates log messages for the common component</td>
+</tr>
+<tr class="row-even"><td>nuance.pal</td>
+<td>Activates log messages for all PAL modules</td>
+</tr>
+<tr class="row-odd"><td>nuance.prompter</td>
+<td>Activates log messages for the prompter component</td>
+</tr>
+<tr class="row-even"><td>“”</td>
+<td>empty string value activates log messages for all components</td>
+</tr>
+</tbody>
+</table>
+<p>If a log output (also called “consumer”) is configured for a top-level module
+like <code class="docutils literal notranslate"><span class="pre">nuance.asr5</span></code>, it will also receive the log messages of the sub-modules like
+<code class="docutils literal notranslate"><span class="pre">nuance.asr5.Recognizer</span></code>, <code class="docutils literal notranslate"><span class="pre">nuance.asr.AsrManager</span></code>, …</p>
+</div>
+<div class="section" id="log-zones">
+<h2>Log zones</h2>
+<p>Log zones are used to select a certain type of logger output. Multiple log zones
+can be combined in the logger configuration, e.g. a consumer can set
+<code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;:&quot;LOG_ERROR|LOG_WARNING&quot;</span></code> to receive ERROR as well as WARNING messages.</p>
+<p>The following log zones are defined:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Zone</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>LOG_FATAL</td>
+<td>All events that are a show stopper for the running application</td>
+</tr>
+<tr class="row-odd"><td>LOG_ERROR</td>
+<td>All events that are error conditions but recoverable</td>
+</tr>
+<tr class="row-even"><td>LOG_WARNING</td>
+<td>Information that is useful to check the correct functionality</td>
+</tr>
+<tr class="row-odd"><td>LOG_PERFORMANCE_WARNING</td>
+<td>Information that the system performance is worse than expected</td>
+</tr>
+<tr class="row-even"><td>LOG_CORE_INFO</td>
+<td>Special core information, e.g. threads started/stopped, used files and versions.
+This log zone has a low message volume.</td>
+</tr>
+<tr class="row-odd"><td>LOG_INFO</td>
+<td>More information that is useful to check the correct functionality</td>
+</tr>
+<tr class="row-even"><td>LOG_EXTERNAL_FUNC</td>
+<td>Trace entry and exit of external functions</td>
+</tr>
+<tr class="row-odd"><td>LOG_EXTERNAL_PARAM</td>
+<td>Trace parameters of external functions</td>
+</tr>
+<tr class="row-even"><td>LOG_INTERNAL_FUNC</td>
+<td>Trace entry and exit of internal functions</td>
+</tr>
+<tr class="row-odd"><td>LOG_INTERNAL_PARAM</td>
+<td>Trace parameters of internal functions</td>
+</tr>
+<tr class="row-even"><td>LOG_ALL_TEXT</td>
+<td>LOG_FATAL|LOG_ERROR|LOG_WARNING|LOG_PERFORMANCE_WARNING|LOG_CORE_INFO|LOG_INFO|
+LOG_EXTERNAL_FUNC|LOG_EXTERNAL_PARAM|LOG_INTERNAL_FUNC|LOG_INTERNAL_PARAM</td>
+</tr>
+<tr class="row-odd"><td>LOG_DATA</td>
+<td>Trace binary data of the configured modules</td>
+</tr>
+<tr class="row-even"><td>LOG_TIMING_ANALYSIS</td>
+<td>Log timing of audio chunks for detailed offline analysis.</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the binary data log zone <code class="docutils literal notranslate"><span class="pre">LOG_DATA</span></code> cannot be combined with other log zones.</p>
+</div>
+<div class="section" id="json-configuration">
+<h2>JSON Configuration</h2>
+<p>The logger is configured with a JSON file (with <code class="docutils literal notranslate"><span class="pre">&quot;version&quot;:&quot;Common</span> <span class="pre">1.0&quot;</span></code>).</p>
+<p>For example, the following file configures a logger that will write error and warning log messages to standard output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+<span class="s2">&quot;logger&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;consumers&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;stdout Logger&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;stdout&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;not_modules&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;zones&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_ERROR|LOG_WARNING&quot;</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For details on the JSON format of the logger configuration file see the section <code class="docutils literal notranslate"><span class="pre">ILoggerConfig</span></code>
+in the JSON configuration documentation of the common component.</p>
+</div>
+<div class="section" id="logged-text-content">
+<h2>Logged text content</h2>
+<p>A log message in the output consists of the following fields:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TIMESTAMP</span>           <span class="o">-</span> <span class="n">time</span> <span class="p">(</span><span class="n">resolution</span> <span class="ow">in</span> <span class="n">milliseconds</span><span class="p">)</span> <span class="n">since</span> <span class="n">logger</span> <span class="n">has</span> <span class="n">been</span> <span class="n">started</span>
+<span class="n">ZONE</span>                <span class="o">-</span> <span class="n">log</span> <span class="n">zone</span> <span class="n">of</span> <span class="n">the</span> <span class="n">message</span>
+<span class="n">THREAD</span>              <span class="o">-</span> <span class="n">ID</span> <span class="n">of</span> <span class="n">the</span> <span class="n">thread</span> <span class="n">which</span> <span class="n">generated</span> <span class="n">the</span> <span class="n">log</span> <span class="n">message</span>
+<span class="n">MODULE</span>              <span class="o">-</span> <span class="n">the</span> <span class="n">logging</span> <span class="n">source</span>
+<span class="n">MESSAGE</span>             <span class="o">-</span> <span class="n">the</span> <span class="n">text</span> <span class="n">message</span> <span class="p">(</span><span class="k">with</span> <span class="n">optional</span> <span class="n">file</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">line</span> <span class="n">of</span> <span class="n">code</span> <span class="n">where</span> <span class="n">the</span> <span class="n">text</span> <span class="n">was</span> <span class="n">logged</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TIMESTAMP</span>  <span class="n">ZONE</span>       <span class="n">THREAD</span> <span class="n">MODULE</span>                                   <span class="n">MESSAGE</span>
+<span class="o">=========</span>  <span class="o">====</span>       <span class="o">======</span> <span class="o">======</span>                                   <span class="o">=======</span>
+<span class="mi">00</span><span class="p">:</span><span class="mf">00.000</span>  <span class="n">CORE_INFO</span><span class="p">:</span> <span class="p">[</span><span class="mi">25416</span><span class="p">]</span> <span class="n">nuance</span><span class="o">.</span><span class="n">pal</span><span class="o">.</span><span class="n">THREAD</span>                       <span class="n">name</span><span class="o">=</span><span class="s1">&#39;timerThread&#39;</span>  <span class="nb">id</span><span class="o">=</span><span class="mi">21676</span> <span class="n">runtimePrio</span><span class="o">=</span><span class="mi">0</span> <span class="n">was</span> <span class="n">created</span><span class="o">.</span> <span class="p">[</span><span class="n">starrec_pal_thread</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">608</span><span class="p">]</span>  <span class="p">[</span><span class="mi">181</span><span class="p">]</span>
+<span class="mi">00</span><span class="p">:</span><span class="mf">00.000</span>  <span class="n">EXT_FUNC</span><span class="p">:</span>  <span class="p">[</span><span class="mi">25416</span><span class="p">]</span> <span class="n">nuance</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">IConfiguration</span>            <span class="n">create</span><span class="p">(</span><span class="s1">&#39;..\..\data</span><span class="se">\a</span><span class="s1">sr\config&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="p">[</span><span class="mi">51</span><span class="p">]</span>
+<span class="mi">00</span><span class="p">:</span><span class="mf">00.016</span>  <span class="n">EXT_FUNC</span><span class="p">:</span>  <span class="p">[</span><span class="mi">25416</span><span class="p">]</span> <span class="n">nuance</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">SystemManager</span>             <span class="n">create</span><span class="p">()</span> <span class="o">-&gt;</span>  <span class="p">[</span><span class="mi">154</span><span class="p">]</span>
+<span class="mi">00</span><span class="p">:</span><span class="mf">00.016</span>  <span class="n">CORE_INFO</span><span class="p">:</span> <span class="p">[</span><span class="mi">25416</span><span class="p">]</span> <span class="n">nuance</span><span class="o">.</span><span class="n">pal</span><span class="o">.</span><span class="n">THREAD</span>                       <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Logger&#39;</span>  <span class="nb">id</span><span class="o">=</span><span class="mi">9540</span> <span class="n">runtimePrio</span><span class="o">=</span><span class="mi">0</span> <span class="n">was</span> <span class="n">created</span><span class="o">.</span> <span class="p">[</span><span class="n">starrec_pal_thread</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">608</span><span class="p">]</span>  <span class="p">[</span><span class="mi">181</span><span class="p">]</span>
+<span class="mi">00</span><span class="p">:</span><span class="mf">00.032</span>  <span class="n">CORE_INFO</span><span class="p">:</span> <span class="p">[</span><span class="mi">25416</span><span class="p">]</span> <span class="n">nuance</span><span class="o">.</span><span class="n">pal</span><span class="o">.</span><span class="n">THREAD</span>                       <span class="n">name</span><span class="o">=</span><span class="s1">&#39;AUDIO_MAIN&#39;</span>  <span class="nb">id</span><span class="o">=</span><span class="mi">21108</span> <span class="n">runtimePrio</span><span class="o">=</span><span class="mi">0</span> <span class="n">was</span> <span class="n">created</span><span class="o">.</span> <span class="p">[</span><span class="n">starrec_pal_thread</span><span class="o">.</span><span class="n">c</span><span class="p">:</span><span class="mi">608</span><span class="p">]</span>  <span class="p">[</span><span class="mi">181</span><span class="p">]</span>
+<span class="mi">00</span><span class="p">:</span><span class="mf">00.032</span>  <span class="n">EXT_FUNC</span><span class="p">:</span>  <span class="p">[</span><span class="mi">25416</span><span class="p">]</span> <span class="n">nuance</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">SystemManager</span>             <span class="n">create</span><span class="p">()</span> <span class="o">&lt;-</span>  <span class="p">[</span><span class="mi">154</span><span class="p">]</span>
+<span class="mi">00</span><span class="p">:</span><span class="mf">00.032</span>  <span class="n">EXT_FUNC</span><span class="p">:</span>  <span class="p">[</span><span class="mi">25416</span><span class="p">]</span> <span class="n">nuance</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">AudioManager</span>               <span class="n">create</span><span class="p">()</span> <span class="o">-&gt;</span>  <span class="p">[</span><span class="mi">489</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="buffer-overrun">
+<h2><a class="reference internal" href="#buffer-overrun">Buffer overrun</a></h2>
+<p>To decouple the components which create log messages from the logging consumers,
+the components push their log messages into a buffer (logger message queue). A dedicated logger
+thread takes the messages out of this buffer and passes them to the consumers.
+The size of the buffers can be configured with the JSON configuration parameters
+<code class="docutils literal notranslate"><span class="pre">text_buffer_entries</span></code> and <code class="docutils literal notranslate"><span class="pre">data_buffer_size_per_channel</span></code>. If log messages
+are created faster than they are processed by the consumers (e.g. due to slow
+file system when writing a log file, or slow standard output connection), a
+buffer overrun can happen.</p>
+<p>If a data logging buffer is full when the function logData() is called then the following
+text message is logged:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>00:03.0596 ERROR:     [6088] nuance.common.Logger           Log data buffer overrun! Module: nuance.prompter.PrompterAudioSource.prompter. Configured max. size: 1024
+</pre></div>
+</div>
+<p>To reduce the amount of buffer overruns with data logging it is recommended to set the JSON configuration
+parameter <code class="docutils literal notranslate"><span class="pre">&quot;data_buffer_size_per_channel&quot;</span></code> to a rather high value, e.g.  <code class="docutils literal notranslate"><span class="pre">&quot;data_buffer_size_per_channel&quot;:</span> <span class="pre">500000</span></code>.</p>
+<p>If the text logging buffer is full, the software checks if the last logged
+message contains already the info that the logging buffer is full. If not, the
+oldest logged message on the buffer is removed and the following text
+message is logged:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>00:02.0898 ERROR:     [8308] nuance.common.Logger           Log text buffer overrun! Check &#39;text_buffer_entries&#39; property in the configuration! Currently: 512
+</pre></div>
+</div>
+<p>After logging that message, the text buffer is blocked from receiving
+additional logging messages, i.e. incoming messages are dropped as long as
+no space is available in the buffer.</p>
+</div>
+</div>
+<div class="section" id="id1">
+<h1><a class="reference external" href="../../audio/SDK_Audio_UserGuide.html#audio-logging">Audio Logging</a></h1>
+<p>The logging of audio data is described in the <a class="reference external" href="../../audio/SDK_Audio_UserGuide.html#audio-logging">Audio Logging</a> chapter of the <a class="reference external" href="../../audio/SDK_Audio_UserGuide.html">Audio User’s Guide</a>.</p>
+</div>
+<div class="section" id="use-logging">
+<h1><a class="reference internal" href="#use-logging">Use Logging</a></h1>
+<p>This chapter describes how an application can connect to the SDK’s logging subsystem either to write own log messages to it,
+or to receive the log messages from it and handle them as desired.
+Additionally the configuration of built-in log consumers can be modified if desired.</p>
+<div class="section" id="sending">
+<h2><a class="reference internal" href="#sending">Sending</a></h2>
+<p>An application can send messages and data to the logging subsystem as follows:</p>
+<p>Once the logging subsystem is initialized (see <a class="reference internal" href="#initialize-logging">Initialize logging</a>), the application can obtain a handle via the method <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_getInstance</span></code>.</p>
+<p>Use this handle to send own messages to the logging subsystem via <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_logText</span></code> or binary data via <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_logData</span></code>.</p>
+<p>For more details about the parameters, please have a look at the interface documentation of the mentioned methods.</p>
+</div>
+<div class="section" id="receiving">
+<h2><a class="reference internal" href="#receiving">Receiving</a></h2>
+<p>An application can receive messages and data from the logging subsystem as follows:</p>
+<p>Once the logging subsystem is initialized (see <a class="reference internal" href="#initialize-logging">Initialize logging</a>), the application can obtain a handle via the method <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_getInstance</span></code>.</p>
+<p>Use this handle to add an own log consumer via <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_addConsumer</span></code>.</p>
+<p>Optionally this log consumer may already be configured via a JSON file. The connection is done by the consumerName.
+On top of that the consumers configuration can be set or updated by calling <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_configureConsumer</span></code>.
+Here also the consumerName is used to address the desired log consumer.</p>
+<p>Once the log consumer is no longer needed it has to be removed from the logging subsystem by calling <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_removeConsumer</span></code>.</p>
+<p>For more details about the parameters, please have a look at the interface documentation of the mentioned methods.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In addition to the approach described above the SDK supports to plug in customer consumer implementations provided as a shared library.
+If this option is required from your project please contact Cerence for further information.</p>
+</div>
+</div>
+<div class="section" id="modifying">
+<h2><a class="reference internal" href="#modifying">Modifying</a></h2>
+<p>An application can modify at runtime the configuration of any log consumer known at the logging subsystem.</p>
+<p>For instance: Log consumers configured in the JSON logging to file are automatically known at the logging subsystem.</p>
+<p>Once the logging subsystem is initialized (see <a class="reference internal" href="#initialize-logging">Initialize logging</a>) it can be accessed as follows.</p>
+<p>Obtain a handle via the method <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_getInstance</span></code>.</p>
+<p>The configuration of any present log consumer can be modified by calling <code class="docutils literal notranslate"><span class="pre">nuance_common_ILogging_configureConsumer</span></code>.
+The consumerName is used to address the desired log consumer.</p>
+<p>For more details about the parameters, please have a look at the interface documentation of the mentioned methods.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Common_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Common_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Logging System Overview</a></li>
+<li><a class="reference internal" href="#initialize-logging">Initialize Logging</a></li>
+<li><a class="reference internal" href="#general-logging">General Logging</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#module-names">Module names</a></li>
+<li><a class="reference internal" href="#log-zones">Log zones</a></li>
+<li><a class="reference internal" href="#json-configuration">JSON Configuration</a></li>
+<li><a class="reference internal" href="#logged-text-content">Logged text content</a></li>
+<li><a class="reference internal" href="#buffer-overrun">Buffer overrun</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">Audio Logging</a></li>
+<li><a class="reference internal" href="#use-logging">Use Logging</a><ul>
+<li><a class="reference internal" href="#sending">Sending</a></li>
+<li><a class="reference internal" href="#receiving">Receiving</a></li>
+<li><a class="reference internal" href="#modifying">Modifying</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Common_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../SDK_Common_UserGuide.html" title="previous chapter">CERENCE SDK - COMMON USER’S GUIDE</a></li>
+      <li>Next: <a href="csdk_threads.html" title="next chapter">SDK Threads</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/logging_intro.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,1004 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Dynamic Content Consumer Configuration</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="dynamic-content-consumer-configuration">
+<span id="index-0"></span><span id="id1"></span><h1>Dynamic Content Consumer Configuration</h1>
+<div class="section" id="overview">
+<h2>OVERVIEW</h2>
+<p>Dynamic Content Consumers (DCCs) are used to process lists of dynamic data.
+For example, a phone book or music collection would be such a list.
+Depending on the type of dynamic content consumer, they do different kinds
+of processing.
+In this document, we show the available types of dynamic content consumers
+and show their respective configuration options. We also show how to
+connect consumers to applications.</p>
+</div>
+<div class="section" id="common-options">
+<h2>COMMON OPTIONS</h2>
+<p>Every dynamic content consumer is built up following this schema:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;type&gt;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;content name&quot;</span>
+      <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;typeName&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&lt;typeName&gt;&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="o">...</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>This is the name of this content consumer. It is used when creating it from the API.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">content</span></code></dt>
+<dd><p class="first">This is a list of fields that are part of this consumer.</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">type</span></code></dt>
+<dd>The type of this content field. Can either be <code class="docutils literal notranslate"><span class="pre">string</span></code>, <code class="docutils literal notranslate"><span class="pre">string_list</span></code>, <code class="docutils literal notranslate"><span class="pre">string_list_list</span></code>, <code class="docutils literal notranslate"><span class="pre">integer</span></code> (32 bit integer), <code class="docutils literal notranslate"><span class="pre">integer64</span></code> (64 bit integer), <code class="docutils literal notranslate"><span class="pre">base64</span></code> or <code class="docutils literal notranslate"><span class="pre">json</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>The name of this content field.</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">type</span></code></dt>
+<dd>The type of this consumer.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;typeName&gt;</span></code></dt>
+<dd>Holds the type specific configuration of the dynamic content consumer. Can either be <code class="docutils literal notranslate"><span class="pre">list</span></code>, or <code class="docutils literal notranslate"><span class="pre">slm_fm</span></code>.</dd>
+</dl>
+</div>
+<div class="section" id="list-dynamic-content-consumer">
+<span id="listdcc"></span><h2>LIST DYNAMIC CONTENT CONSUMER</h2>
+<p>list dynamic content consumers are used to compile lists of data into
+contexts usable by the on-board recognizer. Processing happens on the
+embedded system itself and no data is transferred to an off-board system.</p>
+<div class="section" id="configuration-options">
+<h3>Configuration Options</h3>
+<p>The following shows a sample configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;VAD_NAMES&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;first_name&quot;</span>
+      <span class="p">},{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;last_name&quot;</span>
+      <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;list&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;lexicon&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;uses&quot;</span> <span class="p">:</span> <span class="s2">&quot;ENU_ML_PRON_CHAIN&quot;</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;vad_firstname_lastname&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod4_900_enu_gen_car_f16_v2_0_0.dat&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">[[{</span>
+                <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;add_tag&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;first_name&quot;</span>
+                <span class="p">}</span>
+              <span class="p">},{</span>
+                <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;filler&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;filler&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;value&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;of&quot;</span><span class="p">,</span> <span class="s2">&quot;in the house of&quot;</span>
+                  <span class="p">],</span>
+                  <span class="s2">&quot;optional&quot;</span> <span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+                <span class="p">}</span>
+              <span class="p">},{</span>
+                <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;tag_name&quot;</span><span class="p">:</span> <span class="s2">&quot;some_tag_name&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;last_name&quot;</span>
+                <span class="p">}</span>
+              <span class="p">}</span>
+            <span class="p">]</span>
+          <span class="p">]</span>
+        <span class="p">},{</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;vad_firstname&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod4_900_enu_gen_car_f16_v2_0_0.dat&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">[[{</span>
+                <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;tag_name&quot;</span><span class="p">:</span> <span class="s2">&quot;some_tag_name&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;first_name&quot;</span>
+                <span class="p">}</span>
+              <span class="p">}</span>
+            <span class="p">]</span>
+          <span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">list</span></code> object contains the following keys.</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">lexicon</span></code></dt>
+<dd>This specifies the lexicon to be used. Here, we reference a lexicon specified in another file.
+The details of the lexicon specification are given in the <a class="reference external" href="./lexicon.html">lexicon configuration documentation</a>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">search</span></code></dt>
+<dd><p class="first">The contexts specify in what way data from the content list is combined. It does so
+by specifying contexts with references to the content fields.</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>The name of the search. This has to be unique inside this specific DCC.
+It is used as reference by the applications to access the search</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tag_name</span></code></dt>
+<dd>A tag to use for all entries for this search. If the property <code class="docutils literal notranslate"><span class="pre">tag_name</span></code> is specified in <code class="docutils literal notranslate"><span class="pre">search</span></code> and <code class="docutils literal notranslate"><span class="pre">content</span></code>,
+the priority goes to the one at the <code class="docutils literal notranslate"><span class="pre">search</span></code> level. An exception
+is made for the leading and trailing <code class="docutils literal notranslate"><span class="pre">content</span></code> of a link arrow, in this case the priority will goes to the “tag_name” from
+xothe <code class="docutils literal notranslate"><span class="pre">content</span></code> block. This exception was introduced mainly to accomodate the title entry from RefDesign.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">acmod</span></code></dt>
+<dd>The acoustic model to use for generating this search.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">link</span></code></dt>
+<dd><p class="first">Field links to the content list.</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">type</span></code></dt>
+<dd>can be <code class="docutils literal notranslate"><span class="pre">content</span></code> or <code class="docutils literal notranslate"><span class="pre">filler</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">content</span></code></dt>
+<dd>gives the <code class="docutils literal notranslate"><span class="pre">clc_category</span></code> to use for the lookup and the <code class="docutils literal notranslate"><span class="pre">name</span></code> of the referenced field, the key “tag_name”
+gives you the option to put the content of the link inside a tag. Tags are visible in the recognition result. They appear in the same
+way as tags/slot in a compiled bnf grammar.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">filler</span></code></dt>
+<dd>gives a list of possibly <code class="docutils literal notranslate"><span class="pre">optional</span></code> filler words (<code class="docutils literal notranslate"><span class="pre">value</span></code>) that can be uttered between content words, as well as the <code class="docutils literal notranslate"><span class="pre">clc_category</span></code></dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+<div class="section" id="phonetic-entries">
+<h3>Phonetic entries</h3>
+<p>In order to directly enter phonetic transcriptions for terminals the list DCC supports the following mechanism:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;terminal name&gt;_Ortho&quot;</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;terminal name&gt;_Pho&quot;</span>
+  <span class="p">}</span>
+<span class="p">],</span>
+</pre></div>
+</div>
+<p>When a content of type “string” is named with the extension “_Ortho” and a content of type “string_list” is named with the extension “_Pho”,
+the list DCC takes the phonetic transcriptions for the orthography from the given string list of the corresponding terminal name.
+If no corresponding phoneme content is given the phonetic transcriptions are looked up in the lexicon.</p>
+<p>Note that this naming convention is compatible with the COP file format, so COP files can directly be used as input for phonetic transcriptions.</p>
+<p>It is possible to add a content field of type “integer” with the name “Entry_ID” to specify IDs for terminals:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Entry_ID&quot;</span>
+  <span class="p">}</span>
+<span class="p">],</span>
+</pre></div>
+</div>
+<p>In addition, the list DCC also supports per-terminal IDs. When enrolling terminals from content fields of type “string” that end in “_Ortho”
+(e.g. LastName_Ortho), the system will look for similar fields of type “integer” ending in “_ID” (e.g. LastName_ID). If any is found in the content list,
+the numbers will be associated and displayed in the recognition result as part of the _userID.lo32 and _userID.hi32 JSON fields:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LastName_ID&quot;</span>
+  <span class="p">},{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span>
+  <span class="p">},{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;FirstName_ID&quot;</span>
+  <span class="p">}</span>
+<span class="p">],</span>
+</pre></div>
+</div>
+<p>If no such fields are found, the system will continue to use the first integer field to continue to provide global row IDs
+(attached to the last or only terminal of the entry).</p>
+<p>When linking to such contents in the DCC configuration, the postfix should be omitted from the link name as demonstrated below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">[[{</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;FirstName&quot;</span>
+      <span class="p">}</span>
+    <span class="p">},{</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LastName&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Note that it is not mandatory for the content to contain the orthography columns, however in that case either an entry ID or per-terminal IDs hast to be provided. Otherwise, the configuration will be considered as invalid.</p>
+</div>
+<div class="section" id="transcription-identifier-entries">
+<h3>Transcription Identifier entries</h3>
+<p>For using phonetic transcriptions from identifier dictionaries via transcription identifier the list DCC supports the following mechanism:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;terminal name&gt;_Ortho&quot;</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;integer64&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;terminal name&gt;_TransID&quot;</span>
+  <span class="p">}</span>
+<span class="p">],</span>
+</pre></div>
+</div>
+<p>When a content of type “string” is named with the extension “_Ortho” and a content of type “integer64” is named with the extension “_TransID”,
+the list DCC takes the phonetic transcriptions for the orthography from any given identifier dictionary.
+More information about the identifier dictionary can be found in the <a class="reference external" href="./lexicon.html">lexicon configuration documentation</a>.
+If no corresponding phoneme content is given the phonetic transcriptions are looked up in the lexicon.</p>
+<p>Note that this naming convention is compatible with the COP file format, so COP files can directly be used as input for transcription identifiers.</p>
+</div>
+<div class="section" id="connecting-to-an-application">
+<h3>Connecting to an Application</h3>
+<p>To connect these dynamically generated contexts to an application, we simply define a dynamic context entry and specify the
+DCC name and the context name we want to use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;application&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;input&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;UC_A1M&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;asr&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+            <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Gate_BNF&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;filename&quot;</span> <span class="p">:</span> <span class="s2">&quot;Gate_BNF.fcf&quot;</span>
+            <span class="p">}</span>
+          <span class="p">},</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;VAD_SLM&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;filename&quot;</span> <span class="p">:</span> <span class="s2">&quot;VAD_SLM.fcf&quot;</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;use_highest_guest_accuracy_on_host&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;update_all_computed_params&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;slot_filling&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+                <span class="s2">&quot;slot&quot;</span> <span class="p">:</span> <span class="s2">&quot;DragonDriveDemoSlm#firstLastNameList&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;search&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;dynamic&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="s2">&quot;VAD_NAMES&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;vad_firstname_lastname&quot;</span>
+                  <span class="p">}</span>
+                <span class="p">}</span>
+              <span class="p">},</span> <span class="p">{</span>
+                <span class="s2">&quot;slot&quot;</span> <span class="p">:</span> <span class="s2">&quot;DragonDriveDemoSlm#firstNameList&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;search&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;dynamic&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="s2">&quot;VAD_NAMES&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;vad_firstname&quot;</span>
+                  <span class="p">}</span>
+                <span class="p">}</span>
+              <span class="p">},</span>
+              <span class="o">...</span>
+            <span class="p">]</span>
+          <span class="p">},</span>
+          <span class="o">...</span>
+        <span class="p">],</span>
+        <span class="o">...</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="slm-fm-dynamic-content-consumer">
+<span id="slmfmdcc"></span><h2>SLM-FM DYNAMIC CONTENT CONSUMER</h2>
+<p>Slm-FM match dynamic content consumer is used to compile lists of data into
+slm context, or fuzzy match contexts, usable by the on-board recognizer. Processing happens on the
+embedded system itself and no data is transferred to an off-board system.
+In other terms, <code class="docutils literal notranslate"><span class="pre">SLM-FM</span> <span class="pre">DYNAMIC</span> <span class="pre">CONTENT</span> <span class="pre">CONSUMER</span></code> is similar to <code class="docutils literal notranslate"><span class="pre">LIST</span> <span class="pre">DYNAMIC</span> <span class="pre">CONTENT</span> <span class="pre">CONSUMER</span></code>
+except the produced context is slm context, or fuzzy match context. It is important to note that for now, the contexts are
+always archived on disk.</p>
+<p>Please note that since the created fuzzy match context consists of normalized strings, the result from this fuzzy match context will be normalized too.
+If “start_rule” is configured, then there will be no warning message about setting the start rule name in the logs. Otherwise, a warning message will be presented.</p>
+<div class="section" id="id2">
+<h3>Configuration Options</h3>
+<p>The following shows a sample configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dynamic_content_consumer&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MUSIC_SONGS&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Artist_First_Ortho&quot;</span>
+    <span class="p">},{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Artist_Last_Ortho&quot;</span>
+    <span class="p">},{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ID&quot;</span>
+    <span class="p">},{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;VALUE&quot;</span>
+    <span class="p">},{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;some_meta_data&quot;</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;slm_fm&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;slm_fm&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;lexicon&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;ENU_ML_PRON_CHAIN&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;fm_search&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;internal_music_album&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;start_rule&quot;</span><span class="p">:</span> <span class="s2">&quot;fm_rule&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;acmod&quot;</span><span class="p">:</span> <span class="s2">&quot;acmod4_900_enu_gen_car_f16_v2_0_0.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;extra_word&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;extra_word_type&gt;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&lt;extra_word_type&gt;&quot;</span><span class="p">:</span> <span class="o">...</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;column&quot;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;entry_id&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;integer&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;activatable&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;accumulate_result&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ID&quot;</span>
+        <span class="p">}]</span>
+      <span class="p">},{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;integer&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;activatable&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;accumulate_result&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;array&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;VALUE&quot;</span>
+        <span class="p">}]</span>
+      <span class="p">},{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;artist&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;string&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;speakable&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;clc_category&quot;</span><span class="p">:</span> <span class="s2">&quot;artist&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;activatable&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;accumulate_result&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;array&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Artist_First_Ortho&quot;</span>
+        <span class="p">},{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Artist_Last_Ortho&quot;</span>
+        <span class="p">}]</span>
+      <span class="p">},{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;meta_data&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some_meta_data&quot;</span>
+        <span class="p">}]</span>
+      <span class="p">}]</span>
+    <span class="p">}],</span>
+    <span class="s2">&quot;slm_search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_artist.fcf&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_0.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ARTIST_ORTHO&quot;</span>
+          <span class="s2">&quot;tag_name&quot;</span><span class="p">:</span> <span class="s2">&quot;some_tag_name&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_title.fcf&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_0.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;TITLE_ORTHO&quot;</span>
+          <span class="s2">&quot;tag_name&quot;</span><span class="p">:</span> <span class="s2">&quot;some_tag_name&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_album.fcf&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_0.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;filler&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;filler&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;optional&quot;</span> <span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;value&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;on&quot;</span><span class="p">,</span> <span class="s2">&quot;from&quot;</span><span class="p">,</span> <span class="s2">&quot;using&quot;</span><span class="p">,</span> <span class="s2">&quot;my&quot;</span><span class="p">,</span> <span class="s2">&quot;on my&quot;</span><span class="p">,</span> <span class="s2">&quot;from my&quot;</span><span class="p">,</span> <span class="s2">&quot;using my&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_composer.fcf&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_0.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;COMPOSER_ORTHO&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_genre.fcf&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_0.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;GENRE_ORTHO&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_playlist.fcf&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_0.dat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;PLAYLIST_ORTHO&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">fm_search</span></code> object contains all keys in <code class="docutils literal notranslate"><span class="pre">LIST</span> <span class="pre">DYNAMIC</span> <span class="pre">CONTENT</span> <span class="pre">CONSUMER</span></code>’s <code class="docutils literal notranslate"><span class="pre">list</span></code> object, the
+difference consist of the <code class="docutils literal notranslate"><span class="pre">context</span></code> object. The fuzzy match <code class="docutils literal notranslate"><span class="pre">context</span></code> contains the following extra keys:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">extra_word</span></code></dt>
+<dd><p class="first">This object is used to add extra words to the context. It has the following keys:</p>
+<p><code class="docutils literal notranslate"><span class="pre">type</span></code> : This is a mandatory key specifying how extra words will be added. It can be <code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">ewf</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">list</span></code> : words are passed in the same json config file. ex.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;extra_word&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;list&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;MUSIC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;constraints&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;next&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;domain&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;nlu&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;orthography&quot;</span><span class="p">:</span> <span class="s2">&quot;play&quot;</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">ewf</span></code> : words are passed through an encoded file format. ex.:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;extra_word&quot;</span> <span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;ewf&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;ewf&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;extra_words_music.ewf&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">column</span></code></dt>
+<dd><p class="first">This specifies the fuzzy match context column. It has the following keys:</p>
+<p><code class="docutils literal notranslate"><span class="pre">type</span></code> : can be <code class="docutils literal notranslate"><span class="pre">integer</span></code> or <code class="docutils literal notranslate"><span class="pre">string</span></code>. This is a mandatory key and only one of the following type is allowed at a time:</p>
+<blockquote class="last">
+<div><p><code class="docutils literal notranslate"><span class="pre">integer</span></code> : has the following options:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">activatable</span></code> : optional key indicating whether the column is activatable or not. The default falue is false.</p>
+<p><code class="docutils literal notranslate"><span class="pre">accumulate_result</span></code>: optional key indicating whether to accumulate result or not. The default value is false.</p>
+<p><code class="docutils literal notranslate"><span class="pre">array</span></code>: Indicate if the column is an array. The default value is false.</p>
+<p><code class="docutils literal notranslate"><span class="pre">unique_values</span></code>: Optional key indicating that the values in the column are unique.  This is useful for the engine to know how to best create the activation information.
+Even if the flag is set, there is no check for the uniqueness of the values of that column.
+If the column is used for activation, only one instance of the value will be used in case there are duplicated values.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">string</span></code> : has the following options:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">speakable</span></code> : this block is specific to speakable column and it is optional to a <code class="docutils literal notranslate"><span class="pre">string</span></code> type.</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">clc_category</span></code>: mandatory key indicating the clc category, (ex. artist).</p>
+<p><code class="docutils literal notranslate"><span class="pre">activatable</span></code> : optional key indicating whether the column is activatable or not. The default falue is false.</p>
+<p><code class="docutils literal notranslate"><span class="pre">accumulate_result</span></code>: optional key indicating whether to accumulate result or not. The default value is false.</p>
+<p><code class="docutils literal notranslate"><span class="pre">array</span></code>: Indicate if the column is an array. The default value is false.</p>
+</div></blockquote>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<p>In addition, the <code class="docutils literal notranslate"><span class="pre">link</span></code> key in the <code class="docutils literal notranslate"><span class="pre">column</span></code> object optionally supports an array of objects, to enable the combination of multiple content inputs.
+If a link array containing more than one content object is used, all content objects must be of type <code class="docutils literal notranslate"><span class="pre">string</span></code>.
+In this case, the values will be concatenated in order (separated by a whitespace) and then treated as a single column. Further, any related “_Pho” content will be ignored.
+If such an entry is to be treated as a single terminal, the <code class="docutils literal notranslate"><span class="pre">split</span></code> field must be set to false. Otherwise, default splitting will be applied.</p>
+<p>Note that if a place holder term whose phonetic transcription is defined in a dictionary (e.g. SpeechContactRelation_Spouse) is needed to be used as a value for a column of an entry, this term can only be used alone and cannot be surrounded by other terms.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">slm_search</span></code> object contains all keys in <code class="docutils literal notranslate"><span class="pre">LIST</span> <span class="pre">DYNAMIC</span> <span class="pre">CONTENT</span> <span class="pre">CONSUMER</span></code>’s <code class="docutils literal notranslate"><span class="pre">list</span></code> object, the
+difference consist of the <code class="docutils literal notranslate"><span class="pre">context</span></code> object. The fuzzy match <code class="docutils literal notranslate"><span class="pre">context</span></code> contains the following extra keys:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">link</span></code></dt>
+<dd><p class="first">This specifies a list of content for dynamic content consumer context. It has the following keys:</p>
+<p><code class="docutils literal notranslate"><span class="pre">type</span></code> : can be <code class="docutils literal notranslate"><span class="pre">content</span></code> or <code class="docutils literal notranslate"><span class="pre">filler</span></code>. This is a mandatory key determine the one of below keys existence:</p>
+<p><code class="docutils literal notranslate"><span class="pre">content</span></code> : Required if and only if “type”: “content”, has the following keys:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">name</span></code> : The name of the referenced field.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clc_category</span></code> : The Clc category to use for the lookup.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tag_name</span></code> : tag name to add around the content of the link. Set this key if you want a specific tag to be added around the content of the link. These tags appear in the recognition result in the same way as other tags/slots (e.g. !tag(..) statement in bnf grammar)</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">filler</span></code> :  Required if and only if “type”: “filler”, has the following keys:</p>
+<blockquote class="last">
+<div><p><code class="docutils literal notranslate"><span class="pre">clc_category</span></code> : The Clc category to use for the lookup.</p>
+<p><code class="docutils literal notranslate"><span class="pre">optional</span></code> : whether or not using optional filler words.</p>
+<p><code class="docutils literal notranslate"><span class="pre">value</span></code> : a list of possibly “optional” filler words.</p>
+</div></blockquote>
+</dd>
+</dl>
+</div>
+<div class="section" id="id3">
+<h3>Connecting to an application</h3>
+<p>Similar to  <code class="docutils literal notranslate"><span class="pre">LIST</span> <span class="pre">DYNAMIC</span> <span class="pre">CONTENT</span> <span class="pre">CONSUMER</span></code>.</p>
+</div>
+<div class="section" id="bit-ids">
+<h3>64 bit IDs</h3>
+<p>It is possible to define ID columns as 64 bit integer by using <code class="docutils literal notranslate"><span class="pre">base64</span></code> or <code class="docutils literal notranslate"><span class="pre">integer64</span></code> type as the content type. Column type remains as <code class="docutils literal notranslate"><span class="pre">integer</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;base64&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;city_id&quot;</span>
+<span class="p">}</span>
+
+<span class="s2">&quot;column&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;city_id&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;integer&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;activatable&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;accumulate_result&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;city_id&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The provided values should be encoded in “base64” or “integer64”.</p>
+<p>Remark: The name “entry_id” is a reserved name and cannot be used as 64 bit integer field name (it can only be 32 bit integer).
+However, users are allowed to define their own 64 bit integer fields to use as entry ids by using a different name.</p>
+</div>
+<div class="section" id="id4">
+<h3>Phonetic entries</h3>
+<p>In order to directly enter phonetic transcriptions for terminals the fuzzy match DCC supports the following mechanism:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;terminal name 1&gt;_Ortho&quot;</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;terminal name 1&gt;_Pho&quot;</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;terminal name 2&gt;_Ortho&quot;</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string_list_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;terminal name 2&gt;_Pho&quot;</span>
+  <span class="p">}</span>
+<span class="p">],</span>
+</pre></div>
+</div>
+<p>When a “name” of type “string” has the extension “_Ortho” and a “name” of type “string_list” has the extension “_Pho”,
+the Fuzzy Match DCC takes the phonetic transcriptions for the orthography from the given string list of the corresponding terminal name.
+If no corresponding phoneme content is given the phonetic transcriptions are looked up in the lexicon.</p>
+<p>The above applies likewise to combinations of type “string_list” for the orthographies and type “string_list_list” for the corresponding phonetic transcriptions.</p>
+<p>Remark: This naming convention is compatible with the COP file format.
+So COP files can directly be used as input for phonetic transcriptions.
+Example of phonetic entry via COP file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#ECO V1.2 UTF-8;</span>
+
+<span class="c1">#ECOScheme COP1 V1.6</span>
+<span class="c1">#EDBDatabaseID NBT_AddressBook_v_1_0</span>
+<span class="c1">#EDBTableUpdateID AddressBookTable_20100708_0501</span>
+<span class="c1">#EDBTableUpdateMode GivenInColumn</span>
+<span class="c1">#EDBTableUpdateType FullUpdate</span>
+
+<span class="c1"># Columns:</span>
+<span class="c1">#Column1 Entry_ID</span>
+<span class="c1">#Column2 EDBTableUpdateMode</span>
+<span class="c1">#Column3 Application_Ortho</span>
+<span class="c1">#Column4 FirstName_Ortho</span>
+<span class="c1">#Column5 FirstName_Pho</span>
+<span class="c1">#Column6 LastName_Ortho</span>
+<span class="c1">#Column7 LastName_Pho</span>
+
+<span class="c1">#Format(Entry_ID) Ident</span>
+<span class="c1">#NumIDFormat(Entry_ID) Decimal</span>
+<span class="c1">#NumIDBinLength(Entry_ID) 64</span>
+
+<span class="c1">#Format(EDBTableUpdateMode) Ident</span>
+
+<span class="c1">#SplitCharSequence(FirstName_Ortho) &quot;\\;&quot;</span>
+
+
+<span class="mi">1</span> <span class="p">;</span> <span class="n">a</span><span class="p">;</span>  <span class="s2">&quot;VAD&quot;</span><span class="p">;</span> <span class="s2">&quot;Heather</span><span class="se">\\</span><span class="s2">;Jane&quot;</span><span class="p">;</span> <span class="s2">&quot;&#39;hE.D$R+*#&#39;d&amp;Ze&amp;In &#39;Z@%~&quot;</span><span class="p">;</span> <span class="s2">&quot;Morris&quot;</span> <span class="p">;</span> <span class="s2">&quot;&#39;mO.R+Is &#39;mA.R+Is$&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="remote-dynamic-content-consumer">
+<h2>REMOTE DYNAMIC CONTENT CONSUMER</h2>
+<p>Remote dynamic content consumers are used to feed data to off-board
+systems. This is in particular interesting if, for instance, the local
+phone book needs to be made available to an off-board system, such
+that the names from that phone book can be used in off-board recognition
+or dialogs.</p>
+<p>Please note that it is not possible to define two dynamic content consumers in parallel.</p>
+<div class="section" id="options">
+<h3>Options</h3>
+<p>The following shows an example of a remote dynamic content consumer:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CONTACTS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;first_name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+      <span class="p">},</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;additional_info&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;json&quot;</span>
+      <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;remote&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;remote&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;remote lm query&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;command&quot;</span> <span class="p">:</span> <span class="s2">&quot;DRAGON_NLU_DATA_UPLOAD_CMD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;connection_info&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;uses&quot;</span> <span class="p">:</span> <span class="s2">&quot;DRAGON_CONNECTION&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;credentials&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;uses&quot;</span> <span class="p">:</span> <span class="s2">&quot;DRAGON_host&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">remote</span></code> object contains the following keys.</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">query</span></code></dt>
+<dd><p class="first">This object represents a query to a remote service.</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>Name of this query (for internal use only)</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">command</span></code></dt>
+<dd>The command to execute</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">connection_info</span></code></dt>
+<dd>The connection info object to use. Connection info is a plain named json object as described in the
+<cite>verbatim json objects documentation</cite>.</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">credentials</span></code></dt>
+<dd>The credentials to use. Credentials are plain named json object as well.</dd>
+</dl>
+</div>
+<div class="section" id="id5">
+<h3>Connecting to an application</h3>
+<p>Remote dynamic content consumers are not connected to application directly.
+Rather, they can be used to upload data to a specific server prior to executing an application that
+uses this server afterwards.</p>
+</div>
+</div>
+<div class="section" id="bag-of-words-dynamic-content-consumer">
+<h2>BAG OF WORDS DYNAMIC CONTENT CONSUMER</h2>
+<p>The bag of words dynamic content consumer implements the bag of words grammar modeling.
+The words of each added sentence are put into one BNF terminal disregarding any order.</p>
+<div class="section" id="id6">
+<h3>Configuration Options</h3>
+<p>The following shows the configuration for the DCC type bag_of_words:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;bag_of_words&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;lexicon&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="o">&lt;</span><span class="n">lexicon</span> <span class="n">configuration</span><span class="o">&gt;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;context name&gt;&quot;</span>
+    <span class="s2">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;acousic model filename&gt;&quot;</span><span class="p">,</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">bag_of_words</span></code> object contains the following keys:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">lexicon</span></code></dt>
+<dd>The lexicon used to lookup the word transcriptions.
+Details of the lexicon specification can be found in <a class="reference external" href="./lexicon.html">lexicon configuration documentation</a>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">search</span></code></dt>
+<dd>The context configuration determines the name and the acoustic model of the generated context.</dd>
+</dl>
+</div>
+<div class="section" id="bag-of-words-grammar">
+<h3>Bag Of Words grammar</h3>
+<p>A bag of words content value consists of a sentence and can contain a user ID.
+When a user ID is available it is associated to each string of the sentence in the grammar.
+Otherwise the grammar will not contain any ID.</p>
+<p>The following content value input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">;</span> <span class="mi">1</span><span class="p">;</span> <span class="s2">&quot;&lt;string 11&gt; &lt;string 12&gt; &lt;string 13&gt; &lt;...&gt;&quot;</span> <span class="p">;</span>
+<span class="n">a</span><span class="p">;</span> <span class="mi">2</span><span class="p">;</span> <span class="s2">&quot;&lt;string 21&gt; &lt;string 22&gt; &lt;...&gt;&quot;</span> <span class="p">;</span>
+</pre></div>
+</div>
+<p>translates to the following bag of words grammar:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!grammar bag_of_words;
+!start  &lt;sentence_0&gt; &lt;sentence_1&gt;;
+&lt;terminal_0&gt; : &quot;&lt;string 11&gt;&quot;!id(0x1) | &quot;&lt;string 12&gt;&quot;!id(0x1) | &quot;&lt;string 13&gt;&quot;!id(0x1) | &quot;&lt;...&gt;&quot;!id(0x1);
+&lt;sentence_0&gt; : &lt;terminal_0&gt;+;
+&lt;terminal_1&gt; : &quot;&lt;string 21&gt;&quot;!id(0x2) | &quot;&lt;string 22&gt;&quot;!id(0x2) | &quot;&lt;...&gt; &quot;!id(0x2);
+&lt;sentence_1&gt; : &lt;terminal_1&gt;+;
+</pre></div>
+</div>
+</div>
+<div class="section" id="bag-of-words-result">
+<h3>Bag Of Words result</h3>
+<p>The bag of words result is an ordinary NBest result.
+In case a user ID is given the corresponding recognized item contains the keys “userID” holding the user ID.
+Otherwise the user ID keys are not contained in the result.</p>
+</div>
+</div>
+<div class="section" id="wake-up-word-dynamic-content-consumer">
+<h2>WAKE UP WORD DYNAMIC CONTENT CONSUMER</h2>
+<p>The wake up word dynamic content consumer implements the wake up word grammar modeling.</p>
+<div class="section" id="id7">
+<h3>Configuration Options</h3>
+<p>The following shows the configuration for the DCC type wuw:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 1.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;dynamic_content_consumer&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;DCC_WUW&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;wuw_Ortho&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+          <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;wuw_ID&quot;</span>
+        <span class="p">}</span>
+      <span class="p">],</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;wuw&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;wuw&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;wuw_ID&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lexicon&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;a lexicon&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;acmod&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;an acoustic model&gt;&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;wuw.fcf&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The key <code class="docutils literal notranslate"><span class="pre">id</span></code> must link with the content which has <code class="docutils literal notranslate"><span class="pre">_ID</span></code> postfix and the type of <code class="docutils literal notranslate"><span class="pre">integer</span></code>, or <code class="docutils literal notranslate"><span class="pre">integer64</span></code>, or <code class="docutils literal notranslate"><span class="pre">base64</span></code>.</p>
+<p>the DCC adds the new wake-up word to the WUW context or replaces the existing.
+If the context didn’t exist it will be created.
+Any existing context will be overwritten.</p>
+<p>The wake-up word context is always persistent.</p>
+</div>
+<div class="section" id="wuw-grammar">
+<h3>WUW grammar</h3>
+<p>The WUW context (in “context” object) needs to be created following the BNF rules.</p>
+<p>Example of such one-shot WUW grammar:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>#BNF+EMV2.1;
+!grammar wuw;
+
+!start &lt;wuw&gt;;
+
+&lt;wuw&gt;: !tag(WUW, your wake-up word here) !optional(&lt;...&gt;);
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-cop-files-as-input">
+<h2>Using COP files as input</h2>
+<p>Dynamic input data can be provided by COP files.
+The user ID must be in the COP Entry_Id column.</p>
+<div class="line-block">
+<div class="line">That field can be a unsigned 32-bit or 64-bit integer: use <code class="docutils literal notranslate"><span class="pre">#NumIDFormat(Entry_ID)</span> <span class="pre">Decimal</span></code></div>
+<div class="line">or a base64 encoded 64-bit integer: use <code class="docutils literal notranslate"><span class="pre">#NumIDFormat(Entry_ID)</span> <span class="pre">BSBase64</span></code></div>
+<div class="line">At this point the  <code class="docutils literal notranslate"><span class="pre">NumIDBinLength</span></code> format specifier is not used. Any bitlength will be accepted</div>
+<div class="line">and ultimately <code class="docutils literal notranslate"><span class="pre">user_id_range</span></code> determines how many bits are stored in the buffer for the user ID.</div>
+</div>
+</div>
+<div class="section" id="anti-wuw">
+<h2>Anti WUW</h2>
+<p>There are anti-wake-up words that can also be added to the dynamic WUW context.</p>
+<p>These anti-wake-up words are typically words that are phonetically close to the actual wake-up word.
+Including those anti-wake-up words can help in reducing the false acceptance rate, but it will probably also increase the false rejection rate</p>
+<p>Wake-up words and anti-wake-up words can be given to the DCC in the same COP file.
+A flag at the beginning of each line indicates the words as wake-up word or anti-wake-up word.</p>
+<p>Wake-up words use AddEntryMode: <strong>a</strong></p>
+<p>Anti-Wake-up words use AddEntryMode: <strong>r</strong></p>
+<p>Example:</p>
+<ul class="simple">
+<li>a;1001;”Hello Auto”;</li>
+<li>a:1002;”Hello Mercedes”;</li>
+<li>r:2002;”Hello Merkedes”;</li>
+</ul>
+<p>Id’s of anti-wake-up words will not be added to the wake-up word grammar although they can be given in the cop file.
+The reason is that the recognizer will not give back an result if an anti-wake-up word is recognized.</p>
+</div>
+<div class="section" id="references">
+<h2>REFERENCES</h2>
+<ul class="simple">
+<li><a class="reference external" href="./lexicon.html">lexicon configuration documentation</a></li>
+<li><a class="reference external" href="./verbatim.html">verbatim json objects documentation</a></li>
+<li><a class="reference external" href="./application.html">application</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dynamic Content Consumer Configuration</a><ul>
+<li><a class="reference internal" href="#overview">OVERVIEW</a></li>
+<li><a class="reference internal" href="#common-options">COMMON OPTIONS</a></li>
+<li><a class="reference internal" href="#list-dynamic-content-consumer">LIST DYNAMIC CONTENT CONSUMER</a><ul>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#phonetic-entries">Phonetic entries</a></li>
+<li><a class="reference internal" href="#transcription-identifier-entries">Transcription Identifier entries</a></li>
+<li><a class="reference internal" href="#connecting-to-an-application">Connecting to an Application</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#slm-fm-dynamic-content-consumer">SLM-FM DYNAMIC CONTENT CONSUMER</a><ul>
+<li><a class="reference internal" href="#id2">Configuration Options</a></li>
+<li><a class="reference internal" href="#id3">Connecting to an application</a></li>
+<li><a class="reference internal" href="#bit-ids">64 bit IDs</a></li>
+<li><a class="reference internal" href="#id4">Phonetic entries</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#remote-dynamic-content-consumer">REMOTE DYNAMIC CONTENT CONSUMER</a><ul>
+<li><a class="reference internal" href="#options">Options</a></li>
+<li><a class="reference internal" href="#id5">Connecting to an application</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bag-of-words-dynamic-content-consumer">BAG OF WORDS DYNAMIC CONTENT CONSUMER</a><ul>
+<li><a class="reference internal" href="#id6">Configuration Options</a></li>
+<li><a class="reference internal" href="#bag-of-words-grammar">Bag Of Words grammar</a></li>
+<li><a class="reference internal" href="#bag-of-words-result">Bag Of Words result</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wake-up-word-dynamic-content-consumer">WAKE UP WORD DYNAMIC CONTENT CONSUMER</a><ul>
+<li><a class="reference internal" href="#id7">Configuration Options</a></li>
+<li><a class="reference internal" href="#wuw-grammar">WUW grammar</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-cop-files-as-input">Using COP files as input</a></li>
+<li><a class="reference internal" href="#anti-wuw">Anti WUW</a></li>
+<li><a class="reference internal" href="#references">REFERENCES</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

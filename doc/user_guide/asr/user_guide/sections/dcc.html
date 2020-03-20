@@ -1,0 +1,1149 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Dynamic Content Consumers</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Recognition Results" href="results.html" />
+    <link rel="prev" title="Search spaces" href="search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="dynamic-content-consumers">
+<span id="id1"></span><h1>Dynamic Content Consumers</h1>
+<p>Dynamic Content Consumers are modules that take in (<em>consume</em>) user
+content, such as a list of names of address book contacts, and make it
+available for the recognizer to use (Cerence ASR, or the Cerence Cloud
+recognizer). User data is often only available at run-time. This means
+that, for efficiency, there needs to be a mechanism that allows most
+of the data needed for recognition to be prepared beforehand, while
+leaving the possibility to fill in certain parts at runtime.</p>
+<p>In speech recognition, user content is part of the search space of
+“valid” utterances that the recognizer has to recognize. For Cerence ASR,
+the search space is created using contexts (see <a class="reference internal" href="search.html#contexts"><span class="std std-ref">contexts</span></a>). The mechanism provided by Cerence ASR is that of “slots”,
+which provide named “anchor” points in a context, where other contexts
+(called “guest contexts”) can be inserted at compile-time or at run
+time.</p>
+<p>For example, suppose a grammar contains the following phrase:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;Set the heat to ??[num] degrees&quot;</span>
+</pre></div>
+</div>
+<p>The phrase is fixed, except for the <code class="docutils literal notranslate"><span class="pre">[num]</span></code> part. In this case,
+there are not so many distinct values for <code class="docutils literal notranslate"><span class="pre">[num]</span></code>, and they are all
+known beforehand, so it is entirely possible to add them to the
+grammar ahead of time. However, for ease of maintenance and reuse, you
+still might want to keep a separate subgrammar for the numbers that
+you can easily reuse in other places (“Tune the radio to FM ??[num] point ??[num]
+[megahertz]”).</p>
+<p>In the previous example, all possible values from <code class="docutils literal notranslate"><span class="pre">[num]</span></code> can be
+known beforehand. There are however many cases where that is not the
+case, e.g. for Voice-Activated Dialing (VAD):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;Call ??[contact]&quot;</span>
+</pre></div>
+</div>
+<p>In this case, <code class="docutils literal notranslate"><span class="pre">[contact]</span></code> will be a name, or a phrase like <code class="docutils literal notranslate"><span class="pre">my</span>
+<span class="pre">mother</span></code>, <code class="docutils literal notranslate"><span class="pre">my</span> <span class="pre">husband</span></code>, etc. These latter phrases can be covered in
+the grammar itself, as they will be common for many users. The list of
+possible names, though will be user-specific, and will often be
+availabe in the shape of the contact list on user’s cellular phone.</p>
+<p>The contact list may change, either because the user adds and removes
+contacts from their phone, or because different users make use of the
+system. Either way, the contact list will need to be updated
+frequently in order to make sure the VAD system has the best chance of
+recognizing the contact names.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p id="index-0">Dynamic Content Consumers (DCCs) are the way in which user-provided
+data is transformed into a shape that is usable by the
+recognizer. This is usually an ASR context, but it may also be remote
+upload of the data to the Cerence cloud, for use by a remote
+recognizer:</p>
+<a class="reference internal image-reference" href="../../_images/dcc.png"><img alt="../../_images/dcc.png" class="align-center" src="../../_images/dcc.png" style="width: 60%;" /></a>
+<p>There are basically two ways to provide user data to a DCC: in a COP
+file, or using a content value iterator. The DCC will load the data,
+and transform it into an ASR context, or prepare it for remote
+upload.</p>
+<p>THe ASR contexts are called “guest” contexts. They are attached into
+“host” contexts in specific locations called “slots”. In the VAD
+example above, the slot would be called <code class="docutils literal notranslate"><span class="pre">contact</span></code>, and the guest
+context would be a list context containing the names that can appear
+in the <code class="docutils literal notranslate"><span class="pre">contact</span></code> location. See section <a class="reference internal" href="search.html#filling-slots"><span class="std std-ref">Filling slots</span></a> for
+basic information on how to implement slot filling. Below we will look
+specifically at dynamically filling slots.</p>
+<div class="section" id="creating-dccs">
+<h2>Creating DCCs</h2>
+<p>DCCs can be created implicitly, by specifying their configuration in
+the JSON configuration (typically in <code class="docutils literal notranslate"><span class="pre">dcc.json</span></code>).</p>
+<p>DCCs can also be created explicitly, using the C API. If a DCC will
+provide data from one data source, we use
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IDynamicContentConsumer_create</span></code> for creation.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IDynamicContentConsumer_create</span><span class="p">(</span><span class="n">asrManager</span><span class="p">,</span> <span class="s2">&quot;DCP_music&quot;</span><span class="p">,</span> <span class="n">listener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">musicConsumer</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="section" id="dcc-listeners">
+<h3>DCC listeners</h3>
+<p>When you create a DCC, you can pass a
+<code class="docutils literal notranslate"><span class="pre">IDynamicContentConsumerListener</span></code> component. This has three
+callback functions, for receiving events, warnings and errors:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="nf">void</span><span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IDynamicContentConsumerListener_onEvent</span><span class="p">)</span>
+    <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="n">nuance_asr5_DynamicContentConsumerEvent</span> <span class="n">event</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">message</span><span class="p">);</span>
+
+<span class="k">typedef</span> <span class="nf">void</span><span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IDynamicContentConsumerListener_onWarning</span><span class="p">)</span>
+    <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="n">nuance_asr5_DynamicContentConsumerError</span> <span class="n">warning</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">message</span><span class="p">);</span>
+
+<span class="k">typedef</span> <span class="nf">void</span><span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IDynamicContentConsumerListener_onError</span><span class="p">)</span>
+    <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="n">nuance_asr5_DynamicContentConsumerError</span> <span class="n">error</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">message</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>For more details on listeners in Cerence ASR, refer to section
+<a class="reference internal" href="c_api.html#listener-details"><span class="std std-ref">Listeners</span></a>. During the creation of a DCC, several
+events are sent to the listener callback functions.</p>
+<p id="dcc-creation-events"><span id="index-1"></span>Any contexts that were persisted before will be re-loaded, allowing
+the ASR application that uses this context to run with pre-prepared
+data. The way to enable persistent contexts is by putting a
+<code class="docutils literal notranslate"><span class="pre">&quot;persist_contexts&quot;:</span> <span class="pre">&quot;true&quot;</span></code> key-value pair next to the <code class="docutils literal notranslate"><span class="pre">search</span></code>
+key in the section for the context type:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;name&gt;&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;dcc_name&gt;&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[{</span> <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span> <span class="p">}],</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;type&gt;&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;&lt;type&gt;&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;persist_contexts&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">[{</span> <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span> <span class="p">}]</span>
+        <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>When a DCC is created that has persisted contexts, the user is
+notified with the number of the entries that are currently persisted
+for this DCC (“0” in case the DCC is created for the first time).
+The event callback
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IDynamicContentConsumerListener_onEvent</span></code> will be
+called with the <code class="docutils literal notranslate"><span class="pre">NUANCE_ASR5_DCC_WITH_N_ENTRIES</span></code> event type. The
+message contains the number of entries.</li>
+<li>Additionally, an event of type <code class="docutils literal notranslate"><span class="pre">NUANCE_ASR5_DCC_WITH_DCC_DATA_ID</span></code>
+is sent to the <code class="docutils literal notranslate"><span class="pre">onEvent</span></code> callback, with the data ID in the
+message. The data ID is the value of the <code class="docutils literal notranslate"><span class="pre">EDBTableUpdateID</span></code> tag of
+COP file from which the context was built (&lt;null&gt; in case the DCC
+was created for the first time), or the value of the <code class="docutils literal notranslate"><span class="pre">dataId</span></code>
+parameter if the data was uploaded using a content value iterator
+(see <a class="reference internal" href="#content-value-iterator-api"><span class="std std-ref">Iterator API</span></a>).</li>
+<li>If the number of the entries cannot be obtained, the <code class="docutils literal notranslate"><span class="pre">onWarning</span></code>
+callback will be called with event type
+<code class="docutils literal notranslate"><span class="pre">NUANCE_ASR5_DCC_ENTRY_COUNT_UNKNOWN</span></code>. This situation can occur
+for instance if not all of the persisted files are available.</li>
+</ul>
+</div>
+<div class="section" id="dcc-context-types">
+<h3>DCC context types</h3>
+<p>DCCs can produce several different types of contexts. Depending on the
+source data, a specific type of context will be the most applicable,
+and DCCs allow to specify which one to use:</p>
+<ul>
+<li><p class="first">list</p>
+<p>A list context uses each record in the input data as a possible
+phrase in the context.</p>
+</li>
+<li><p class="first">bag_of_words</p>
+<p>A “bag of words”-type of context allows any of the words appearing
+in the data source to appear in the audio input.</p>
+</li>
+<li><p class="first">slm and slm_fm</p>
+<p>SLM is short for “statistical language model”. FM is short for
+“fuzzy match”.</p>
+<p>These contexts do not describe full phrases to be recognized, but
+rather they put a confidence score on the probability of recognized
+word sequences</p>
+</li>
+<li><p class="first">remote</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="data-sources-for-dccs">
+<span id="dcc-data-sources"></span><h2>Data sources for DCCs</h2>
+<div class="section" id="cop-files">
+<span id="data-source-cop"></span><span id="index-2"></span><h3>COP files</h3>
+<p>A COP file is a file that stores user data, and is used as input for
+dynamic content consumers. “COP” is short for “Categorized
+Orthographic Phonetic”. A COP file contains data in a tabular form.
+It consists of a few standard blocks:</p>
+<ul class="simple">
+<li>A file header (<code class="docutils literal notranslate"><span class="pre">#ECO</span> <span class="pre">V1.2</span> <span class="pre">UTF-8;</span></code>)</li>
+<li>A data header, which describes overall properties of the data table:<ul>
+<li>the COP scheme version</li>
+<li>the ID of the database</li>
+<li>update type and mode</li>
+</ul>
+</li>
+<li>A column specification, which lists the column names, and additional
+properties such as the data type, and whether the data is quoted or
+not.
+Column names are expected to have a suffix that indicates whether
+the data uses regular orthography (“_Ortho”) or phonetic notation
+(“_Phon”).</li>
+</ul>
+<p>An example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#ECO V1.2 UTF-8;
+
+#ECOScheme COP1 V1.6
+#EDBDatabaseID NBT_Contacts_v_1_0
+#EDBTableUpdateMode GivenInColumn
+#EDBTableUpdateType FullUpdate
+#EDBTableUpdateID 1
+
+# Columns:
+#Column1 FirstName_Ortho
+#Column2 LastName_Ortho
+#Column3 AdditionalInfo_Ortho
+
+#Format(FirstName_Ortho) Quoted
+#Format(LastName_Ortho) Quoted
+#Format(AdditionalInfo_Ortho) Quoted
+
+&quot;Donald&quot;, &quot;Knuth&quot;, &quot;{ \&quot;profession\&quot;: \&quot;algorithm_expert\&quot; }&quot;;
+&quot;Hopper&quot;, &quot;Grace&quot;, &quot;{ \&quot;profession\&quot;: \&quot;cobol_coder\&quot; }&quot;;
+</pre></div>
+</div>
+<p>The COP file format is detailed in separate PDF file: <a class="reference internal" href="../chapters/references.html#cop-file"><span class="std std-ref">COP files</span></a>.</p>
+<p>The C API call to use to instruct a DCC to load data from a COP file
+is this one:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_asr5_IDynamicContentConsumer_startDataPreparationFromCopFile</span> <span class="p">(</span>
+     <span class="n">nuance_asr5_IDynamicContentConsumer</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+     <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">cOPFilePath</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="content-value-iterators">
+<span id="index-3"></span><span id="id2"></span><h3>Content value iterators</h3>
+<p>COP files are easy to use, but have the disadvantage that they have to
+be written to external storage, after which the DCC can be instructed
+to load the data from the file.</p>
+<p>A more direct method is to use a content value iterator, where you can
+feed data directly to the DCC. This uses a different API call to start
+data preparation:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_asr5_IDynamicContentConsumer_startDataPreparation</span> <span class="p">(</span>
+     <span class="n">nuance_asr5_IDynamicContentConsumer</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+     <span class="n">nuance_asr5_IContentValuesIterator</span> <span class="o">*</span><span class="n">iterator</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Briefly, the content value iterator works by providing implementations
+for an iterator API. The DCC will use the iterator API to walk all the
+records of the user data table (for example, all contacts in the
+user’s contact list).</p>
+<p>The iterator API implementation can then make use of the content values
+API to insert a set of key-value pairs for each entry (in the example,
+the relevant fields of each contact). For each entry, the system can
+specify if the record should be added or deleted.</p>
+<p>The following sequence diagram illustrates what happens when
+<code class="docutils literal notranslate"><span class="pre">startDataPreparation</span></code> is called on a DCC:</p>
+<a class="reference internal image-reference" href="../../_images/content-value-iterator.png"><img alt="../../_images/content-value-iterator.png" class="align-center" src="../../_images/content-value-iterator.png" style="width: 40%;" /></a>
+<p>In this setup, the <code class="docutils literal notranslate"><span class="pre">IContentValueIterator</span></code> must be implemented by
+the system developer. The DCC and the <code class="docutils literal notranslate"><span class="pre">IContentValues</span></code> API are
+provided by Cerence ASR. Every blue box in the diagram is a data record
+being retrieved by the DCC.</p>
+<p>The DCC, on the left, coordinates the data ingestion process. It
+starts by initializing the iterator, by calling the <code class="docutils literal notranslate"><span class="pre">start</span></code>
+function. This function initializes everything that requires
+initialization. As part of this process, it receives also a
+description of the content, where it can retrieve the DCC’s column
+names and the corresponding data types (using the content format API).</p>
+<p>When initialization is done, the DCC will call <code class="docutils literal notranslate"><span class="pre">next</span></code> to inquire
+whether more data is to be loaded. If yes, then <code class="docutils literal notranslate"><span class="pre">get</span></code> will be called
+to produce a new <code class="docutils literal notranslate"><span class="pre">nuance_asr5_IContentValues</span></code> object containing the
+next set of key-value pairs, where the keys must match those in the
+content description received by <code class="docutils literal notranslate"><span class="pre">start</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">get</span></code> function will use the <code class="docutils literal notranslate"><span class="pre">IContentValues</span></code> API to construct
+the content values object and fill it with data.</p>
+<p>Finally, when all data has been loaded (signalled by <code class="docutils literal notranslate"><span class="pre">next</span></code> setting
+its <code class="docutils literal notranslate"><span class="pre">hasNext</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">LH_FALSE</span></code>), the <code class="docutils literal notranslate"><span class="pre">finish</span></code> function is
+called to allow the content value iterator to perform cleanup if needed.</p>
+<p>In the sections below, you will find more detail on the the Content
+Value Iterator API, Content Values API, and the Content Format API.</p>
+<div class="section" id="iterator-api">
+<span id="content-value-iterator-api"></span><h4>Iterator API</h4>
+<p>The iterator API must be implemented by the developer, and will be
+used by the DCC to walk a list of user data, where each list entry is
+a record that can have one or more values.</p>
+<p>The image above shows the sequence of calls that happens when the DCC
+uses the iterator to get the data. The following function signatures
+should be implemented by the iterator:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="nf">nuance_common_ResultCode</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IContentValuesIterator_start</span><span class="p">)</span>
+        <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="k">const</span> <span class="n">nuance_asr5_IContentFormat</span> <span class="o">*</span><span class="n">contentFormat</span><span class="p">,</span> <span class="n">nuance_common_String</span> <span class="o">**</span><span class="n">dataId</span><span class="p">);</span>
+
+<span class="k">typedef</span> <span class="nf">nuance_common_ResultCode</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IContentValuesIterator_next</span><span class="p">)</span>
+        <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="n">LH_BOOL</span> <span class="o">*</span><span class="n">hasNext</span><span class="p">);</span>
+
+<span class="k">typedef</span> <span class="nf">nuance_common_ResultCode</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IContentValuesIterator_get</span><span class="p">)</span>
+        <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="n">nuance_asr5_IContentValues</span> <span class="o">*</span><span class="n">contentValues</span><span class="p">,</span> <span class="n">nuance_asr5_IContentValuesIterator_ModificationType</span> <span class="o">*</span><span class="n">modificationType</span><span class="p">);</span>
+
+<span class="k">typedef</span> <span class="nf">nuance_common_ResultCode</span> <span class="p">(</span><span class="o">*</span><span class="n">FUNC_nuance_asr5_IContentValuesIterator_finish</span><span class="p">)</span>
+        <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>These functions should behave as follows:</p>
+<ul>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">start</span></code> function receives from the DCC a description of the
+content that it expects the iterator to return in the <code class="docutils literal notranslate"><span class="pre">get</span></code>
+function. This content description is the one in the <code class="docutils literal notranslate"><span class="pre">content</span></code> key
+in the DCC description:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;dynamic_content_consumer&quot; : [{
+  &quot;name&quot;: &quot;DCC_LOCAL_TITLE&quot;,
+  &quot;content&quot;: [{
+    &quot;type&quot;: &quot;string&quot;,
+    &quot;name&quot;: &quot;Title_Ortho&quot;
+   }],
+   ...
+</pre></div>
+</div>
+<p>In this example, the content format API will return the pair
+“Title_Ortho”, “string”.  The content description in the
+<code class="docutils literal notranslate"><span class="pre">contentFormat</span></code> parameter uses the content format API; please check
+section <a class="reference internal" href="#content-format-api"><span class="std std-ref">Content Format</span></a> for details.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">dataId</span></code> parameter is a string identifier that is provided back
+to the system through the DCC’s
+<code class="docutils literal notranslate"><span class="pre">IDynamicContentConsumerListener</span></code>. See <a class="reference internal" href="#dcc-creation-events"><span class="std std-ref">here</span></a> for more information.</p>
+<p>After the call to <code class="docutils literal notranslate"><span class="pre">start</span></code>, the current iterator position is
+invalid. The current iterator position should be set to the first
+element in the call to <code class="docutils literal notranslate"><span class="pre">next</span></code> that follows the call to <code class="docutils literal notranslate"><span class="pre">start</span></code>.</p>
+<p>Pseudo-code example (no result code handling):</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">ExampleContentValuesIterator_start</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="k">const</span> <span class="n">nuance_asr5_IContentFormat</span> <span class="o">*</span><span class="n">contentFormat</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">**</span><span class="n">dataId</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">nuance_common_ResultCode</span> <span class="n">resultCode</span><span class="p">;</span>
+  <span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">names</span><span class="p">;</span>
+
+  <span class="cm">/* Examine the content format. This is optional. The application can store the names */</span>
+  <span class="n">resultCode</span> <span class="o">=</span> <span class="n">contentFormat</span><span class="o">-&gt;</span><span class="n">nuance_asr5_IContentFormat_getNames</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">names</span><span class="p">);</span>
+
+ <span class="p">{</span>
+    <span class="n">nuance_common_String</span> <span class="o">*</span><span class="n">type</span><span class="p">;</span>
+
+    <span class="cm">/* iterate over the string list and for each name call */</span>
+    <span class="n">resultCode</span> <span class="o">=</span> <span class="n">contentFormat</span><span class="o">-&gt;</span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_asr5_IContentFormat_getType</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">type</span><span class="p">);</span>
+    <span class="cm">/* the application can store the type for the name in a type map here */</span>
+  <span class="p">}</span>
+
+  <span class="cm">/* set the iterator to invalid position here */</span>
+
+  <span class="k">return</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">next</span></code> function should set its <code class="docutils literal notranslate"><span class="pre">hasNext</span></code> parameter to
+<code class="docutils literal notranslate"><span class="pre">LH_TRUE</span></code> when there are more records to be loaded, or
+<code class="docutils literal notranslate"><span class="pre">LH_FALSE</span></code> if the end of the data was reached.</p>
+<p>Pseudo-code example (no result code handling):</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">ExampleContentValuesIterator_next</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="n">LH_BOOL</span> <span class="o">*</span><span class="n">hasNext</span><span class="p">)</span> <span class="p">{</span>
+  <span class="cm">/* if the iterator is at the invalid position set it to the first line here */</span>
+  <span class="cm">/* else proceed the iterator to the next line                               */</span>
+
+  <span class="cm">/* if there is data at the current position */</span>
+  <span class="o">*</span><span class="n">hasNext</span> <span class="o">=</span> <span class="n">LH_TRUE</span><span class="p">;</span>
+  <span class="cm">/* else */</span>
+  <span class="o">*</span><span class="n">hasNext</span> <span class="o">=</span> <span class="n">LH_FALSE</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">finish</span></code> function is called when all data has been loaded,
+i.e. after <code class="docutils literal notranslate"><span class="pre">next</span></code> has returned <code class="docutils literal notranslate"><span class="pre">LH_FALSE</span></code>. This function can do
+any cleanup that is needed at the end of the data upload.</p>
+<p>Pseudo-code example (no result code handling):</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">ExampleContentValuesIterator_finish</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="cm">/* do cleanup here: e.g. close streams, free memory, etc. */</span>
+  <span class="k">return</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">The <code class="docutils literal notranslate"><span class="pre">get</span></code> function does most of the work. When it is called, it
+should fetch the next data row, and enter the data into the
+<code class="docutils literal notranslate"><span class="pre">ContentValue</span></code> object. This is done using the
+<a class="reference internal" href="#content-values-api"><span class="std std-ref">content values API</span></a>, using the right
+<code class="docutils literal notranslate"><span class="pre">put</span></code> function for each data element. For example, to enter a string
+for the <code class="docutils literal notranslate"><span class="pre">Title_Ortho</span></code> field, you would do:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_asr5_IContentValues_putString</span><span class="p">(</span><span class="n">contentValues</span><span class="p">,</span> <span class="s">&quot;Title_Ortho&quot;</span><span class="p">,</span> <span class="s">&quot;Beat It&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">modificationType</span></code> argument for the <code class="docutils literal notranslate"><span class="pre">get</span></code> function is defined as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">typedef</span> <span class="n">enum</span>
+<span class="p">{</span>
+    <span class="n">NUANCE_ASR5_ICONTENTVALUESITERATOR_MT_ADD</span><span class="p">,</span>                        <span class="o">/**&lt;</span> <span class="n">Add</span> <span class="n">the</span> <span class="n">content</span> <span class="n">value</span> <span class="o">*/</span>
+    <span class="n">NUANCE_ASR5_ICONTENTVALUESITERATOR_MT_DELETE_MATCHTYPE_EXACT</span><span class="p">,</span>     <span class="o">/**&lt;</span> <span class="n">Delete</span> <span class="n">the</span> <span class="n">given</span> <span class="n">entry</span> <span class="p">(</span><span class="n">Note</span><span class="p">:</span> <span class="n">Only</span> <span class="n">supported</span> <span class="k">for</span> <span class="n">Local</span> <span class="n">DCC</span><span class="p">)</span> <span class="o">*/</span>
+    <span class="n">NUANCE_ASR5_ICONTENTVALUESITERATOR_MT_DELETE_MATCHTYPE_CONTAINS</span>   <span class="o">/**&lt;</span> <span class="n">Delete</span> <span class="n">entries</span> <span class="n">that</span> <span class="n">contains</span> <span class="n">this</span> <span class="n">value</span> <span class="p">(</span><span class="n">Note</span><span class="p">:</span> <span class="n">Only</span> <span class="n">supported</span> <span class="k">for</span> <span class="n">Local</span> <span class="n">DCC</span><span class="p">)</span> <span class="o">*/</span>
+<span class="p">}</span> <span class="n">NUANCE_ASR5_IContentValuesIterator_ModificationType</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>It instructs the DCC to either add or delete the current entry. For
+deleting an entry, there are two options:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">MATCHTYPE_EXACT</span></code> - all field values must match exactly with the
+values provided in the <code class="docutils literal notranslate"><span class="pre">IContentValues</span></code> argument.</li>
+<li><code class="docutils literal notranslate"><span class="pre">MATCHTYPE_CONTAINS</span></code> - this type allows the <code class="docutils literal notranslate"><span class="pre">IContentValues</span></code>
+object to only provide a subset of the data fields.</li>
+</ul>
+<p>Pseudo-code example (no result code handling):</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">ExampleContentValuesIterator_get</span><span class="p">(</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">nuance_asr5_IContentValues</span> <span class="o">*</span><span class="n">contentValues</span><span class="p">,</span>
+    <span class="n">nuance_asr5_IContentValuesIterator_ModificationType</span> <span class="o">*</span><span class="n">modificationType</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">nuance_common_ResultCode</span> <span class="n">resultCode</span><span class="p">;</span>
+
+  <span class="cm">/* get the current entry line                                                               */</span>
+  <span class="cm">/* for each element of the current entry line retrieve the name from the stored name list   */</span>
+  <span class="cm">/* retrieve the corresponding type from the type map and call the appropriate put function  */</span>
+  <span class="cm">/* e.g. if the type is a string then call                                                   */</span>
+  <span class="n">resultCode</span> <span class="o">=</span> <span class="n">nuance_asr5_IContentValues_putString</span><span class="p">(</span><span class="n">contentValues</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span>
+
+  <span class="cm">/* specify if the current line should be added or removed */</span>
+  <span class="cm">/* currently only addding is supported                    */</span>
+  <span class="o">*</span><span class="n">modificationType</span> <span class="o">=</span> <span class="n">NUANCE_ASR5_ICONTENTVALUESITERATOR_MT_ADD</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The iterator is created by collecting the functions in a <code class="docutils literal notranslate"><span class="pre">vtable</span></code>,
+and then creating the content values iterator. It should be destroyed
+after the iterator is finished, to clean up all resources. See section
+<a class="reference internal" href="c_api.html#listener-details"><span class="std std-ref">Listeners</span></a> for more details.</p>
+</div>
+<div class="section" id="content-values-api">
+<span id="id3"></span><h4>Content Values API</h4>
+<p>In the <code class="docutils literal notranslate"><span class="pre">get</span></code> function in the content value iterator API, the data
+elements are stored into a <code class="docutils literal notranslate"><span class="pre">IContentValue</span></code> structure.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">IContentValue</span></code> object itself is provided by the DCC that calls
+<code class="docutils literal notranslate"><span class="pre">get</span></code>, so there is no need to construct the <code class="docutils literal notranslate"><span class="pre">IContentValue</span></code> object
+yourself.</p>
+<p>The data is added by repeatedly calling the <code class="docutils literal notranslate"><span class="pre">put*</span></code> functions,
+depending on how many data elements should be entered, and their
+types.  There is a function for each of the following types: 32 bit
+integer, 64 bit integer, string, string list and string list list:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ASR_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IContentValues_putInt</span>
+        <span class="p">(</span><span class="n">nuance_asr5_IContentValues</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">value</span><span class="p">);</span>
+
+<span class="n">ASR_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IContentValues_putInt64</span>
+        <span class="p">(</span><span class="n">nuance_asr5_IContentValues</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="n">LH_S64</span> <span class="n">value</span><span class="p">);</span>
+
+<span class="n">ASR_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IContentValues_putString</span>
+        <span class="p">(</span><span class="n">nuance_asr5_IContentValues</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">value</span><span class="p">);</span>
+
+<span class="n">ASR_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IContentValues_putStringList</span>
+        <span class="p">(</span><span class="n">nuance_asr5_IContentValues</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">value</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nvalue</span><span class="p">);</span>
+
+<span class="n">ASR_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IContentValues_putStringListList</span>
+        <span class="p">(</span><span class="n">nuance_asr5_IContentValues</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span> <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="k">const</span> <span class="n">nuance_common_StringListList</span> <span class="o">*</span><span class="n">value</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">key</span></code> argument is the name of the “column” of the data element,
+from the content format, such as “Title_Ortho”.</p>
+</div>
+<div class="section" id="content-format">
+<span id="content-format-api"></span><h4>Content Format</h4>
+<p>The content format API allows the <code class="docutils literal notranslate"><span class="pre">start</span></code> function from the content
+value iterator API to find the names and types of the data elements
+that the iterator is supposed to return to the DCC.</p>
+<p>This is useful in situations where it is not known beforehand what the
+data fields are called, or what their types should be.</p>
+<p>The content format API is defined as follows:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ASR_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IContentFormat_getNames</span>
+<span class="p">(</span>
+    <span class="k">const</span> <span class="n">nuance_asr5_IContentFormat</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="n">nuance_common_StringList</span> <span class="o">**</span><span class="n">names</span>
+<span class="p">);</span>
+
+<span class="n">ASR_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IContentFormat_getType</span>
+<span class="p">(</span>
+    <span class="k">const</span> <span class="n">nuance_asr5_IContentFormat</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span>
+    <span class="n">nuance_common_String</span> <span class="o">**</span><span class="n">type</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The application uses the <code class="docutils literal notranslate"><span class="pre">getNames</span></code> function first, to retrieve a
+list of the required column names. Then, by calling the <code class="docutils literal notranslate"><span class="pre">getType</span></code>
+function for each column name the application can query the expected
+type.</p>
+</div>
+</div>
+<div class="section" id="using-sampa-phonetic-notation">
+<h3>Using SAMPA phonetic notation</h3>
+<p>In addition to the default L&amp;H+ phonetic notation, it is possible, in
+COP files, to also use the Sampa phonetic alphabet for a number of
+languages.</p>
+<p>As indicated above, a COP file can contain phonetic information (see
+<a class="reference internal" href="#data-source-cop"><span class="std std-ref">COP files</span></a>): data in columns for which the names end in
+“_Pho”, are interpreted as phonetic data. Using a specific tag, you
+can indicate that this data is specified in Sampa notation.</p>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#ECO V1.2 UTF-8;</span>
+
+<span class="c1">#ECOScheme COP1 V1.6</span>
+<span class="c1">#EDBDatabaseID NBT_AddressBook_v_1_0</span>
+
+<span class="c1">#EDBTableUpdateID AddressBookTable_20100708_0501</span>
+<span class="c1">#EDBTableUpdateMode GivenInColumn</span>
+<span class="c1">#EDBTableUpdateType FullUpdate</span>
+
+<span class="c1"># Columns:</span>
+<span class="c1">#Column1 Entry_ID</span>
+<span class="c1">#Column2 EDBTableUpdateMode</span>
+<span class="c1">#Column3 FirstName_Ortho</span>
+<span class="c1">#Column4 FirstName_Pho</span>
+<span class="c1">#Column5 LastName_Ortho</span>
+<span class="c1">#Column6 LastName_Pho</span>
+<span class="c1"># Column1 to Column2 must contain defined values, the others may be empty.</span>
+<span class="c1"># In the column EDBTableUpdateMode the allowed values are: r (remove) and a (add)</span>
+
+<span class="c1">#Format(Entry_ID) Ident</span>
+<span class="c1">#NumIDFormat(Entry_ID) Decimal</span>
+<span class="c1">#NumIDBinLength(Entry_ID) 64</span>
+
+<span class="c1">#Format(EDBTableUpdateMode) Ident</span>
+<span class="c1">#Format(FirstName_Pho) Ident</span>
+<span class="c1">#Format(LastName_Pho) Ident</span>
+
+<span class="mi">34</span>  <span class="p">;</span> <span class="n">a</span><span class="p">;</span> <span class="s2">&quot;John&quot;</span><span class="p">;</span> <span class="o">&lt;</span><span class="n">t</span><span class="o">&gt;</span><span class="p">[</span><span class="n">LNG</span><span class="o">=</span><span class="n">SR</span><span class="o">-</span><span class="n">ENU</span><span class="p">]</span><span class="n">dZAn</span><span class="o">&lt;/</span><span class="n">t</span><span class="o">&gt;</span><span class="p">;</span> <span class="s2">&quot;Smith&quot;</span><span class="p">;</span> <span class="o">&lt;</span><span class="n">t</span><span class="o">&gt;</span><span class="p">[</span><span class="n">LNG</span><span class="o">=</span><span class="n">SR</span><span class="o">-</span><span class="n">ENU</span><span class="p">]</span><span class="n">smIT</span><span class="o">&lt;/</span><span class="n">t</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>In this COP file, columns 4 (“FirstName_Pho”) and 6 (“LastName_Pho”)
+contain phonetic transcriptions of columns 3 and 4.</p>
+<p>As an example, look at the entry <code class="docutils literal notranslate"><span class="pre">&lt;t&gt;[LNG=SR-ENU]dZAn&lt;/t&gt;</span></code>:</p>
+<ul class="simple">
+<li>The <code class="docutils literal notranslate"><span class="pre">&lt;t&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;/t&gt;</span></code> begin and end tags indicate that the
+enclosed strings are Sampa data.</li>
+<li>The <code class="docutils literal notranslate"><span class="pre">[LNG=SR-ENU]</span></code> directive indicates to the Sampa convertor in
+which language the Sampa data is written.</li>
+<li><code class="docutils literal notranslate"><span class="pre">dZan</span></code> is the Sampa data itself.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="dynamic-context-creation">
+<h2>Dynamic context creation</h2>
+<div class="section" id="data-preparation">
+<span id="id4"></span><h3>Data preparation</h3>
+<p>When the DCC has been created, data processing can be started in one
+of two ways:</p>
+<ol class="arabic">
+<li><p class="first">start data processing by providing the COP file to the consumer:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IDynamicContentConsumer_startDataPreparationFromCopFile</span><span class="p">(</span><span class="n">musicConsumer</span><span class="p">,</span> <span class="s2">&quot;copFilePathName.cop&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>See section <a class="reference internal" href="#data-source-cop"><span class="std std-ref">COP files</span></a> for more details.</p>
+</li>
+<li><p class="first">start data processing by providing music data to the consumer
+with the nuance_asr5_IContentValuesIterator:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_asr5_IDynamicContentConsumer_startDataPreparation</span><span class="p">(</span>
+  <span class="n">nuance_asr5_IDynamicContentConsumer</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="n">nuance_asr5_IContentValuesIterator</span> <span class="o">*</span><span class="n">iterator</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This will make the content provider poll the <code class="docutils literal notranslate"><span class="pre">iterator</span></code> for data to add.
+See section <a class="reference internal" href="#content-value-iterators"><span class="std std-ref">Content value iterators</span></a> for more details.</p>
+</li>
+</ol>
+<p>It is important to keep the IDynamicContentConsumer object alive as
+long as there is an application that depends on this DCC.</p>
+<p>After the data preparation is completed (for ListContextDCC, SlmFmDCC,
+WUWDCC and BagOfWordsDCC), the user is notified with a
+<code class="docutils literal notranslate"><span class="pre">DCC_DATA_PREPARATION_FINISHED</span></code> event. Unless the data preparation
+was aborted, the message of the event contains the current total
+number of entries contained within this DCC, together with the number
+of added, removed, failed to add and failed to remove entries. The
+message format looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">current_total_number</span><span class="o">=</span><span class="n">x</span> <span class="n">added</span><span class="o">=</span><span class="n">y</span> <span class="n">failed_to_add</span><span class="o">=</span><span class="n">z</span> <span class="n">removed</span><span class="o">=</span><span class="n">t</span> <span class="n">failed_to_remove</span><span class="o">=</span><span class="n">u</span>
+</pre></div>
+</div>
+<p>In case of using remove via matching strings, the numbers will be
+invalidated and -1 will be returned for all the values.</p>
+<p>Additionally, if the contexts for the DCC are persisted, the change in
+the number of the entries for this DCC is also persisted to notify the
+user when the DCC is re-created next time.  Together with the number
+of entries, the user will be informed with the data ID if it has been
+provided and stored with persisted context.</p>
+</div>
+</div>
+<div class="section" id="supplying-the-context-to-the-asr-application">
+<span id="index-6"></span><h2>Supplying the context to the ASR application</h2>
+<p>The contexts created by DCCs must be connected to the ASR
+applications that need them. In this section we will show how this
+works, by example. We start by defining a fairly complex DCC:</p>
+<div class="highlight-json notranslate" id="dcc-example-1"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;DCC_SLM_FM_MUSIC_SLM_ONLY&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;base64&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ID&quot;</span>
+  <span class="p">},{</span>
+    <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ARTIST_ORTHO&quot;</span>
+  <span class="p">},{</span>
+    <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;TITLE_ORTHO&quot;</span>
+  <span class="p">},{</span>
+    <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ALBUM_ORTHO&quot;</span>
+  <span class="p">}],</span>
+  <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_fm&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;slm_fm&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;lexicon&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;clc&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;filename&quot;</span> <span class="p">:</span> <span class="s2">&quot;clc_enu_cfg3_v6_0_2.dat&quot;</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;slm_search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_artist.fcf&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_1.dat&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ARTIST_ORTHO&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_title.fcf&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_1.dat&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;TITLE_ORTHO&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;slm_music_album.fcf&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_1.dat&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;link&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ALBUM_ORTHO&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This DCC consumes content in 4 columns, as defined in lines 3 to 15:
+it expects artist, title and album data, along with a Base64-encoded
+ID string.</p>
+<p>As the <code class="docutils literal notranslate"><span class="pre">type</span></code> field indicates, the DCC will provide SLM/FM contexts
+as the result of processing the data (<code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;slm_fm&quot;</span></code>). The JSON
+dictionary for the <code class="docutils literal notranslate"><span class="pre">slm_fm</span></code> key specifies how to generate the
+contexts.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">slm_search</span></code> key contains an array with three entries:
+<code class="docutils literal notranslate"><span class="pre">slm_music_artist.fcf</span></code>, <code class="docutils literal notranslate"><span class="pre">slm_music_title.fcf</span></code> and
+<code class="docutils literal notranslate"><span class="pre">slm_music_album.fcf</span></code>. For each of these, an SLM context will be
+created: each block contains the “recipe” for an SLM.</p>
+<p>For each context, the corresponding acoustic model must be provided,
+with the <code class="docutils literal notranslate"><span class="pre">acmod</span></code> key. The <code class="docutils literal notranslate"><span class="pre">link</span></code> block defines which data will be
+used for generating the context. In this case, the each SLM context
+contains data from one column of the input data. (See
+<a class="reference internal" href="#listcontext-dcc-example"><span class="std std-ref">below</span></a> for a more complex example.)</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p id="dynamic-context-example">The following application definition shows how to use one of the
+contexts defined by the above DCC. By declaring a part of the search
+as <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;dynamic&quot;</span></code>, the system knows that that part should be
+retrieved from a DCC.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">dynamic</span></code> block provides the details:
+<code class="docutils literal notranslate"><span class="pre">dynamic_content_consumer</span></code> gives the name of the DCC, and
+<code class="docutils literal notranslate"><span class="pre">search_name</span></code> specifies which context, produced by this DCC, to use.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;DCC_PROVIDED_SEARCH&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;asr&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;dynamic&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;dynamic_content_consumer&quot;</span><span class="p">:</span> <span class="s2">&quot;DCC_SLM_FM_MUSIC_SLM_ONLY&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;search_name&quot;</span><span class="p">:</span> <span class="s2">&quot;slm_music_artist.fcf&quot;</span>
+          <span class="p">}</span>
+        <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The following example shows how to fill a slot in static host context:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;USES_TWO_DCC&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;asr&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;SEARCH_VAD_NAMES&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;vad_unconstrained.fcf&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;connection&quot;</span><span class="p">:</span> <span class="p">[{</span>
+            <span class="nt">&quot;expansion_point&quot;</span><span class="p">:</span> <span class="s2">&quot;slot:VAD#firstname&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;dynamic&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;dynamic_content_consumer&quot;</span><span class="p">:</span> <span class="s2">&quot;VAD_NAMES_TWO_DCC_2&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;search_name&quot;</span><span class="p">:</span> <span class="s2">&quot;internal_vad_firstname.fcf&quot;</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">},{</span>
+            <span class="nt">&quot;expansion_point&quot;</span><span class="p">:</span> <span class="s2">&quot;slot:VAD#lastname&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">,</span>
+              <span class="nt">&quot;dynamic&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;dynamic_content_consumer&quot;</span><span class="p">:</span> <span class="s2">&quot;VAD_NAMES_TWO_DCC_1&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;search_name&quot;</span><span class="p">:</span> <span class="s2">&quot;internal_vad_lastname.fcf&quot;</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}]</span>
+        <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In the example, the static host context <code class="docutils literal notranslate"><span class="pre">vad_unconstrained.fcf</span></code>
+contains two slots. They are filled in the <code class="docutils literal notranslate"><span class="pre">connection</span></code> block, where
+each expansion point if filled with a dynamically created guest
+context. In this case, the two contexts are created by different DCCs,
+but as shown above, one DCC can create several contexts. If the source
+data is the same for both DCCs, then the setup shown above could be
+combined in a single DCC, which would create both contexts.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>In the above example, each context created by the DCC was based on a
+single column of data from the user data source file. This example
+shows how to incorporate several fields in the same context. The
+result in this example is a list context, as opposed to an SLM
+context, as shown by the <code class="docutils literal notranslate"><span class="pre">&quot;type&quot;:</span> <span class="pre">&quot;list&quot;</span></code> key-value pair.</p>
+<div class="highlight-json notranslate" id="listcontext-dcc-example"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;DCC_LOCAL_VAD&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string_list&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;FirstName_Pho&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string_list&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LastName_Pho&quot;</span>
+    <span class="p">}],</span>
+    <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;list&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;lexicon&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;clc&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;filename&quot;</span> <span class="p">:</span> <span class="s2">&quot;clc_enu_mpthreevadml_v6_0_1.dat&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;vocon_parameters&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;LH_CLC_PARAM_NUMBER_OUTPUT_TRANSCRIPTIONS&quot;</span> <span class="p">:</span> <span class="mi">5</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;lex_cache&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;persist&quot;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+          <span class="nt">&quot;cache_word_size&quot;</span> <span class="p">:</span> <span class="mi">1000</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+        <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;firstname_lastname.fcf&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;acmod&quot;</span> <span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_1.dat&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;link&quot;</span> <span class="p">:</span> <span class="p">[[{</span>
+          <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;tag_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;firstname&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;FirstName&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+           <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span>
+           <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span>
+             <span class="nt">&quot;tag_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;lastname&quot;</span><span class="p">,</span>
+             <span class="nt">&quot;clc_category&quot;</span> <span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+             <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;LastName&quot;</span>
+          <span class="p">}</span>
+        <span class="p">}]]</span>
+      <span class="p">}]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>THe key here is that the <code class="docutils literal notranslate"><span class="pre">link</span></code> field contains multiple entries: one
+for the first name, and one for the last name. Every row in the list
+context will thus be composed of a FirstName-LastName pair.</p>
+<div class="section" id="data-updates">
+<h3>Data updates</h3>
+<p>It is possible to update the dynamic data by adding new entries on top
+of the existing data or from scratch.  In order to add new entries,
+<code class="docutils literal notranslate"><span class="pre">startDataPreparationFromCopFile</span></code> should be called again where the
+input argument copFilePathName.cop should provide the new entries.</p>
+<p>However if the previously added data is wanted to be purged and the
+new entries should be added from scratch <code class="docutils literal notranslate"><span class="pre">deleteAll</span></code> should be
+called before calling <code class="docutils literal notranslate"><span class="pre">startDataPreparationFromCopFile</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IDynamicContentConsumer_deleteAll</span><span class="p">(</span><span class="n">musicConsumer</span><span class="p">);</span>
+<span class="n">nuance_asr5_IDynamicContentConsumer_startDataPreparation</span><span class="p">(</span><span class="n">musicConsumer</span><span class="p">,</span> <span class="n">dataProvider</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that if the recognizer is already running an application that is
+using the DCC, the dynamic content consumer thread will be blocked and
+wait for the recognizer to finish before updating the data.  However,
+if the recognizer starts after the DCC starting to update the data, it
+will not wait.  The recognizer can be started at any time.  If the
+data preparation of the DCC is still ongoing it will be paused and the
+contexts will be generated from the data that already has been
+consumed by the DCC.  The recognition is performed on these contexts.
+Once the recognition has finished the DCC resumes data preparation at
+the point it was paused.</p>
+<p>However, it is possible to specify a set of DCCs that the recognition
+will wait for.  As such, recognition will only start after the
+referenced DCCs have finished their data preparation.  This set can be
+defined via configuration and changed at runtime (via vh_callback).
+For more information, see <a class="reference internal" href="../external/configuration.html#vocon5-json-configuration"><span class="std std-ref">Cerence ASR JSON configuration reference</span></a> (ASR JSON
+configuration reference), and <a class="reference internal" href="non_functional_aspects.html#dynamic-configuration"><span class="std std-ref">Dynamic configuration at runtime</span></a> (the
+<code class="docutils literal notranslate"><span class="pre">vh_callback</span></code> concept).</p>
+</div>
+<div class="section" id="dccs-and-the-asynchronous-api">
+<h3>DCCs and the asynchronous API</h3>
+<p>When using the DCC API, there are some important facts to remember.
+An application that depends on a dynamic content consumer, should most
+probably wait for it to finish. Since we are dealing with an
+asynchronous API, it is important to wait for finished event if more
+than one operation in executed on the DCC.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IDynamicContentConsumer_create</span><span class="p">(</span><span class="o">...</span><span class="p">,</span><span class="n">dccListener</span><span class="p">,</span> <span class="n">dcc</span><span class="p">);</span>
+<span class="n">nuance_asr5_IDynamicContentConsumer_startDataPreparation</span><span class="p">(</span><span class="n">dcc</span><span class="p">);</span>
+<span class="n">wait</span> <span class="k">for</span> <span class="n">event</span> <span class="n">DCC_DATA_PREPARATION_FINISHED</span>
+<span class="n">nuance_asr5_IApplication_create</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">application</span><span class="p">);</span>
+<span class="n">nuance_asr5_IAsrManager_setApplications</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">application</span><span class="p">);</span>
+<span class="n">nuance_asr5_IRecognizer_start</span>
+</pre></div>
+</div>
+<p>This will guarantee that the application will be using the context
+created by <code class="docutils literal notranslate"><span class="pre">startDataPreparationFromCopFile</span></code>, and not the persisted
+one loaded when the DCC was created.</p>
+<p>In conclusion, a dcc can be used for three different purposes:</p>
+<ul class="simple">
+<li>Load context from the cache: When the dcc is created, it first tries
+to load related persisted contexts. If such contexts exist, they can
+be used by the application.</li>
+<li>Preparing data: This is done by calling
+<code class="docutils literal notranslate"><span class="pre">startDataPreparationFromCopFile</span></code>. This will update/overwrite the
+existing data.</li>
+<li>deleteAll: Calling this will delete persisted contexts. The next <code class="docutils literal notranslate"><span class="pre">startDataPreparationFromCopFile</span></code> will create a context from scratch.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="lexicons-clcs">
+<span id="index-7"></span><h2>Lexicons / CLCs</h2>
+<p>The DCC examples shown above both use context from COP files that only
+contain “_Ortho” fields. This means that no phonetic transcriptions
+are available, which is necessary for creating a context. The DCC will
+have to do this for all entries in the user data.</p>
+<p>Most often, this will be done by providing a CLC buffer (“common
+linguistic component”, shared with Vocalizer). In the
+<a class="reference internal" href="#dcc-example-1"><span class="std std-ref">first example above</span></a>, lines 18-21, shows how
+this is done:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;lexicon&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;clc&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;filename&quot;</span> <span class="p">:</span> <span class="s2">&quot;clc_enu_cfg3_v6_0_2.dat&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is really only needed to specify the CLC buffer file name (remember
+the <a class="reference internal" href="non_functional_aspects.html#asr-path-json"><span class="std std-ref">ASR paths</span></a>), and the DCC will handle the
+rest.</p>
+<p>The <a class="reference internal" href="#listcontext-dcc-example"><span class="std std-ref">second example</span></a> shows how to
+specify parameters for the CLC component, and how to define a
+cache to avoid calling the CLC component again for entries that occur
+multiple times in the user data:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;lexicon&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;clc&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;filename&quot;</span> <span class="p">:</span> <span class="s2">&quot;clc_enu_mpthreevadml_v6_0_1.dat&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;vocon_parameters&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;LH_CLC_PARAM_NUMBER_OUTPUT_TRANSCRIPTIONS&quot;</span> <span class="p">:</span> <span class="mi">5</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;lex_cache&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;persist&quot;</span> <span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="nt">&quot;cache_word_size&quot;</span> <span class="p">:</span> <span class="mi">1000</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="remote-dccs">
+<span id="dcc-remote"></span><h2>Remote DCCs</h2>
+<p>For details on remote DCCs, please refer to section <a class="reference internal" href="remote_applications.html#data-upload"><span class="std std-ref">Data upload</span></a></p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dynamic Content Consumers</a><ul>
+<li><a class="reference internal" href="#creating-dccs">Creating DCCs</a><ul>
+<li><a class="reference internal" href="#dcc-listeners">DCC listeners</a></li>
+<li><a class="reference internal" href="#dcc-context-types">DCC context types</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-sources-for-dccs">Data sources for DCCs</a><ul>
+<li><a class="reference internal" href="#cop-files">COP files</a></li>
+<li><a class="reference internal" href="#content-value-iterators">Content value iterators</a><ul>
+<li><a class="reference internal" href="#iterator-api">Iterator API</a></li>
+<li><a class="reference internal" href="#content-values-api">Content Values API</a></li>
+<li><a class="reference internal" href="#content-format">Content Format</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-sampa-phonetic-notation">Using SAMPA phonetic notation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dynamic-context-creation">Dynamic context creation</a><ul>
+<li><a class="reference internal" href="#data-preparation">Data preparation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#supplying-the-context-to-the-asr-application">Supplying the context to the ASR application</a><ul>
+<li><a class="reference internal" href="#data-updates">Data updates</a></li>
+<li><a class="reference internal" href="#dccs-and-the-asynchronous-api">DCCs and the asynchronous API</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lexicons-clcs">Lexicons / CLCs</a></li>
+<li><a class="reference internal" href="#remote-dccs">Remote DCCs</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="../chapters/using_the_csdk_ddfw.html">Using Cerence ASR</a><ul>
+      <li>Previous: <a href="search.html" title="previous chapter">Search spaces</a></li>
+      <li>Next: <a href="results.html" title="next chapter">Recognition Results</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

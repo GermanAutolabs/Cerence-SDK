@@ -1,0 +1,541 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Applications</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Search spaces" href="search.html" />
+    <link rel="prev" title="Audio setup and configuration" href="audio_setup_and_configuration.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="applications">
+<span id="vocon-applications"></span><h1>Applications</h1>
+<p>In section <a class="reference internal" href="high_level_description.html#high-level-description"><span class="std std-ref">High-level description</span></a>, we said that an ASR
+application is a description of a phase during a recognition
+session, where a “phase” is a time period where the recognizer is
+listening for a particular class of utterances, like a wake-up word or
+a command. Here we take this further, and deconstruct an ASR
+application setup in its constituent parts.</p>
+<p id="index-0">An ASR “application” can be seen as a task description for the recognizer. It may
+contain a several different things:</p>
+<ul>
+<li><p class="first">a description of the search space:</p>
+<ul class="simple">
+<li>which context(s) to use;</li>
+<li>(optionally) which language model(s) to use with the contexts;</li>
+<li>if several contexts are to be used, it should be specified if they
+should be merged, or if they will be used as host and guest contexts;</li>
+<li>if a setup with host and guest contexts is to be used, then the
+configuration should explain which guest context goes into which
+host context’s slots;</li>
+<li>if dynamically generated guest contexts are to be used, the
+configuration should link the corresponding slots to the dynamic
+content consumers that will provide the guest contexts.</li>
+</ul>
+</li>
+<li><p class="first">(optional) description of the NLU component:</p>
+<p>in addition to an ASR setup, an application can contain an NLU
+setup. If applicable, the configuration should specify which NLU
+processor to use, and the setup for it.</p>
+</li>
+<li><p class="first">(optional) Settings for ASR parameters relating to the contexts</p>
+<p>(More info on setting parameters: <a class="reference internal" href="#setting-parameters"><span class="std std-ref">Setting parameters for recognizers, ASR applications, search</span></a>)</p>
+</li>
+</ul>
+<p>There may be several applications configured at the same time in a
+recognizer, and several of them can be active at the same time as well.
+A complete description of the configuration options for applications
+can be found here: <a class="reference internal" href="../../json/application.html#application-configuration-options"><span class="std std-ref">Application Configuration Options</span></a>.</p>
+<p>Many of these items are usually defined in an <code class="docutils literal notranslate"><span class="pre">applications.json</span></code>
+configuration file. As with other configuration tasks, also in this
+case the determination of specific configuration values can be delayed
+to run-time. The <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code> mechanism can be used to retrieve
+values for specific keys at runtime. (See <a class="reference internal" href="../../json/callbacks.html#callbacks"><span class="std std-ref">Callbacks Configuration Options</span></a> for more info.)</p>
+<p>Applications that are described in the JSON configuration are loaded
+when Cerence ASR loads its configuration files. Applications that are
+configured by using the API, should also be fully set up before
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IRecognizer_start</span></code> is called to start the recognition
+process.</p>
+<p>In addition, just before a recognition is started, the initial
+applications must be activated. This is done by calling
+<code class="docutils literal notranslate"><span class="pre">&lt;AsrManager&gt;.setApplications(...)</span></code>, with a list of application names.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The image below illustrates broadly the stages that a “simple”
+recognition goes through, starting from audio capture and ending with
+one or more ASR hypotheses.</p>
+<p>In the first stage, the audio stream is converted into a phoneme
+stream, using the acoustic model for the target language. This stage
+works the same for any utterances, both the ones that the system might
+need to recognize, and all others as well.</p>
+<p>In the second stage, the phoneme stream from the first stage is
+continuously matched to the utterances defined in the context, to
+detect whether any of them appears in the stream. It is important to
+note, here, that the construction of contexts, whether BNF or SLM,
+starts from written representations of words, i.e. <em>not</em> phonemes. An
+important part of the compilation process of contexts is to convert
+these written representations into phonemes. From these phoneme
+strings a model is constructed which will match the phoneme stream
+from first stage which the utterances that are to be recognized. The
+second step of stage 2 is then to re-convert a matched stream of
+phonemes into their written representations, which can then be
+incorporated in a recognition hypothesis.</p>
+<p>In the third part, hypotheses from the second stage are handled
+(and also events, warnings and errors). This is the same for all
+hypotheses that come out of stage 2.</p>
+<a class="reference internal image-reference" href="../../_images/applications.png" id="app-setup-example"><img alt="../../_images/applications.png" class="align-center" id="app-setup-example" src="../../_images/applications.png" style="width: 90%;" /></a>
+<p>The architecture of a Cerence ASR recognition setup reflects the fact that
+stage 2 is specific for the utterances to be recognized at a specific
+point in time, wheras stages 1 and 3 remain the same throughout the
+recognition session: stage 2 is extracted into “ASR applications”,
+and the Cerence ASR API allows easy activation and deactivation of ASR
+applications, depending on the utterances that the system should look
+for at a specific time during the recognition session.</p>
+<p>Below, we first discuss recognizers, and after that we look at
+<a class="reference internal" href="#id1"><span class="std std-ref">Applications</span></a>.</p>
+<div class="section" id="recognizers">
+<span id="vocon-recognizers"></span><h2>Recognizers</h2>
+<p>The static parts of a recognition setup are collected in
+<strong>Recognizer</strong> configurations. This includes, for example, the
+acoustic model. A Cerence ASR recognizer is configured with a specific
+acoustic model, and this does not change throughout a recognition
+session. The same is true for the code that handles the output of the
+Cerence ASR recognizer: event messages, warnings, errors, and actual
+recognition results. This code stays the same during a recognition
+session, and is configured, using a RecognizerListener, on the
+recognizer.  More information on recognizer configuration options can
+be found here: <a class="reference internal" href="../../json/recognizer.html#recognizer-configuration-options"><span class="std std-ref">Recognizer Configuration Options</span></a>. The
+recognition results that will be handed to the <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback
+will always be in JSON format, but the structure will depend on the
+result type (ASR, NLU, cloud, etc.). More
+information on result contents can be found here:
+<a class="reference internal" href="results.html#asr-result-structure"><span class="std std-ref">ASR results</span></a> and <a class="reference internal" href="results.html#nlu-result-structure"><span class="std std-ref">NLU results</span></a>.</p>
+<div class="section" id="configuration">
+<span id="recognizer-config"></span><h3>Configuration</h3>
+<p>A basic recognizer configuration looks like this (typically in <code class="docutils literal notranslate"><span class="pre">recognizer.json</span></code>):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;recognizer&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rec&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;asr_engine&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="nt">&quot;acmod&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;acmod6_6000_enu_gen_car_f16_v1_0_1.dat&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}],</span>
+      <span class="nt">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;...&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This recognizer has a simple configuration for its ASR engine: only
+the acoustic model file is configured. In this case, the file is
+referenced statically, i.e. the configuration is fixed. (Note that the
+acoustic model file will be loaded from the path configured in
+<code class="docutils literal notranslate"><span class="pre">asr_paths.json</span></code> using the <code class="docutils literal notranslate"><span class="pre">acmod</span></code> key (see <a class="reference internal" href="non_functional_aspects.html#asr-path-json"><span class="std std-ref">ASR paths</span></a>) You can also have Cerence ASR resolve the file name
+dynamically, using the <code class="docutils literal notranslate"><span class="pre">vh_callback</span></code> mechanism (see
+<a class="reference internal" href="non_functional_aspects.html#dynamic-configuration"><span class="std std-ref">Dynamic configuration at runtime</span></a>).</p>
+<p>In addition to the acoustic model, it is also possible to specify
+ASR parameters, specifically those with the <code class="docutils literal notranslate"><span class="pre">LH_ENGINE_PARAM</span></code>
+prefix. These parameters apply to internal components of the
+recognizer. The full specification of keys and parameters that can be
+set on a recognizer is here: <a class="reference internal" href="../external/configuration.html#irecognizerconfig"><span class="std std-ref">IRecognizerConfig - The configuration of Recognizer.</span></a></p>
+</div>
+<div class="section" id="audio">
+<h3>Audio</h3>
+<p>A recognizer is an audio module: it consumes audio, and is supposed to
+be configured at the end of an audio chain. It will receive the audio
+stream, process it and return results based on this stream. The
+recognizer should be included in all relevant audio paths, just like
+other audio modules. They are referenced by name:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;AudioMgr 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;audio_scenario&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span>       <span class="s2">&quot;defaultScenario&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">,</span> <span class="s2">&quot;rec&quot;</span><span class="p">]</span> <span class="p">]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>See section <a class="reference internal" href="audio_setup_and_configuration.html#audio-setup-and-config"><span class="std std-ref">Audio setup and configuration</span></a> for more information on
+audio scenarios, and audio setup in general.</p>
+</div>
+<div class="section" id="recognizer-listener">
+<h3>Recognizer listener</h3>
+<p>A recognizer listener provides the way for recognizers to give
+feedback on the recognition process to the system. As shown in the
+figure above, the recognizer listener is created as a separate entity,
+and passed to the recognizer when it is created.</p>
+<p>There are 2 steps to setting up a recognizer listener. First of all,
+a set of callback functions need to be implemented. There are 4 callback
+functions: <code class="docutils literal notranslate"><span class="pre">onEvent</span></code>, <code class="docutils literal notranslate"><span class="pre">onResult</span></code>, <code class="docutils literal notranslate"><span class="pre">onWarning</span></code> and
+<code class="docutils literal notranslate"><span class="pre">onError</span></code>. After implementation of the functions, a <code class="docutils literal notranslate"><span class="pre">vtable</span></code> with
+pointers to these implementations is created, and from this <code class="docutils literal notranslate"><span class="pre">vtable</span></code>
+a recognizer listener is created that can be provided to the recognizer.</p>
+<p>Section <a class="reference internal" href="c_api.html#listener-details"><span class="std std-ref">Listeners</span></a> goes into more detail about listeners.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">onWarning</span></code> and <code class="docutils literal notranslate"><span class="pre">onError</span></code> callbacks return an error code in
+addition to a message string; more information is here:
+<a class="reference external" href="../../../../api_reference/asr/c/group___recognizer_error.html">group___recognizer_error.html</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">onEvent</span></code> callback will be called each time the recognizer
+produces an event.</p>
+<p>See here for more information on which events can occur:
+<a class="reference external" href="../../../../api_reference/asr/c/group___recog_event.html">group___recog_event.html</a></p>
+<p>You can influence the number of <code class="docutils literal notranslate"><span class="pre">SPEECH_DETECTED</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SILENCE_DETECTED</span></code> events somewhat using the <code class="docutils literal notranslate"><span class="pre">speech_events</span></code> key
+in the <code class="docutils literal notranslate"><span class="pre">asr_event</span></code> section of the recognizer configuration (see
+<a class="reference internal" href="../external/configuration.html#irecognizerconfig"><span class="std std-ref">IRecognizerConfig - The configuration of Recognizer.</span></a>).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback is called for each result that the
+recognizer produces. All results are passed to the <code class="docutils literal notranslate"><span class="pre">onResult</span></code>
+callback. The callback itself can decide whether to process a result
+or not. If you are e.g. sure that an NLU result will always be
+produced, you can decide to ignore the ASR result on which the NLU
+result is based. The <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback receives the type of result
+in the <code class="docutils literal notranslate"><span class="pre">resultType</span></code> parameter (see
+<a class="reference external" href="../../../../api_reference/asr/c/group___result_type.html">group___result_type.html</a>)
+and whether the result is a final or a partial result. The result
+itself is a string, and will always be in JSON format.</p>
+</div>
+</div>
+<div class="section" id="id1">
+<span id="id2"></span><h2>Applications</h2>
+<p>The variable parts of the configuration are collected in
+<strong>Application</strong> configurations. An application contains a description
+of the phrases that are to be recognized. Such a description will
+contain Cerence ASR contexts, any links between them (such as which guest
+context will fill a slot in a host context), ASR parameters, and it
+can contain an NLU configuration as well. ASR contexts may be
+present on the file system as <code class="docutils literal notranslate"><span class="pre">.fcf</span></code>-files, or created at run-time
+by dynamic content consumers (See <a class="reference internal" href="dcc.html#dynamic-content-consumers"><span class="std std-ref">Dynamic Content Consumers</span></a>, and
+<a class="reference internal" href="../../json/dyncontent.html#dynamic-content-consumer-configuration"><span class="std std-ref">Dynamic Content Consumer Configuration</span></a>). Normally applications
+are configured using JSON; conventionally, these applications reside
+in the <code class="docutils literal notranslate"><span class="pre">applications.json</span></code> file in the Cerence ASR configuration
+directory.</p>
+<p>It should be noted that “variable” in this context does not mean that
+the actual applications change, but rather that the application
+configuration of a recognizer is easily modified. There is an
+easy-to-use mechanism to “swap out” the variable configuration parts
+in a Cerence ASR recognizer. While the static parts (like the acoustic
+model) remain the same during a recognition session, it is very easy
+to activate and deactivate applications. This makes it possible to
+load or unload potentially very complex context configurations onto or
+from the recognizer, simply by using a single command, and referring
+to the configurations by name.</p>
+<p>Generally, an ASR application is declared like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;input_type&gt;&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;&lt;input_type&gt;&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;...&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;post_processor&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;...&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;nlu&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;nlu_type&gt;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;&lt;nlu_type&gt;&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;...&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Applications are named; this name is used for activating applications
+(<code class="docutils literal notranslate"><span class="pre">&lt;AsrManager&gt;.setApplications(...)</span></code>). The <code class="docutils literal notranslate"><span class="pre">input</span></code> key describes
+the configuration of the application.</p>
+<p>An application’s configuration can consists of several stages. The
+first stage (referred to by <code class="docutils literal notranslate"><span class="pre">type</span></code>) is always there, and can be of
+several types: <code class="docutils literal notranslate"><span class="pre">asr</span></code> denotes the “classic” embedded Cerence ASR
+recognizer. Type <code class="docutils literal notranslate"><span class="pre">cloud</span></code> denotes the remote recognizer in the
+Cerence cloud (see <a class="reference internal" href="remote_applications.html#remote-applications"><span class="std std-ref">Remote applications</span></a>)</p>
+<p>The first stage, which produces “initial” results, can optionally be
+followed by two more stages: an NLU stage (<a class="reference internal" href="nlu_applications.html#nlu-applications"><span class="std std-ref">NLU applications</span></a>),
+and a post-processor. NLU stages are currently always of type
+<code class="docutils literal notranslate"><span class="pre">sem3</span></code>. There is currently also one post-processor type, for VDE
+(Voice Destination Entry).</p>
+<p>In general, any results produced by any of the stages are returned to
+the system’s <code class="docutils literal notranslate"><span class="pre">onResult</span></code> callback. This means that, for a
+post-processor or NLU result, the callback will get both the original
+ASR (or cloud) result, and the processed version of it.</p>
+<div class="section" id="search-spaces">
+<h3>Search spaces</h3>
+<p>Search spaces are an important and extensive subject. They are covered
+in their own section: <a class="reference internal" href="search.html#contexts"><span class="std std-ref">Search spaces</span></a>.</p>
+</div>
+<div class="section" id="nlu">
+<h3>NLU</h3>
+<p>The NLU (natural language understanding) block of an ASR application
+contains components that do postprocessing on “plain” ASR results, to
+extract semantic information such as the user’s intent from the plain
+ASR result.</p>
+<p>Currently, “SEM3” is the only type of NLU processing buffer that
+can be used with Cerence ASR. SEM3 buffers can be constructed from semantic
+information that is included in the BNF grammar (actually
+“BNF+SAM”). The semantic information is ignored when a “normal”
+context compilation is done. A specific SEM3 compiler extracts the
+semantic information, and prepares the buffer for use in SEM3 NLU
+applications.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;nlu&quot;: [{
+    &quot;name&quot;: &quot;SEM3_MUSIC_SIMPLE&quot;,
+    &quot;type&quot;: &quot;sem3&quot;,
+    &quot;sem3&quot;: {
+      &quot;app&quot;: {
+        &quot;name&quot;: &quot;MUSIC_APP&quot;,
+        &quot;file_name&quot;: &quot;music_simple_v5.s3c&quot;
+      }
+    }
+  }
+]
+</pre></div>
+</div>
+<div class="section" id="itn">
+<h4>ITN</h4>
+<p>An example of a SEM3 NLU module, is the ITN module included with
+the messaging data pack for Cerence ASR. ITN, or Inverse Text Normalization,
+is a SEM3 module that takes an ASR result as input, and
+converts the word sequence produced by the ASR into a formatted
+written text. During this formatting, entities such as numbers,
+addresses, times, dates, … are rendered as in standard written
+documents. For instance, a number is rendered as 125 instead of one
+hundred twenty five. Also the Plato tags are removed.</p>
+<p>As example, consider the following ASR result, and the corresponding
+result after it was post-processed by the ITN component:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span>  <span class="n">ASR</span>  <span class="o">|</span>  <span class="mi">8286</span> <span class="o">|</span> <span class="n">sorry</span> <span class="n">I</span>\<span class="n">pronoun</span> <span class="n">know</span> <span class="n">I</span>\<span class="n">pronoun</span> <span class="n">said</span> <span class="n">I</span>\<span class="n">pronoun</span> <span class="n">meet</span> <span class="n">you</span> <span class="n">at</span> <span class="n">the</span> <span class="n">restaurant</span> <span class="n">at</span> <span class="n">five</span> <span class="n">thirty</span> <span class="n">but</span> <span class="n">I</span><span class="s1">&#39;m going to be about fifteen minutes late</span>
+<span class="o">|</span>  <span class="n">ITN</span>  <span class="o">|</span>  <span class="n">n</span><span class="o">/</span><span class="n">a</span>  <span class="o">|</span> <span class="n">sorry</span>     <span class="n">I</span>      <span class="n">know</span>     <span class="n">I</span>    <span class="n">said</span>      <span class="n">I</span>    <span class="n">meet</span> <span class="n">you</span> <span class="n">at</span> <span class="n">the</span> <span class="n">restaurant</span> <span class="n">at</span>    <span class="mi">5</span><span class="p">:</span><span class="mi">30</span>     <span class="n">but</span> <span class="n">I</span><span class="s1">&#39;m going to be about   15    minutes late</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>the semantic tags pronoun have been removed.</li>
+<li>the word sequence “five thirthy” has been formatted as a time indication: “5:30”.</li>
+<li>the word “fifteen” has been replaced by the number “15”.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="post-processors">
+<h3>Post-processors</h3>
+<p>Results can be processed by optional, post-processor libraries.</p>
+<p>A postprocessor must be declared inside the ASR manager, in the
+<code class="docutils literal notranslate"><span class="pre">plugin</span></code> block:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;asr_manager&quot;: [{
+  &quot;name&quot;: &quot;asr&quot;,
+  &quot;plugin&quot;: {
+    &quot;post_processor&quot;: [{
+      &quot;name&quot;: &quot;vderpp5_plugin&quot;
+    }]
+    },
+  &quot;liquid_config_file_name&quot;: &quot;liquid_config.json&quot;
+}]
+</pre></div>
+</div>
+<p>Its configuration is declared as part of the application where it will
+be active:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;application&quot;: [{
+  &quot;name&quot;: &quot;VDE_RPP_APP&quot;,
+  &quot;input&quot;: [{
+    &quot;uses&quot;: &quot;VDE_INPUT&quot;
+  }],
+  &quot;post_processor&quot;: {
+    &quot;name&quot;: &quot;VDERPP_PP&quot;,
+    &quot;source&quot;: [
+      &quot;UDEPS&quot;
+    ],
+    &quot;library_name&quot;: &quot;vderpp5_plugin&quot;,
+    &quot;config&quot;: {
+      &quot;sortPerStreet&quot;: &quot;1&quot;,
+      &quot;partial_results&quot;: &quot;0&quot;,
+      &quot;input_acceptance_threshold&quot;: &quot;50&quot;,
+      &quot;...&quot;: &quot;...&quot;
+    }
+  }
+}]
+</pre></div>
+</div>
+<p>The value of the <code class="docutils literal notranslate"><span class="pre">source</span></code> key is a JSON array containing context
+names. The postprocessor will be applied to results originating from
+these contexts.</p>
+</div>
+</div>
+<div class="section" id="setting-parameters-for-recognizers-asr-applications-search">
+<span id="setting-parameters"></span><h2>Setting parameters for recognizers, ASR applications, search</h2>
+<p>ASR parameter values can be set in the following ways:</p>
+<ul class="simple">
+<li>For recognizers, use the JSON configuration (see
+<a class="reference external" href="recognizer_config">this recognizer configuration example</a>, <code class="docutils literal notranslate"><span class="pre">vocon_parameters</span></code> block)</li>
+<li>For search, use the JSON configuration (see
+<a class="reference external" href="simple_file_base_contexts">this ASR application configuration example</a>, <code class="docutils literal notranslate"><span class="pre">vocon_parameters</span></code>
+block). Alternatively, parameter settings can be included in the
+compiled context files.</li>
+<li>For ASR applications, use the JSON configuration.</li>
+</ul>
+<p>A JSON configuration block is used for statically specifying ASR
+parameters via JSON configuration, like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;vocon_parameters&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;LH_ENGINE_PARAM_SPEECHDETECTOR_ABSOLUTE_THRESHOLD&quot;</span> <span class="p">:</span> <span class="mi">800</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In addition, Cerence ASR supports setting parameters at runtime via
+callbacks. These callbacks have to be configured in the JSON
+configuration files as well. This procedure is described in detail
+here: <a class="reference internal" href="non_functional_aspects.html#dynamic-configuration"><span class="std std-ref">Dynamic configuration at runtime</span></a>.</p>
+<p>The parameters that can be set per component are documented in the
+respective IVPxxx members (see links above).</p>
+<p>Additionally, ASR parameters can be specified through their
+hexadecimal key. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;vocon_parameters&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;0x33a14f52&quot;</span> <span class="p">:</span> <span class="mi">64000</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="nesting-of-the-parameters">
+<h3>Nesting of the parameters</h3>
+<p>The same parameter can be set on the recognizer, application or
+search level.</p>
+<p>If the parameter is set on the recognizer level then it will be
+applied for all objects which accept this parameter.  The value
+of the same parameter can be overwritten by redefining it on a lower level.</p>
+</div>
+</div>
+<div class="section" id="remote-applications">
+<h2>Remote applications</h2>
+<p>Remote applications are described in detail in a dedicated section: <a class="reference internal" href="remote_applications.html#remote-applications"><span class="std std-ref">Remote applications</span></a>.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Applications</a><ul>
+<li><a class="reference internal" href="#recognizers">Recognizers</a><ul>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#audio">Audio</a></li>
+<li><a class="reference internal" href="#recognizer-listener">Recognizer listener</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">Applications</a><ul>
+<li><a class="reference internal" href="#search-spaces">Search spaces</a></li>
+<li><a class="reference internal" href="#nlu">NLU</a><ul>
+<li><a class="reference internal" href="#itn">ITN</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#post-processors">Post-processors</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#setting-parameters-for-recognizers-asr-applications-search">Setting parameters for recognizers, ASR applications, search</a><ul>
+<li><a class="reference internal" href="#nesting-of-the-parameters">Nesting of the parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#remote-applications">Remote applications</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="../chapters/using_the_csdk_ddfw.html">Using Cerence ASR</a><ul>
+      <li>Previous: <a href="audio_setup_and_configuration.html" title="previous chapter">Audio setup and configuration</a></li>
+      <li>Next: <a href="search.html" title="next chapter">Search spaces</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

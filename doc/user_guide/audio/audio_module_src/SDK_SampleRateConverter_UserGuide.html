@@ -1,0 +1,256 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CERENCE SDK - SAMPLE RATE CONVERTER USER’S GUIDE</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Overview" href="user_guide/audio_module_src_configuration_api_ref.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="doc-title">
+<h1>CERENCE SDK - SAMPLE RATE CONVERTER USER’S GUIDE</h1>
+<div class="line-block">
+<div class="line">© 2020 Cerence, Inc. All rights reserved.</div>
+<div class="line">Published by Cerence, Inc.</div>
+<div class="line">15 Wayside Road, Burlington, Massachusetts 01803, U.S.A.</div>
+</div>
+<p>Cerence, Inc. provides this document without representation or warranty of any kind. The
+information in this document is subject to change without notice and does not represent a commitment by Cerence, Inc. The software and/or databases described in this document are furnished under a license
+agreement and may be used or copied only in accordance with the terms of such license agreement. Without
+limiting the rights under copyright reserved herein, and except as permitted by such license agreement, no part of
+this document may be reproduced or transmitted in any form or by any means, including, without limitation,
+electronic, mechanical, photocopying, recording, or otherwise, or transferred to information storage and retrieval
+systems, without the prior written permission of Cerence, Inc.</p>
+<p>Cerence and the Cerence logo are trademarks or registered trademarks of Cerence, Inc. or its affiliates in the United States and/or other countries. All other trademarks referenced
+herein are the property of their respective owners.</p>
+<div class="section" id="scope-of-document">
+<h2>Scope Of Document</h2>
+<p>The main scope of this <abbr title="Software Development Kit">SDK</abbr> documentation is to serve as user guide
+for engineers who use the Cerence <abbr title="Software Development Kit">SDK</abbr> to develop and deliver project-specific applications.</p>
+</div>
+<div class="section" id="overview">
+<h2>Overview</h2>
+<p>In general the <cite>Sample Rate Converter</cite> audio module offers the possibility to change the sampling rate and as a side effect also the audio
+packet size - more precise the <cite>samples per channel</cite> value - of a multi-channel audio data stream. The <cite>Sample Rate Converter</cite> audio module
+is usable in an audio input or audio output <a class="reference external" href="../index.html#glossary">Audio Path</a> of an <a class="reference external" href="../index.html#glossary">Audio Scenario</a> to connect audio modules with different audio formats
+(except for a different number of audio channels).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Except for the occasional one the <cite>Sample Rate Converter</cite> audio module may not be used between a <a class="reference external" href="../audio_module_sse/index.html">Speech Signal Enhancement</a> audio
+module and an <cite>Asr</cite> audio module. Dependent on its configuration the <a class="reference external" href="../audio_module_sse/index.html">Speech Signal Enhancement</a> audio module adds additional information
+into the audio signal for the <cite>Asr</cite> audio module. This additional information can be useful for the <cite>Asr</cite> for an optimized
+recognition. A sample rate conversion in-between would destroy this information. Thus it is recommended to perform a sample rate conversion
+in front of the <a class="reference external" href="../audio_module_sse/index.html">Speech Signal Enhancement</a> audio module. In case a sample rate conversion is really needed between
+<a class="reference external" href="../audio_module_sse/index.html">Speech Signal Enhancement</a> audio module and <cite>Asr</cite> audio module please contact your support.</p>
+</div>
+<p>The input audio format of the <cite>Sample Rate Converter</cite> audio module is automatically given by the audio format of the audio module connected
+to the input of the <cite>Sample Rate Converter</cite>.</p>
+<p>The output audio format of the <cite>Sample Rate Converter</cite> audio module has to be configured. Please ensure that the audio module connected to
+the output of the <cite>Sample Rate Converter</cite> audio module can handle this audio format.
+If that is not the case the activation of the <a class="reference external" href="../index.html#glossary">Audio Scenario</a> fails.</p>
+<p>With different filter scopes it is possible to define a specific filter set used by the <cite>Sample Rate Converter</cite> audio module. Thereby the
+<cite>Sample Rate Converter</cite> audio module provides an internal filter set optimized for the recognition and the audibility use case.</p>
+</div>
+<div class="section" id="document-conventions">
+<h2>Document Conventions</h2>
+<p><abbr title="Application Programming Interface">API</abbr> call examples in this document are shown in C syntax.</p>
+</div>
+<div class="section" id="developing-applications">
+<h2>Developing Applications</h2>
+<div class="section" id="api-reference">
+<span id="id1"></span><h3><abbr title="Application Programming Interface">API</abbr> Reference</h3>
+<p>The <abbr title="Application Programming Interface">API</abbr> reference documentation of the <abbr title="Software Development Kit">SDK</abbr> <cite>Sample Rate Converter</cite> component is included in the Cerence <abbr title="Software Development Kit">SDK</abbr> package
+at <code class="file docutils literal notranslate"><span class="pre">doc/api_reference/audio/audio_module_src/</span></code>. There is a separate folder for each supported programming language
+in which the reference documentation can be accessed via the mainpage <code class="file docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+<p>The C <abbr title="Application Programming Interface">API</abbr> documentation is available at <a class="reference external" href="../../../api_reference/audio/audio_module_src/c/index.html">doc/api_reference/audio/audio_module_src/c/index.html</a>.</p>
+</div>
+<div class="section" id="configuration-api-reference">
+<span id="id2"></span><h3>Configuration <abbr title="Application Programming Interface">API</abbr> Reference</h3>
+<p>The configuration has to be done in the <abbr title="JavaScript Object Notation">JSON</abbr> format as specified in the configuration <abbr title="Application Programming Interface">API</abbr> reference:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#isamplerateconverterconfig-interface-of-the-samplerateconverter-abbr-src-audio-module-configuration">ISampleRateConverterConfig - Interface of the ‘SampleRateConverter’ (abbr. ‘SRC’) audio module configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#itoplevelaudioconfig-the-top-level-audio-configuration-structure">ITopLevelAudioConfig - The top-level audio configuration structure.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#itoplevelconfig-interface-for-top-level-configuration-classes">ITopLevelConfig - Interface for top-level configuration classes.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#iaudioscenarioconfig-the-audio-scenario-configuration">IAudioScenarioConfig - The audio scenario configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#iaudiopluginconfig-the-audio-plug-in-configuration">IAudioPluginConfig - The audio plug-in configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#iaudiomoduleconfig-the-audio-module-configuration">IAudioModuleConfig - The audio module configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#ichunkpoolconfig-chunkpool-configuration">IChunkPoolConfig - ChunkPool configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/audio_module_src_configuration_api_ref.html#iaudioformatconfig-the-audio-format-configuration">IAudioFormatConfig - The audio format configuration.</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="creating-and-configuring">
+<span id="id3"></span><h3>Creating And Configuring</h3>
+<p>The creation and configuration of an audio module is described in general in the <a class="reference external" href="../index.html#creating-and-configuring-audio-modules">Creating and Configuring Audio Modules</a>
+chapter of the main <a class="reference external" href="../index.html">Audio User’s Guide</a>.</p>
+<p>The configuration of the audio scenario and the <cite>Sample Rate Converter</cite> audio module looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+<span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span>       <span class="s2">&quot;exampleScenario&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;mod_a&quot;</span><span class="p">,</span> <span class="s2">&quot;src&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">,</span> <span class="s2">&quot;mod_b&quot;</span><span class="p">]]</span>
+<span class="p">}</span>
+
+<span class="o">...</span>
+
+<span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span>         <span class="s2">&quot;SampleRateConverter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span>         <span class="s2">&quot;src&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;filter_scope&quot;</span><span class="p">:</span> <span class="s2">&quot;SRC_FILTER_SCOPE_RECOGNITION&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;audio_format&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;16khz_1ch&quot;</span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Given the example from above activating the audioscenario <code class="docutils literal notranslate"><span class="pre">&quot;exampleScenario&quot;</span></code> will create the <cite>Sample Rate Converter</cite> audio module named <code class="docutils literal notranslate"><span class="pre">&quot;src&quot;</span></code>.</p>
+<p>The <cite>Sample Rate Converter</cite> audio module is linked into the audio stream following the definitions in the audio scenarios audio-paths section.</p>
+<p>Finally there will be a system setup like shown in the following figure.</p>
+<img alt="_images/src_audio_path.png" src="_images/src_audio_path.png" />
+</div>
+</div>
+<div class="section" id="references">
+<span id="id4"></span><h2>References</h2>
+<ul class="simple">
+<li><a class="reference external" href="../index.html">Audio User’s Guide</a></li>
+<li><a class="reference external" href="../index.html#audio-manager">Audio Manager</a></li>
+<li><a class="reference external" href="../index.html#glossary">Audio Path</a></li>
+<li><a class="reference external" href="../index.html#glossary">Audio Scenario</a></li>
+<li><a class="reference external" href="../index.html#creating-and-configuring-audio-modules">Creating and Configuring Audio Modules</a></li>
+<li><a class="reference external" href="../audio_module_sse/index.html">Speech Signal Enhancement</a></li>
+</ul>
+</div>
+<div class="section" id="version-history">
+<h2>Version History</h2>
+<table border="1" class="colwidths-given docutils">
+<colgroup>
+<col width="5%" />
+<col width="5%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><em>REVISION</em></th>
+<th class="head"><em>DATE</em></th>
+<th class="head"><em>DESCRIPTION</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1.0</td>
+<td>10.06.2019</td>
+<td>initial version</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CERENCE SDK - SAMPLE RATE CONVERTER USER’S GUIDE</a><ul>
+<li><a class="reference internal" href="#scope-of-document">Scope Of Document</a></li>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#document-conventions">Document Conventions</a></li>
+<li><a class="reference internal" href="#developing-applications">Developing Applications</a><ul>
+<li><a class="reference internal" href="#api-reference"><abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#configuration-api-reference">Configuration <abbr title="Application Programming Interface">API</abbr> Reference</a></li>
+<li><a class="reference internal" href="#creating-and-configuring">Creating And Configuring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#version-history">Version History</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="user_guide/audio_module_src_configuration_api_ref.html" title="next chapter">Overview</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/SDK_SampleRateConverter_UserGuide.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

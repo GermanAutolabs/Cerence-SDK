@@ -1,0 +1,828 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Advanced Prompter API Functions</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Overview" href="prompter_configuration_api_ref.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="advanced-prompter-api-functions">
+<span id="id1"></span><h1>Advanced Prompter <abbr title="Application Programming Interface">API</abbr> Functions</h1>
+<div class="section" id="runtime-activation-of-individual-voice-config-keys">
+<span id="id2"></span><h2>Runtime Activation of Individual voice_config Keys</h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> class provides an asynchronous <abbr title="Application Programming Interface">API</abbr> call to individually set voice_config keys to values different than
+defined in the current active usecase. This <abbr title="Application Programming Interface">API</abbr> call is only supported for instances of type <code class="docutils literal notranslate"><span class="pre">local</span></code>. The keys that are
+modifiable are <code class="docutils literal notranslate"><span class="pre">volume</span></code>, <code class="docutils literal notranslate"><span class="pre">speechrate</span></code>, <code class="docutils literal notranslate"><span class="pre">pitch</span></code> and <code class="docutils literal notranslate"><span class="pre">timbre</span></code>. As precondition for the call to work, the <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance must have a valid usecase activated.</p>
+<p>Otherwise <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompterListener_onError</span></code> is called and the key’s value cannot be modified.</p>
+<div class="highlight-c notranslate" id="code-c-iprompter-setparameter"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompter</span> <span class="o">*</span><span class="n">prompter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="p">...</span>
+<span class="cm">/* IPrompter creation and usecase activation already done at this point. */</span>
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_setParameter</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="n">NUANCE_PROMPTER_VOLUME</span><span class="p">,</span> <span class="mi">40</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+<p>A call to this method overrules the values of the keys defined in the current active usecase.
+If e.g. the current active usecase has defined <code class="docutils literal notranslate"><span class="pre">&quot;volume&quot;</span> <span class="pre">:</span> <span class="pre">90</span></code> a subsequent <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_setParameter</span></code>
+call that sets volume to 95 will result in a volume of 95 in the next played prompt. Another call to
+<code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_activateUseCase</span></code> resets the keys like defined in the passed usecase and overrules any values
+that were previously modified with above methods.</p>
+<p>The following sample <abbr title="JavaScript Object Notation">JSON</abbr> configuration and call sequences show how <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_activateUseCase</span></code>
+and <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_setParameter</span></code> influence the values of the voice_config keys of the <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code>
+instance:</p>
+<div class="literal-block-wrapper docutils container" id="code-json-iprompter-setparameter">
+<div class="code-block-caption"><span class="caption-text">Example of a Prompter config file with particular voice_config settings.</span></div>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Prompter 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;voice_data_path&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;VE_DATA&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;vocalizer_path&quot;</span><span class="p">:</span> <span class="s2">&quot;../vocalizer&quot;</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;prompter&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;SYS_PROMPTER&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;voice_data_path&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;VE_DATA&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;usecase&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;english_us&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;voice_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;ava&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;german&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;voice_config&quot;</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;petra&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+<span class="hll">  <span class="nt">&quot;voice_config&quot;</span><span class="p">:</span> <span class="p">[{</span>
+</span><span class="hll">      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ava&quot;</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="s2">&quot;enu&quot;</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;voice&quot;</span><span class="p">:</span> <span class="s2">&quot;Ava&quot;</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;operating_point&quot;</span><span class="p">:</span> <span class="s2">&quot;embedded-high&quot;</span>
+</span><span class="hll">    <span class="p">},</span> <span class="p">{</span>
+</span><span class="hll">      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;petra&quot;</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="s2">&quot;ged&quot;</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;voice&quot;</span><span class="p">:</span> <span class="s2">&quot;Petra-Ml&quot;</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;operating_point&quot;</span><span class="p">:</span> <span class="s2">&quot;embedded-high&quot;</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;volume&quot;</span><span class="p">:</span> <span class="mi">73</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;speechrate&quot;</span><span class="p">:</span> <span class="mi">120</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;pitch&quot;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+</span><span class="hll">      <span class="nt">&quot;timbre&quot;</span><span class="p">:</span> <span class="mi">140</span>
+</span><span class="hll">    <span class="p">}</span>
+</span><span class="hll">  <span class="p">]</span>
+</span><span class="hll"><span class="p">}</span>
+</span></pre></div>
+</td></tr></table></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="code-c-sequence-iprompter-setparameter">
+<div class="code-block-caption"><span class="caption-text">Sequence showing the functionality of <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_setParameter</span></code>. The used IPrompter instance is based on the <a class="reference internal" href="#code-json-iprompter-setparameter"><span class="std std-ref">Prompter config file</span></a>.</span></div>
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_common_IBackgroundOperation_Status</span> <span class="n">status</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_IBACKGROUNDOPERATION_RUNNING</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompter</span> <span class="o">*</span><span class="n">prompter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompt</span> <span class="o">*</span><span class="n">prompt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="p">...</span>
+<span class="cm">/* IPrompter creation already done at this point. */</span>
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_activateUseCase</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="s">&quot;german&quot;</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_setParameter</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="n">NUANCE_PROMPTER_VOLUME</span><span class="p">,</span> <span class="mi">93</span><span class="p">);</span>
+<span class="p">...</span>
+
+<span class="cm">/* plays prompt with volume=93, speechrate=120, pitch=80, timbre=140 */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_playString</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="s">&quot;Hallo&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">prompt</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompt_waitForCompletion</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">prompt</span><span class="o">-&gt;</span><span class="n">destroy</span><span class="p">();</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_activateUseCase</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="s">&quot;english_us&quot;</span><span class="p">);</span>
+<span class="p">...</span>
+
+<span class="cm">/* plays prompt with default values of Cerence TTS Embedded volume=80, speechrate=100, pitch=100, timbre=100 */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_playString</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="s">&quot;Hello&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">prompt</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompt_waitForCompletion</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">prompt</span><span class="o">-&gt;</span><span class="n">destroy</span><span class="p">();</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_setParameter</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="n">NUANCE_PROMPTER_VOLUME</span><span class="p">,</span> <span class="mi">50</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_setParameter</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="n">NUANCE_PROMPTER_SPEECH_RATE</span><span class="p">,</span> <span class="mi">300</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_setParameter</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="n">NUANCE_PROMPTER_PITCH</span><span class="p">,</span> <span class="mi">200</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_setParameter</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="n">NUANCE_PROMPTER_TIMBRE</span><span class="p">,</span> <span class="mi">90</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_activateUseCase</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="s">&quot;english_us&quot;</span><span class="p">);</span>
+<span class="p">...</span>
+
+<span class="cm">/* plays prompt with default values of Cerence TTS Embedded volume=80, speechrate=100, pitch=100, timbre=100 */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_playString</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="s">&quot;Hello&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">prompt</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompt_waitForCompletion</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">prompt</span><span class="o">-&gt;</span><span class="n">destroy</span><span class="p">();</span>
+<span class="n">prompt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="pausing-and-resuming-the-iprompter-instance">
+<span id="pausing-and-resuming-the-prompter"></span><h2>Pausing and Resuming the IPrompter Instance</h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> class also provides methods to pause and resume speech output.
+These methods are only supported for instances of type <code class="docutils literal notranslate"><span class="pre">local</span></code>.</p>
+<div class="highlight-c notranslate" id="code-c-iprompter-pause-resume"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompter</span> <span class="o">*</span><span class="n">prompter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="p">...</span>
+<span class="cm">/**</span>
+<span class="cm"> * IPrompter creation and usecase activation already done at this point.</span>
+<span class="cm"> * Possibly a play operation is currently performed on the IPrompter instance.</span>
+<span class="cm"> */</span>
+
+<span class="cm">/* When pausing the instance, the play operation is interrupted. */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_pause</span><span class="p">(</span><span class="n">prompter</span><span class="p">);</span>
+<span class="p">...</span>
+
+<span class="cm">/* When resuming the instance, the play operation is continued again. */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_resume</span><span class="p">(</span><span class="n">prompter</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_pause</span></code> on an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance pauses an executing play operation.
+If no play operation is currently executed, then the next queued play operation pauses right at the beginning of its execution.</p>
+<p>A call to <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_resume</span></code> removes the pausing state and the play operation continues.</p>
+</div>
+<div class="section" id="get-available-speech-configurations">
+<span id="id3"></span><h2>Get Available Speech Configurations</h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> interface provides the method <code class="docutils literal notranslate"><span class="pre">getAvailableSpeechConfigurations</span></code>
+to retrieve data about available speech configurations. This information might be needed at application level,
+e.g. to show a list of available <abbr title="Text To Speech">TTS</abbr> languages and voices on the <abbr title="Human Machine Interface">HMI</abbr> and to allow selection by the user.
+On a <code class="docutils literal notranslate"><span class="pre">local</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance a speech configuration is identified via a 3-letter language code, a voice name,
+an operating point, a multi-lingual language set and a usecase name, for example: <em>“enu” “ava-ml” “embedded-high” [“enu”,”spm”] “MyJsonUseCaseName”</em>.
+The usecase name identifies the <abbr title="JavaScript Object Notation">JSON</abbr> usecase that contains the configuration with the associated speech parameters.
+On a <code class="docutils literal notranslate"><span class="pre">cloud</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance a speech configuration does not contain operating point and multi-lingual information and both are left empty.
+The returned language codes of a cloud instance are rather according to the ISO-3166-1 and/or ISO-639 standard than the
+3-letter language code. In cloud case typically following speech configuration is returned: <em>“eng-USA” “ava-ml” “” [] “MyJsonCloudUseCaseName”</em>.</p>
+<p>The call <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_getAvailableSpeechConfigurations</span></code> returns the information as five lists:</p>
+<div class="highlight-c notranslate" id="code-c-iprompter-getavailablespeechconfigurations"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompter</span> <span class="o">*</span><span class="n">prompter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* List of strings holding the 3-letter language codes */</span>
+<span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">languageCodes</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* List of strings holding the voice names */</span>
+<span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">voiceNames</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* List of strings holding the operating points */</span>
+<span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">operatingPoints</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* List of ML language sets, a language set consists of one or more language codes */</span>
+<span class="n">nuance_common_StringListList</span> <span class="o">*</span><span class="n">mlLanguageSets</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* List of strings holding the usecase names */</span>
+<span class="n">nuance_common_StringList</span> <span class="o">*</span><span class="n">useCaseNames</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+
+<span class="p">...</span>
+<span class="cm">/* IPrompter creation already done at this point. */</span>
+
+<span class="cm">/* retrieve available speech config info */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_getAvailableSpeechConfigurations</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span>
+                                                                <span class="o">&amp;</span><span class="n">languageCodes</span><span class="p">,</span>
+                                                                <span class="o">&amp;</span><span class="n">voiceNames</span><span class="p">,</span>
+                                                                <span class="o">&amp;</span><span class="n">operatingPoints</span><span class="p">,</span>
+                                                                <span class="o">&amp;</span><span class="n">mlLanguageSets</span><span class="p">,</span>
+                                                                <span class="o">&amp;</span><span class="n">useCaseNames</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+<p>The outputs are (unsorted) lists of strings describing available speech configurations.
+All lists have the same length and each list represents a column of the speech configuration table.
+All elements having the same list index describe one speech configuration.</p>
+</div>
+<div class="section" id="skip-to-a-text-marker">
+<span id="id4"></span><h2>Skip to a Text Marker</h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">IPrompt</span></code> class provides the call <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompt_skipToMarker</span></code> which can be used to navigate within the currently playing prompt,
+i.e. it is possible to skip back and forth or jump directly to text unit markers or user-defined bookmarks.
+The method is only supported for instances of type <code class="docutils literal notranslate"><span class="pre">local</span></code>.
+To understand how this <abbr title="Application Programming Interface">API</abbr> method works, you need a basic understanding of the processing of markers within the Cerence <abbr title="Text To Speech">TTS</abbr> Embedded engine.</p>
+<p>Cerence <abbr title="Text To Speech">TTS</abbr> Embedded allows to synthesize an input text in 2 steps. First (with the <abbr title="Application Programming Interface">API</abbr> call <code class="docutils literal notranslate"><span class="pre">ve_ttsAnalyzeText()</span></code>) it performs text analysis and
+rewrites the input text based on given user rule sets. The result of the text analysis is a list of jump points to all textunit and bookmark
+markers found in the text as well as the rewritten text. In the second step (with the <abbr title="Application Programming Interface">API</abbr> call <code class="docutils literal notranslate"><span class="pre">ve_ttsProcessText2SpeechStartingAt()</span></code>) the actual
+synthesis starts based on the list with the jump points and the rewritten text. In addition an index of the jump point is passed to the
+function that tells from which textunit or bookmark the synthesis should start. The following example text shows how jumping within a synthesis
+works if <em>readmode=sent</em> and therefore <em>TU = textunit = sentence</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Hello. I am &lt;ESC&gt;\mrk=111\ the prompter. I like to &lt;ESC&gt;\mrk=222\ tell a lot of stories. Goodbye!
+|     |    |                            |         |                                     |
+TU1   TU2  BMRK111                      TU3       BMRK222                               TU4
+</pre></div>
+</div>
+<p>Resulting list of jump points:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="62%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Jump Point Index</th>
+<th class="head">Marker</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>TU1</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>TU2</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>BMRK111</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>TU3</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>BMRK222</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>TU4</td>
+</tr>
+</tbody>
+</table>
+<p>Whereas <em>readmode=word</em> <em>(TU = textunit = word)</em> causes the text analysis to produce the following results:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Hello. I am &lt;ESC&gt;\mrk=111\ the prompter. I like to &lt;ESC&gt;\mrk=222\ tell a lot of stories. Goodbye!
+|     | |  |              |   |         | |    |  |              |    | |   |  |        |
+TU1  TU2|  BMRK111        TU4 TU5      TU6|    TU8|             TU9 TU10|  TU12|        TU14
+        TU3                               TU7     BMRK222               TU11   TU13
+</pre></div>
+</div>
+<p>Snippet of resulting list of jump points:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="62%" />
+<col width="38%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Jump Point Index</th>
+<th class="head">Marker</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>0</td>
+<td>TU1</td>
+</tr>
+<tr class="row-odd"><td>1</td>
+<td>TU2</td>
+</tr>
+<tr class="row-even"><td>2</td>
+<td>TU3</td>
+</tr>
+<tr class="row-odd"><td>3</td>
+<td>BMRK111</td>
+</tr>
+<tr class="row-even"><td>4</td>
+<td>TU4</td>
+</tr>
+<tr class="row-odd"><td>5</td>
+<td>TU5</td>
+</tr>
+<tr class="row-even"><td>…</td>
+<td>…</td>
+</tr>
+<tr class="row-odd"><td>15</td>
+<td>TU14</td>
+</tr>
+</tbody>
+</table>
+<p>The resulting jump point indices are used as input argument for the Cerence <abbr title="Text To Speech">TTS</abbr> Embedded <abbr title="Application Programming Interface">API</abbr> call <code class="docutils literal notranslate"><span class="pre">ve_ttsProcessText2SpeechStartingAt(int</span> <span class="pre">index)</span></code> to
+instruct the synthesis to start from this jump point onwards.</p>
+<p>On top of these Cerence <abbr title="Text To Speech">TTS</abbr> Embedded functions the Prompter <abbr title="Application Programming Interface">API</abbr> provides the call <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompt_skipToMarker</span></code>.</p>
+<p>It takes the parameters:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">position</span></code>: integer value defining the marker position to skip to</li>
+<li><code class="docutils literal notranslate"><span class="pre">mode</span></code>: the skip mode</li>
+</ul>
+<p>Supported markers are text units and bookmarks. The type of the text units this method relates to, depends on how the Prompter has configured its readmode
+(as described above Cerence <abbr title="Text To Speech">TTS</abbr> Embedded creates textunit markers at different places for <em>readmode=sent</em> vs. <em>readmode=word</em>).
+The <code class="docutils literal notranslate"><span class="pre">mode</span></code> parameter accepts the following enum values:</p>
+<div class="highlight-c notranslate" id="code-c-skipmode"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * Skips to the text unit at given position. The value correspondents to the text unit number</span>
+<span class="cm"> * counted from the beginning of the prompt. The first text unit of the prompt has the position 1.</span>
+<span class="cm"> */</span>
+<span class="n">NUANCE_PROMPTER_TEXTUNIT_ABSOLUTE</span><span class="p">,</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Skips to the text unit at position counted relatively from the currently playing text unit.</span>
+<span class="cm"> * The given position defines how many text units to skip and in which direction. The position -1</span>
+<span class="cm"> * means to skip one text unit back. The position 1 means to skip one text unit forward.</span>
+<span class="cm"> * And position 0 means to skip to the beginning of the currently playing text unit.</span>
+<span class="cm"> */</span>
+<span class="n">NUANCE_PROMPTER_TEXTUNIT_RELATIVE</span><span class="p">,</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Skips to the bookmark at given position, whereas the position</span>
+<span class="cm"> * contains the bookmark ID used in the text to play.</span>
+<span class="cm"> */</span>
+<span class="n">NUANCE_PROMPTER_BOOKMARK_ID</span><span class="p">,</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Analogically to the mode NUANCE_PROMPTER_TEXTUNIT_RELATIVE it skips to the bookmark</span>
+<span class="cm"> * at position counted relatively from the currently playing bookmark.</span>
+<span class="cm"> */</span>
+<span class="n">NUANCE_PROMPTER_BOOKMARK_RELATIVE</span>
+</pre></div>
+</td></tr></table></div>
+<p>Given the example text above the playing prompt can for instance be skipped to the 3rd text unit with following call:</p>
+<div class="highlight-c notranslate" id="code-c-iprompt-skiptomarker"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompt</span> <span class="o">*</span><span class="n">prompt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="p">...</span>
+<span class="cm">/* Assuming that the play operation is already performing. */</span>
+
+<span class="cm">/* Restart the prompt at the 3rd sentence. */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompt_skipToMarker</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">NUANCE_PROMPTER_TEXTUNIT_ABSOLUTE</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+<p>Or it can be skipped to the position of a bookmark in the text:</p>
+<div class="highlight-c notranslate" id="code-c-iprompt-skiptomarker-bookmark"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompt</span> <span class="o">*</span><span class="n">prompt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="p">...</span>
+<span class="cm">/* Assuming that the play operation is already performing. */</span>
+
+<span class="cm">/* Restart the prompt at the bookmark with the ID 222. */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompt_skipToMarker</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="mi">222</span><span class="p">,</span> <span class="n">NUANCE_PROMPTER_BOOKMARK_ID</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+<p>If <code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompt_skipToMarker</span></code> is called with a <code class="docutils literal notranslate"><span class="pre">position</span></code> value that is not existing or while no prompt is playing, it will return an error result.</p>
+<span class="target" id="playing-encoded-audio-files"></span></div>
+<div class="section" id="id6">
+<h2>Playing Encoded Audio Files</h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">local</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instances support the playback of digital audio recordings via the <code class="docutils literal notranslate"><span class="pre">play</span></code> <abbr title="Application Programming Interface">API</abbr> calls.
+Audio files that shall be played need to be added as Cerence <abbr title="Text To Speech">TTS</abbr> Embedded control sequence <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;\audio=&quot;&lt;path&gt;&quot;\</span></code> to the the input text,
+see chapter “Inserting a digital audio recording” in the referenced <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation.
+While Cerence <abbr title="Text To Speech">TTS</abbr> Embedded by default only supports inserting <abbr title="Waveform Audio File Format">WAV</abbr> format audio files that contain linear
+16-bit <abbr title="Pulse Code Modulation">PCM</abbr> samples, the Prompter additionally supports to play back audio files with the following encodings:</p>
+<ul class="simple">
+<li>Ogg/Opus, sample rate of 24kHz</li>
+</ul>
+<p>To define an audio insertion of an encoded audio file in the prompt text, the file name must be prefixed with a string describing the format of the data.
+The string must contain the media type (also called mime type or content type) which is composed of a type, a subtype and if required, additional parameters.
+The string with the media type must be concluded with a <code class="docutils literal notranslate"><span class="pre">:</span></code> character followed by the actual path to the file to be inserted.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Playing back encoded audio files through the Prompter is only reasonable for rather small files.
+When playing larger files (e.g. with a playing time of a few minutes), noticeable time delays occur.
+Therefore playback of such large files should not be done through the Prompter, but rather
+by handing over the files to a suitable media player outside of Cerence <abbr title="Software Development Kit">SDK</abbr>.</p>
+</div>
+<div class="section" id="adding-ogg-opus-encoded-audio-files-into-tts-strings">
+<span id="id7"></span><h3>Adding Ogg/Opus Encoded Audio Files Into <abbr title="Text To Speech">TTS</abbr> Strings</h3>
+<p>The Prompter has the ability to play Ogg/Opus files by converting the audio data read from the file into
+the format Cerence <abbr title="Text To Speech">TTS</abbr> Embedded requires (linear 16-bit <abbr title="Pulse Code Modulation">PCM</abbr> , 22 kHz). In order to be able to decode Ogg/Opus files,
+the <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance internally builds a decoder chain using an audio path that includes <abbr title="Software Development Kit">SDK</abbr> Audio components
+required for this purpose (i.e. AudioDecoder, OpusDecoder, OggUnpacker, SampleRateConverter).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance uses its Audio Manager instance (which was registered
+at the time of <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> creation) to activate this internal audio path on demand.
+To activate such an audio path, the Audio Manager must know the factories of the <abbr title="Software Development Kit">SDK</abbr> Audio components
+contained therein. Therefore, as a prerequisite, the application must register these factories at
+the Audio Manager instance once, as described in more detail in the <a class="reference external" href="../../audio/SDK_Audio_UserGuide.html">Audio User’s Guide</a>.</p>
+<p>For example:</p>
+<div class="highlight-c notranslate" id="code-c-iprompter-playstring-oggopusfile-factories"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;IAudioDecoder.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;IOggUnpacker.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;IOpusDecoder.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;ISampleRateConverter.h&quot;</span><span class="cp"></span>
+
+<span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_audio_IAudioManager</span> <span class="o">*</span><span class="n">audioManager</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="p">...</span>
+
+<span class="cm">/* Assuming that the IAudioManager instance is created at this point. */</span>
+
+<span class="cm">/* Register required factories at the Audio Manager. */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_audio_IAudioDecoder_registerFactory</span><span class="p">(</span><span class="n">audioManager</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_audio_IOggUnpacker_registerFactory</span><span class="p">(</span><span class="n">audioManager</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_audio_IOpusDecoder_registerFactory</span><span class="p">(</span><span class="n">audioManager</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_audio_ISampleRateConverter_registerFactory</span><span class="p">(</span><span class="n">audioManager</span><span class="p">);</span>
+<span class="p">...</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Pass the IAudioManager instance to subsequent IPrompter creations.</span>
+<span class="cm"> * The instance(s) will be capable of playing Ogg/Opus files.</span>
+<span class="cm"> */</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+<p>The required media type to insert an Ogg/Opus-encoded 24kHz audio file in the prompt text
+must define the type <code class="docutils literal notranslate"><span class="pre">audio</span></code>, the subtype <code class="docutils literal notranslate"><span class="pre">ogg</span></code> and the additional parameters <code class="docutils literal notranslate"><span class="pre">codecs=opus</span></code> and <code class="docutils literal notranslate"><span class="pre">rate=24000</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is recommended to use the file name extension <code class="docutils literal notranslate"><span class="pre">.opus</span></code> for Ogg/Opus encoded files.</p>
+</div>
+<p>For example:</p>
+<div class="highlight-c notranslate" id="code-c-iprompter-playstring-oggopusfile"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompter</span> <span class="o">*</span><span class="n">prompter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPromptListener</span> <span class="o">*</span><span class="n">promptListener</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompt</span> <span class="o">*</span><span class="n">prompt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/* The input text with a Cerence TTS Embedded control sequence to insert &quot;&lt;config dir&gt;/recordings/enu_hello.opus&quot;. */</span>
+<span class="hll"><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">inputText</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\x1b\\</span><span class="s">audio=</span><span class="se">\&quot;</span><span class="s">audio/ogg;codecs=opus;rate=24000:recordings/enu_hello.opus</span><span class="se">\&quot;\\</span><span class="s">&quot;</span><span class="p">;</span>
+</span>
+<span class="p">...</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Creations of IPromptListener and IPrompter instances already</span>
+<span class="cm"> * done, IPrompter instance has a valid usecase activated.</span>
+<span class="cm"> */</span>
+
+<span class="cm">/* Start the play operation to play the given input text. */</span>
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_playString</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="n">inputText</span><span class="p">,</span> <span class="n">promptListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">prompt</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References</h2>
+<ul class="simple">
+<li><a class="reference external" href="../../audio/SDK_Audio_UserGuide.html">Audio User’s Guide</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Prompter_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Prompter_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Advanced Prompter <abbr title="Application Programming Interface">API</abbr> Functions</a><ul>
+<li><a class="reference internal" href="#runtime-activation-of-individual-voice-config-keys">Runtime Activation of Individual voice_config Keys</a></li>
+<li><a class="reference internal" href="#pausing-and-resuming-the-iprompter-instance">Pausing and Resuming the IPrompter Instance</a></li>
+<li><a class="reference internal" href="#get-available-speech-configurations">Get Available Speech Configurations</a></li>
+<li><a class="reference internal" href="#skip-to-a-text-marker">Skip to a Text Marker</a></li>
+<li><a class="reference internal" href="#id6">Playing Encoded Audio Files</a><ul>
+<li><a class="reference internal" href="#adding-ogg-opus-encoded-audio-files-into-tts-strings">Adding Ogg/Opus Encoded Audio Files Into <abbr title="Text To Speech">TTS</abbr> Strings</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Prompter_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="prompter_configuration_api_ref.html" title="previous chapter">Overview</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/prompter_advanced_usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

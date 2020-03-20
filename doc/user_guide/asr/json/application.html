@@ -1,0 +1,436 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Application Configuration Options</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="application-configuration-options">
+<span id="index-0"></span><span id="id1"></span><h1>Application Configuration Options</h1>
+<div class="section" id="overview">
+<h2>OVERVIEW</h2>
+<p>An application contains the ASR/Cloud/NLU configuration for a given ASR/Cloud/NLU task.  That is, it can configure
+a set of search, queries and possibly other things that are used when
+an utterance is processed by Cerence ASR.
+In this document, we provide a brief overview of application types and their
+options.</p>
+</div>
+<div class="section" id="common-options">
+<h2>COMMON OPTIONS</h2>
+<p>Every application is build up following this schema:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;application&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;application_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;input_name&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;typeName&gt;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;&lt;typeName&gt;&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="o">...</span>
+      <span class="p">}</span>
+    <span class="p">}],</span>
+    <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;output_name&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;typeName&gt;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;&lt;typeName&gt;&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="o">...</span>
+      <span class="p">}</span>
+    <span class="p">}],</span>
+    <span class="s2">&quot;nlu&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;nlu_name&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;typeName&gt;&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;&lt;typeName&gt;&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="o">...</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>Uniquely identifies the input.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">input</span></code></dt>
+<dd>configure for recognition, the type can be can be <code class="docutils literal notranslate"><span class="pre">asr</span></code> and <code class="docutils literal notranslate"><span class="pre">cloud</span></code> at the moment.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">output</span></code></dt>
+<dd>configure for recognition, the type can be can be <code class="docutils literal notranslate"><span class="pre">internalAudio</span></code> at the moment.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">nlu</span></code></dt>
+<dd>configure for nlu, the can be <code class="docutils literal notranslate"><span class="pre">sem3</span></code> only.</dd>
+</dl>
+</div>
+<div class="section" id="asr-input">
+<h2>ASR INPUT</h2>
+<p>The asr input can be used to configure almost any recognition task. This
+includes tasks as complex as the all-in-one menu (A1M). The following configuration
+is a reduced version of said A1M. It gives an example of all available configuration
+options for the asr input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;input&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;APP_CNC&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;asr&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;search&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;CNC_CTX&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;static&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;modelm_small.fcf&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;VAD_NAMES&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;dynamic&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dynamic&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;dynamic_content_consumer&quot;</span> <span class="p">:</span> <span class="s2">&quot;DCC_LOCAL_VAD_NAMES&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;search_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;vad_lastname.fcf&quot;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+      <span class="p">],</span>
+      <span class="s2">&quot;dccs_to_wait_for&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+              <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;DCC_LOCAL_VAD_NAMES&quot;</span>
+          <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">asr</span></code> object contains the following keys.</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">search</span></code></dt>
+<dd><blockquote class="first">
+<div><p>A list of search objects to be used in recognition.
+Each search object can contain the following keys.</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>Unique name of the search. Used in the result.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">type</span></code></dt>
+<dd>Is either <code class="docutils literal notranslate"><span class="pre">static</span></code> or <code class="docutils literal notranslate"><span class="pre">dynamic</span></code></dd>
+<dt><code class="docutils literal notranslate"><span class="pre">static</span></code></dt>
+<dd><p class="first">A static context (found on disk)</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">filename</span></code></dt>
+<dd>Filename of the context. This path is relative to the
+<code class="docutils literal notranslate"><span class="pre">search</span> <span class="pre">path</span> <span class="pre">specified</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">`asr_paths</span> <span class="pre">configuration`_'s</span> <span class="pre">``asr_paths</span></code></dd>
+<dt><code class="docutils literal notranslate"><span class="pre">file_path</span></code></dt>
+<dd>The absolute path to the context. This is mutually exclusive with <code class="docutils literal notranslate"><span class="pre">filename</span></code>.</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">dynamic</span></code></dt>
+<dd><p class="first">A context generated online by a DCC</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">dynamic_content_consumer</span></code></dt>
+<dd>The name of the DCC</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">search_name</span></code></dt>
+<dd>The name (not filename) of the context generated by the DCC</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">source</span></code></dt>
+<dd>The name of the source that identifies the source (e.g. device name) of the dynamic data.</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">vocon_parameters</span></code></dt>
+<dd>ASR parameters related to search spaces.
+Possible parameters are described in the <a class="reference external" href="../user_guide/external/configuration.html">vocon parameters documentation</a>.
+Parameter values specified here take precedence over values specified in the <a class="reference external" href="./recognizer.html">recognizer</a> configuration for the time of recognition of the current use-case.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">consolidated_update</span></code></dt>
+<dd><p class="first">Configures consolidated update for search spaces that have consolidated update buffer.</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">filename</span></code></dt>
+<dd><p class="first">The consolidated update file name. It is a required field in case the file_path key is not provided.
+The file should be located under <code class="docutils literal notranslate"><span class="pre">context_update</span></code> <a class="reference external" href="../user_guide/external/configuration.html#iasrpathsconfig-configures-all-the-directories-where-vocon-high-5-stores-and-retrieves-data-files">asr_paths configuration</a>’s <code class="docutils literal notranslate"><span class="pre">asr_paths</span></code> in this case.</p>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">search</span> <span class="pre">path</span> <span class="pre">specified</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">`asr_paths</span> <span class="pre">configuration`_'s</span> <span class="pre">``asr_paths</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">file_path</span></code></dt>
+<dd>The consolidated update absolute path (including the filename). It is a required field in case the filename key is not provided</dd>
+</dl>
+</div></blockquote>
+</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">dccs_to_wait_for</span></code></dt>
+<dd><p class="first">List of dynamic content consumers that the recognition will wait for before starting. This key is optional.
+Its values can be changed via vh_callback. If not specified, the recognition will start with the data available at that point.
+All DCCs listed here must be defined in the same application configuration. Otherwise, they will be ignored and a warning will be logged.
+Each object contains the following keys:</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>The name of the DCC to wait for.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">source</span></code></dt>
+<dd>The source of the DCC to wait for. This key is optional.</dd>
+</dl>
+</div></blockquote>
+</dd>
+</dl>
+</div>
+<div class="section" id="cloud-input">
+<h2>CLOUD INPUT</h2>
+<p>The following configuration gives an example of all available configuration
+options for the cloud input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;MY_CLOUD_APP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cloud&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;cloud_services_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;REMOTE_QUERY_HTTP&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;command&quot;</span> <span class="p">:</span> <span class="s2">&quot;DRAGON_NLU_ASR_CMD&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;connection_info&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;uses&quot;</span> <span class="p">:</span> <span class="s2">&quot;DRAGON_CONNECTION_INFO_HTTP&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;param&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;REQUEST_INFO&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;REQUEST_INFO&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;start&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="s2">&quot;end&quot;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+              <span class="s2">&quot;text&quot;</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;appserver_data&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;message&quot;</span> <span class="p">:</span> <span class="s2">&quot;SLOTS:GLOBAL:reset_cancel&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;timezone&quot;</span> <span class="p">:</span> <span class="s2">&quot;America</span><span class="se">\\</span><span class="s2">/Toronto&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;speaker&quot;</span> <span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;error_on_user_data_not_uploaded&quot;</span> <span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;conversation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;actions&quot;</span> <span class="p">:</span> <span class="p">[]</span>
+              <span class="p">},</span>
+              <span class="s2">&quot;binary_results&quot;</span> <span class="p">:</span> <span class="mi">0</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">cloud</span></code> object has the following keys.</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">cloud_services_name</span></code></dt>
+<dd>The name of the cloud services to use for connection to the server.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">query</span></code></dt>
+<dd><p class="first">The query object to use with the connection.</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>The name of the query.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">command</span></code></dt>
+<dd>The command to send to the server.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">connection_info</span></code></dt>
+<dd>The connection info to send as part of the query.
+This is a <a class="reference external" href="./verbatim.html">verbatim json</a> object.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">param</span></code></dt>
+<dd><p class="first">Paramters for query.</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">type</span></code></dt>
+<dd>Type of this set of parameters.
+Can currently only be <code class="docutils literal notranslate"><span class="pre">REQUEST_INFO</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">REQUEST_INFO</span></code></dt>
+<dd>The <code class="docutils literal notranslate"><span class="pre">REQUEST_INFO</span></code> parameter object.
+This is a <a class="reference external" href="./verbatim.html">verbatim json</a> object.</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+<div class="section" id="sem3-nlu">
+<h2>SEM3 NLU</h2>
+<p>The following configuration gives an example of all available configuration
+options for the sem3 input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;nlu&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;SEM3_MESSAGING&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;sem3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sem3&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MUSIC_APP&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;itn_enu_messaging_v2_0_v5.s3c&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">app</span></code> object contains the following keys.</p>
+<p><code class="docutils literal notranslate"><span class="pre">app</span></code></p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>Unique name of the sem3 app. Used in the result.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">file_name</span></code></dt>
+<dd>The name on disc of the sem3 app to load. It is a required field in case the file_path key is not provided.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">filePath</span></code></dt>
+<dd>The absolute path (including the filename) of the sem3 app to load.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">additionalData</span></code></dt>
+<dd><p class="first">additional data to a particular annotator that can have multiple data receivers.</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">path</span></code></dt>
+<dd>A data path is a combination of a unique annotator identifier, optionally with one or more data receiver identifier.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">configuration</span></code></dt>
+<dd>Specify configuration for a SEM3 context that have multiple data receivers.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">data</span></code></dt>
+<dd>Sem3 data, for now, only static data supported.</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">filter</span></code></dt>
+<dd>The filter applied to sem3 additional data.</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="internalaudio-output">
+<h2>internalAudio OUTPUT</h2>
+<p>The internalAudio OUTPUT can be used to route the audio received by
+Cerence ASR to other audio module like Prompter, Biometry, AudioToFile
+etc. The configuration take effect when setApplication interface is
+called, the audioStartTimeMs, audioEndTimeMs define the section of the
+audio interested. An application json may contain only “output”
+section, no asr/cloud input and sem3 nlu, in this case, the only
+purpose of the application is to routing audio.  It gives an example
+of all available configuration options for the internalAudio output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;output&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;to_file&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;internalAudio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;internalAudio&quot;</span> <span class="p">:</span> <span class="p">{</span>
+       <span class="n">json</span> <span class="n">string</span><span class="p">,</span>
+    <span class="p">}</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;to_prompter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;internalAudio&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;internalAudio&quot;</span> <span class="p">:</span> <span class="p">{</span>
+       <span class="n">json</span> <span class="n">string</span><span class="p">,</span>
+    <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>REFERENCES</h2>
+<ul class="simple">
+<li><a class="reference external" href="../user_guide/external/configuration.html#iasrpathsconfig-configures-all-the-directories-where-vocon-high-5-stores-and-retrieves-data-files">asr_paths configuration</a></li>
+<li><a class="reference external" href="../user_guide/external/configuration.html">vocon parameters documentation</a></li>
+<li><a class="reference external" href="./recognizer.html">recognizer</a></li>
+<li><a class="reference external" href="./verbatim.html">verbatim json</a> documentation</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Application Configuration Options</a><ul>
+<li><a class="reference internal" href="#overview">OVERVIEW</a></li>
+<li><a class="reference internal" href="#common-options">COMMON OPTIONS</a></li>
+<li><a class="reference internal" href="#asr-input">ASR INPUT</a></li>
+<li><a class="reference internal" href="#cloud-input">CLOUD INPUT</a></li>
+<li><a class="reference internal" href="#sem3-nlu">SEM3 NLU</a></li>
+<li><a class="reference internal" href="#internalaudio-output">internalAudio OUTPUT</a></li>
+<li><a class="reference internal" href="#references">REFERENCES</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

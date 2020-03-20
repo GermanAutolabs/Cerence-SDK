@@ -1,0 +1,643 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Remote / Cloud Configuration Options</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="remote-cloud-configuration-options">
+<span id="remote-config-options"></span><span id="index-0"></span><h1>Remote / Cloud Configuration Options</h1>
+<div class="section" id="overview">
+<h2>OVERVIEW</h2>
+<p>It is possible to configure CSDK and DDFW to use remote HTTP
+servers such that users can upload user specific grammar (like
+personal contacts) to the remote server or make remote recognition
+with or without NLU post processing.  On top of recognition related
+command CSDK and DDFW supports commands to send text messages to the remote
+dialog manager or to send logs for the server analytics.</p>
+<p>The sections below offer an overview of cloud-related configuration
+options. For a full reference, please consult the <a class="reference external" href="../../cloudservices/SDK_CloudServices_UserGuide.html">Cloud Services User
+Guide</a>.</p>
+</div>
+<div class="section" id="common-options">
+<h2>COMMON OPTIONS</h2>
+<div class="section" id="connection-info">
+<h3>Connection info</h3>
+<p>The “connection info” data is passed to the cloud server for most
+commands. It represents metadata about the source of the request. An
+example of a connection info JSON block looks like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;connection_info&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;MyConnection&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;dictation_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;Dictation&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;dictation_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;locale&quot;</span> <span class="p">:</span> <span class="s2">&quot;Canada&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;application_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;Testing http application&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;organization_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;NUANCE&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_OS&quot;</span> <span class="p">:</span> <span class="s2">&quot;4.0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_network&quot;</span> <span class="p">:</span> <span class="s2">&quot;wifi&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;audio_source&quot;</span> <span class="p">:</span> <span class="s2">&quot;SpeakerAndMicrophone&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;location&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;+45.5086699, -73.5539925&gt; +/- 99.00m&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;application_session_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;afb7bf7gw2g7seg5nw0up2z&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;utterance_number&quot;</span> <span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;ui_langugage&quot;</span> <span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_submodel&quot;</span> <span class="p">:</span> <span class="s2">&quot;nmPhone2,1&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;application_state_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;45&quot;</span>
+      <span class="p">}</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">connection_info</span></code></dt>
+<dd><p class="first">This is the type of the object. The <code class="docutils literal notranslate"><span class="pre">uses</span></code> keyword can only
+be used with this object where a <code class="docutils literal notranslate"><span class="pre">connection_info</span></code> (in this case)
+is expected.</p>
+<dl class="last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">name</span></code></dt>
+<dd>The name of the object.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">json</span></code> Under this key you can put an arbitrary JSON object that</dt>
+<dd>contains command related parameters which will be transferred to
+the server.  Callbacks will be resolved if specified here.</dd>
+</dl>
+</dd>
+</dl>
+</div>
+<div class="section" id="cloud-services">
+<h3>Cloud services</h3>
+<p>A cloud services object contains the data needed to set up an actual
+server connection. Typically, cloud services configurations go in te
+<code class="docutils literal notranslate"><span class="pre">cloudservicesconfig.json</span></code> file. Note that you can have several
+cloud services configurations for the same server. This is required if
+you want to run cloud commands in parallel: commands using the same
+cloud services object will be executed one after the other, so if you
+want to run commands in parallel, you need to use different cloud
+services objects.</p>
+<p>An example for HTTP connections:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;cloud_services&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;http&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;MyCloudServices&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;url&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://...:443/NmspServlet/&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_key&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;ssl_certificate_bundle&quot;</span><span class="p">:</span> <span class="s2">&quot;bundle.crt&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;dragondrive_eval_1.0&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;carrier&quot;</span> <span class="p">:</span> <span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;device_model&quot;</span> <span class="p">:</span> <span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;uid&quot;</span> <span class="p">:</span> <span class="s2">&quot;dragon_drive_sdk_tests_uid&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;input_audio_format&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;encoding&quot;</span> <span class="p">:</span> <span class="s2">&quot;ENCODING_OPUS&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;sample_rate&quot;</span> <span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+        <span class="nt">&quot;samples_per_channel&quot;</span> <span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+        <span class="nt">&quot;channel_count&quot;</span> <span class="p">:</span> <span class="mi">1</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;output_audio_format&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;encoding&quot;</span> <span class="p">:</span> <span class="s2">&quot;ENCODING_OPUS&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;sample_rate&quot;</span> <span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+        <span class="nt">&quot;samples_per_channel&quot;</span> <span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+        <span class="nt">&quot;channel_count&quot;</span> <span class="p">:</span> <span class="mi">1</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">cloud_services</span></code></dt>
+<dd>This is the type of the object. This object could be referenced by its name.
+This object holds the parameters related to the connection to a server.
+For details on the configuration see the document <code class="docutils literal notranslate"><span class="pre">nds_cloudservices_configuration_classes.html</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">url</span></code>, <code class="docutils literal notranslate"><span class="pre">app_id</span></code>, <code class="docutils literal notranslate"><span class="pre">app_key</span></code></dt>
+<dd>These are the credentials needed to connect to a cloud server. You
+will receive these when you order cloud services from Cerence.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ssl_certificate_bundle</span></code></dt>
+<dd><p class="first">This is a pointer to the file that contains the SSL
+certificates. If this is a relative path, it is resolved relative to
+the path in which this configuration file resides.</p>
+<p class="last">It is also possible to omit this key, and use the environment variable
+<code class="docutils literal notranslate"><span class="pre">CURL_CA_BUNDLE</span></code> to point to the SSL certificate store:</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="cloud-applications">
+<span id="cloud-apps"></span><h3>Cloud Applications</h3>
+<div class="section" id="uploading-data">
+<span id="remote-upload-data"></span><h4>Uploading Data</h4>
+<p>The client application sometimes needs to upload on-device data to the
+server.  This data will in turn be converted to the appropriate
+grammars depending on the data type. The grammars can then be used in
+subsequent recognition requests.  In the Cerence NLU Product, on-device
+data that will help improve Cerence recognition accuracy and Cerence NLU
+interpretation accuracy are:</p>
+<ul class="simple">
+<li>User’s contact list<ul>
+<li>first name</li>
+<li>last name</li>
+<li>nick name</li>
+<li>relationship</li>
+<li>has home phone number</li>
+<li>has work phone number</li>
+<li>has email address</li>
+</ul>
+</li>
+<li>Meeting titles</li>
+<li>Meeting locations</li>
+<li>Reminder subjects</li>
+<li>Note subjects</li>
+<li>Artist names</li>
+<li>Song titles</li>
+<li>Album titles</li>
+<li>Playlists</li>
+</ul>
+<p>Currently, we support contact list and structured_content type. The
+remote dynamic content consumer is used to upload this data.  By
+default, the action UPLOAD_ACTION_CLEAR_THEN_ADD will be used; this
+means that the existing content will be cleared before adding the new
+data.  If the user wants to incrementally upload the data without
+<code class="docutils literal notranslate"><span class="pre">clear_all</span></code>, the property <code class="docutils literal notranslate"><span class="pre">force_clear_all</span></code> has to be set to
+<code class="docutils literal notranslate"><span class="pre">false</span></code> as illustrated below:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CONTACTS&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;first_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;last_name&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;company&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;additional_info&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span>
+  <span class="p">}],</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;remote&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;DRAGON_NLU_DATA_UPLOAD_CMD&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;grammar_type&quot;</span><span class="p">:</span> <span class="s2">&quot;contacts&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;force_clear_all&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In order to use incremental upload mode, the client application must
+pass a valid checksum value in order to associate previously uploaded
+data with the new data.</p>
+<p><em>NOTE</em>: It is possible to upload data in parallel to an ongoing
+recognition session. However, this works only if the application and
+the DCC refer to the different Cloud Services configurations. If they
+use the same Cloud Services configuration, the server requests will be
+queued, and run one atfer the other.</p>
+</div>
+<div class="section" id="uploading-data-in-chunks">
+<h4>Uploading data in chunks</h4>
+<p>It is possible to upload the data in chunks for UPLOADER_MODE_NVC. Two
+JSON keys were introduced for this purpose:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;data_chunk_size&quot;</span></code> - this is the number of items per data
+block). The key is optional. The minimum value is 1; the default value
+is 50.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;data_total_size&quot;</span></code> - this is the number of items in this data
+upload command. The key is optional. The minimum value is 1; the
+default value is 200.</li>
+</ul>
+<p>Example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;remote&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;DRAGON_NLU_DATA_UPLOAD_CMD&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;grammar_type&quot;</span><span class="p">:</span> <span class="s2">&quot;contacts&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;data_chunk_size&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nt">&quot;data_total_size&quot;</span><span class="p">:</span> <span class="mi">2</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="deleting-previously-uploaded-data">
+<h4>Deleting previously uploaded data</h4>
+<p>Deleting previously uploaded data needs (without adding a new data)
+can be done by calling <code class="docutils literal notranslate"><span class="pre">deleteAll</span></code> on the corresponding remote DCC:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>nuance_common_ResultCode nuance_asr5_IDynamicContentConsumer_deleteAll(nuance_asr5_IDynamicContentConsumer *instance);
+</pre></div>
+</div>
+<p><em>NOTE:</em> The checksum will be returned with <code class="docutils literal notranslate"><span class="pre">DCC_DATA_ID</span></code> event. This
+checksum needs to be used with the next startDataPreparation call
+(provided as a value of <code class="docutils literal notranslate"><span class="pre">EDBTableUpdateID</span></code>).</p>
+<p>If a dialog needs to upload data from scratch rather then updating the
+existing content, this can be done by calling <code class="docutils literal notranslate"><span class="pre">deleteAll</span></code> followed
+by <code class="docutils literal notranslate"><span class="pre">startDataPreparation</span></code> (with the correct checksum provided to the
+latter).  An alternative solution is to set the <code class="docutils literal notranslate"><span class="pre">force_clear_all</span></code>
+optional parameter in remote DCC configuration. In this case, the call
+to <code class="docutils literal notranslate"><span class="pre">deleteAll</span></code> is not needed.</p>
+</div>
+<div class="section" id="the-structured-content-type">
+<h4>The structured_content type</h4>
+<p>If you want to upload the data with the structured_content type format
+then you need to specify the key <code class="docutils literal notranslate"><span class="pre">structured_content</span></code> in the remote
+DCC configuration. If this key is absent then the old contacts data
+format is used.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">structured_content</span></code> configuration maps the content of the COP
+file to the JSON format that will be uploaded to the server.  The
+server expects the data in the following format:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>list: [
+        {
+          &quot;content_id&quot; : &lt;INT&gt; unique id to identify this item,
+          &quot;content&quot; :
+          {
+          },
+        }, ...
+     ]
+</pre></div>
+</div>
+<p>e.g.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[ { &quot;content_id&quot;: 12235,
+    &quot;content&quot;: { &quot;song&quot; : &quot;Thriller&quot;, &quot;artist&quot;: &quot;Michael Jackson&quot;,
+                 &quot;album&quot;: &quot;MJ greatest hits&quot;, &quot;lastPlayed&quot;: &quot;2012-08-24&quot;}
+  },
+  { &quot;content_id&quot;: 12452,
+    &quot;content&quot;: { &quot;song&quot; : &quot;abc&quot;, &quot;artist&quot;: &quot;Michael Jackson&quot;,
+                 &quot;album&quot;: &quot;MJ greatest hits&quot;, &quot;lastPlayed&quot;: &quot;2012-09-01&quot;} }
+  },
+  ... ]
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[ { &quot;content_id&quot;: 525,
+    &quot;content&quot;: { &quot;street&quot;: &quot;Maisonneuve&quot;, &quot;ShopName&quot;: &quot;Starbucks&quot;, &quot;opened24h&quot;: 1 }
+  },
+  { &quot;content_id&quot;: 526,
+    &quot;content&quot;: { &quot;street&quot;: &quot;Sherbook&quot;, &quot;ShopName&quot;: &quot;Cafe Express&quot;, &quot;opened24h&quot;:0 }
+  },
+  ... ]
+</pre></div>
+</div>
+<p>The actual key names (<code class="docutils literal notranslate"><span class="pre">&quot;song&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;street&quot;</span></code>, …) in the
+<code class="docutils literal notranslate"><span class="pre">&quot;content&quot;</span></code> object depend on the command sent to on the server.  The
+structured_content key in the DCC configuration maps these names to
+the names in the COP file.</p>
+<p>An example will make this clear. Below is a DCC configuration for
+first and last names. In the COP file, the columns have names in all caps
+while the server command expects key names in all lower case.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;dynamic_content_consumer&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CONTACTS&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Contact_ID&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Company_Ortho&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PhoneTypes_Ortho&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string_list&quot;</span>
+    <span class="p">}],</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;remote&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;DRAGON_NLU_DATA_UPLOAD_CMD&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;grammar_type&quot;</span><span class="p">:</span> <span class="s2">&quot;structured_content&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;structured_content&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;contacts&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Contact_ID&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;fn&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ln&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Company_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ph&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PhoneTypes_Ortho&quot;</span>
+          <span class="p">}</span>
+       <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;content&quot;</span></code> array in the <code class="docutils literal notranslate"><span class="pre">&quot;structured_content&quot;</span></code> config object
+links the name as expected by the server (<code class="docutils literal notranslate"><span class="pre">fn</span></code>), to the column name
+in the COP file (<code class="docutils literal notranslate"><span class="pre">FirstName_Ortho</span></code>).</p>
+<p><em>NOTE</em>: For the <code class="docutils literal notranslate"><span class="pre">NCS_UPLOAD_DATA_CMD</span></code> command, the configuration is
+slightly different. In this case, it is important to specify the mode.
+Additionally, the <code class="docutils literal notranslate"><span class="pre">&quot;grammar_type&quot;</span></code> key will get the value that is specified in
+the <code class="docutils literal notranslate"><span class="pre">&quot;category&quot;</span></code> key in the example above, and <code class="docutils literal notranslate"><span class="pre">&quot;category&quot;</span></code> key
+should be removed or empty.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
+  &quot;dynamic_content_consumer&quot;: {
+   &quot;name&quot;: &quot;CONTACTS&quot;,
+     &quot;content&quot;: [
+       {
+         &quot;name&quot;: &quot;Contact_ID&quot;,
+         &quot;type&quot;: &quot;integer&quot;
+       },
+       {
+         &quot;name&quot;: &quot;FirstName_Ortho&quot;,
+         &quot;type&quot;: &quot;string&quot;
+       },
+       {
+         &quot;name&quot;: &quot;LastName_Ortho&quot;,
+         &quot;type&quot;: &quot;string&quot;
+       },
+       {
+         &quot;name&quot;: &quot;Company_Ortho&quot;,
+         &quot;type&quot;: &quot;string&quot;
+       },
+       {
+         &quot;name&quot;: &quot;PhoneTypes_Ortho&quot;,
+         &quot;type&quot;: &quot;string_list&quot;
+       }
+     ],
+   &quot;type&quot;: &quot;remote&quot;,
+   &quot;remote&quot;: {
+     &quot;cloud_services_name&quot;: &quot;csHttp&quot;,
+     &quot;command&quot;: &quot;NCS_UPLOAD_DATA_CMD&quot;,
+     &quot;mode&quot;: &quot;UPLOADER_MODE_NCS&quot;,
+     &quot;grammar_type&quot;: &quot;contacts&quot;,
+     &quot;contacts&quot;: {
+       &quot;id&quot;: &quot;Contact_ID&quot;,
+       &quot;content&quot; : [{
+          &quot;name&quot;: &quot;fn&quot;,
+          &quot;link&quot;: {
+            &quot;name&quot;: &quot;FirstName_Ortho&quot;
+          }
+        },{
+          &quot;name&quot;: &quot;ln&quot;,
+          &quot;link&quot;: {
+            &quot;name&quot;: &quot;LastName_Ortho&quot;
+          }
+        },{
+          &quot;name&quot;: &quot;c&quot;,
+          &quot;link&quot;: {
+            &quot;name&quot;: &quot;Company_Ortho&quot;
+          }
+        },{
+          &quot;name&quot;: &quot;ph&quot;,
+          &quot;link&quot;: {
+            &quot;name&quot;: &quot;PhoneTypes_Ortho&quot;
+          }
+        }]
+     }
+   }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="checksum">
+<h4>Checksum</h4>
+<p>The Cerence cloud uses checksums to correlate client-side requests with
+the server-side data. For any modification made to server-side data,
+the server will return a checksum value to the client.</p>
+<p>When the client wants to make subsequent modifications to the
+server-side data, it must present this checksum to the server to make
+sure that the modifications will be done on the right version of the
+server-side data. For example, if a client wants to add more entries
+to an existing server-side contact list,it must make sure to include
+the checksum in the upload request. The server will then validate the
+checksum before making modifications to the contact list.</p>
+<p>The client provides the checksum to the server by including it in the
+COP file,  by setting the value to EDBTableUpdateID in COP
+file header:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>#ECO V1.2 UTF-8;
+
+#ECOScheme COP1 V1.6
+#EDBDatabaseID NBT_FirstLastNames_v_1_0
+#EDBTableUpdateMode GivenInColumn
+#EDBTableUpdateType FullUpdate
+#EDBTableUpdateID 1234
+
+#Column1 Contact_ID
+#Column2 FirstName_Ortho
+#Column3 LastName_Ortho
+
+#Format(Contact_ID) Ident
+#AFType(Contact_ID) NumID
+#NumIDFormat(Contact_ID) Decimal
+#NumIDBinLength(Contact_ID) 32
+
+1;&quot;Heather&quot;; &quot;Morris&quot;
+2;&quot;John&quot;; &quot;Smith&quot;
+3;&quot;Paola&quot;; &quot;Paola&quot;
+</pre></div>
+</div>
+<p>If data is uploaded for the first time, or the previous data must be
+deleted prior to uploading the new content, then the value of the
+checksum is not important, and will ignored by the server.</p>
+<p>After the first successful upload, the server will provides the new
+checksum in its JSON response.</p>
+<p>In case the content on the server needs to be updated by adding or
+removing entries from the existing content, then the previously
+received checksum must to be set to EDBTableUpdateID in COP file
+header.</p>
+</div>
+</div>
+<div class="section" id="cloud-logging">
+<h3>Cloud logging</h3>
+<p>It is possible to send log messages from the client to the
+server. The purpose of this is is very useful for analysis
+Cloud logging becomes very important process for the research analysis
+which could allow improve cloud recognition.</p>
+<p>Logging data on the server can currently be done in two ways:</p>
+<ul class="simple">
+<li>Transfer the log information with the ASR command</li>
+<li>Transfer the log information with a separate <code class="docutils literal notranslate"><span class="pre">cloud</span></code> type
+application.</li>
+</ul>
+<p><strong>Transfer log information with ASR command</strong></p>
+<p>Log messages can be included in a <code class="docutils literal notranslate"><span class="pre">LOG_CONTENT</span></code> sub-dictionary of
+the <code class="docutils literal notranslate"><span class="pre">REQUEST_INFO</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
+  &quot;REQUEST_INFO&quot;: {
+    &quot;json&quot;: {
+      &quot;start&quot;: 0,
+      &quot;end&quot;: 0,
+      &quot;text&quot;: &quot;&quot;,
+      &quot;appserver_data&quot;: {
+        &quot;...&quot;: &quot;...&quot;
+    },
+    &quot;LOG_CONTENT&quot;: {
+      &quot;...&quot;: &quot;...&quot;
+    }
+  }
+}
+</pre></div>
+</div>
+<p><strong>Transfer log information with a separate “cloud” type application</strong></p>
+<p>A separate log application is configured like this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>{
+  &quot;version&quot;: &quot;VoConHigh 5.0&quot;,
+  &quot;application&quot;: {
+    &quot;name&quot;: &quot;APP_CLOUD_LOGGING&quot;,
+    &quot;type&quot;: &quot;cloud&quot;,
+    &quot;cloud&quot;: {
+      &quot;cloud_services_name&quot; : &quot;csHttp&quot;,
+      &quot;query&quot;: {
+        &quot;name&quot;: &quot;CLOUD_LOG&quot;,
+        &quot;command&quot;: &quot;DRAGON_NLU_LOG_REVISION_CMD&quot;,
+        &quot;connection_info&quot;: {
+          &quot;uses&quot;: &quot;DRAGON_CONNECTION_INFO&quot;
+        },
+        &quot;param&quot;: {
+          &quot;type&quot;: &quot;LOG_CONTENT&quot;,
+          &quot;LOG_CONTENT&quot;: {
+            &quot;json&quot;: {
+              &quot;...&quot;: &quot;...&quot;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Remote / Cloud Configuration Options</a><ul>
+<li><a class="reference internal" href="#overview">OVERVIEW</a></li>
+<li><a class="reference internal" href="#common-options">COMMON OPTIONS</a><ul>
+<li><a class="reference internal" href="#connection-info">Connection info</a></li>
+<li><a class="reference internal" href="#cloud-services">Cloud services</a></li>
+<li><a class="reference internal" href="#cloud-applications">Cloud Applications</a><ul>
+<li><a class="reference internal" href="#uploading-data">Uploading Data</a></li>
+<li><a class="reference internal" href="#uploading-data-in-chunks">Uploading data in chunks</a></li>
+<li><a class="reference internal" href="#deleting-previously-uploaded-data">Deleting previously uploaded data</a></li>
+<li><a class="reference internal" href="#the-structured-content-type">The structured_content type</a></li>
+<li><a class="reference internal" href="#checksum">Checksum</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cloud-logging">Cloud logging</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

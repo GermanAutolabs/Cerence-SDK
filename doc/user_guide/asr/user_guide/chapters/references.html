@@ -1,0 +1,499 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>References</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Tools and Sample Code" href="tools_and_sample_code.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="references">
+<h1>References</h1>
+<div class="section" id="json-configuration-reference">
+<span id="json-config-reference"></span><h2>JSON Configuration reference</h2>
+<p>The full JSON configuration reference can be found here:
+<a class="reference internal" href="../external/configuration.html#vocon5-json-configuration"><span class="std std-ref">Cerence ASR JSON configuration reference</span></a>. This reference lists all the
+keys that can occur in a Cerence ASR configuration file, and gives a brief
+description of what they are used for.</p>
+<div class="section" id="cloud-services">
+<span id="cloud-services-json-reference"></span><h3>Cloud services</h3>
+<p>A cloud services object contains the data needed to set up an actual
+server connection. Typically, cloud services configurations go in te
+<code class="docutils literal notranslate"><span class="pre">cloudservicesconfig.json</span></code> file. Note that you can have several
+cloud services configurations for the same server. This is required if
+you want to run cloud commands in parallel: commands using the same
+cloud services object will be executed one after the other, so if you
+want to run commands in parallel, you need to use different cloud
+services objects.</p>
+<p>An example for HTTP connections:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;cloud_services&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;http&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;MyCloudServices&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;url&quot;</span> <span class="p">:</span> <span class="s2">&quot;https://...:443/NmspServlet/&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;app_id&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;app_key&quot;</span> <span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;ssl_certificate_bundle&quot;</span><span class="p">:</span> <span class="s2">&quot;bundle.crt&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;app_name&quot;</span> <span class="p">:</span> <span class="s2">&quot;dragondrive_eval_1.0&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;app_version&quot;</span> <span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;app_language&quot;</span> <span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;carrier&quot;</span> <span class="p">:</span> <span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;device_model&quot;</span> <span class="p">:</span> <span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;uid&quot;</span> <span class="p">:</span> <span class="s2">&quot;dragon_drive_sdk_tests_uid&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;input_audio_format&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;encoding&quot;</span> <span class="p">:</span> <span class="s2">&quot;ENCODING_OPUS&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sample_rate&quot;</span> <span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+        <span class="s2">&quot;samples_per_channel&quot;</span> <span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+        <span class="s2">&quot;channel_count&quot;</span> <span class="p">:</span> <span class="mi">1</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;output_audio_format&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;encoding&quot;</span> <span class="p">:</span> <span class="s2">&quot;ENCODING_OPUS&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sample_rate&quot;</span> <span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+        <span class="s2">&quot;samples_per_channel&quot;</span> <span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+        <span class="s2">&quot;channel_count&quot;</span> <span class="p">:</span> <span class="mi">1</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">cloud_services</span></code></dt>
+<dd>This is the type of the object. This object could be referenced by its name.
+This object holds the parameters related to the connection to a server.
+For details on the configuration see the document <code class="docutils literal notranslate"><span class="pre">nds_cloudservices_configuration_classes.html</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">url</span></code>, <code class="docutils literal notranslate"><span class="pre">app_id</span></code>, <code class="docutils literal notranslate"><span class="pre">app_key</span></code></dt>
+<dd>These are the credentials needed to connect to a cloud server. You
+will receive these when you order cloud services from Cerence.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">ssl_certificate_bundle</span></code></dt>
+<dd><p class="first">This is a pointer to the file that contains the SSL
+certificates. If this is a relative path, it is resolved relative to
+the path in which this configuration file resides.</p>
+<p class="last">It is also possible to omit this key, and use the environment variable
+<code class="docutils literal notranslate"><span class="pre">CURL_CA_BUNDLE</span></code> to point to the SSL certificate store:</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="cloud-uploads-structured-content">
+<span id="structured-content"></span><span id="index-0"></span><h2>Cloud uploads: structured content</h2>
+<p>If you want to upload the data with the structured_content type format
+then you need to specify the key <code class="docutils literal notranslate"><span class="pre">structured_content</span></code> in the remote
+DCC configuration. If this key is absent then the old contacts data
+format is used.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">structured_content</span></code> configuration maps the content of the COP
+file to the JSON format that will be uploaded to the server.  The
+server expects the data in the following format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="s2">&quot;content_id&quot;</span> <span class="p">:</span> <span class="o">&lt;</span><span class="n">INT</span><span class="o">&gt;</span> <span class="n">unique</span> <span class="nb">id</span> <span class="n">to</span> <span class="n">identify</span> <span class="n">this</span> <span class="n">item</span><span class="p">,</span>
+          <span class="s2">&quot;content&quot;</span> <span class="p">:</span>
+          <span class="p">{</span>
+          <span class="p">},</span>
+        <span class="p">},</span> <span class="o">...</span>
+     <span class="p">]</span>
+</pre></div>
+</div>
+<p>e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="p">{</span> <span class="s2">&quot;content_id&quot;</span><span class="p">:</span> <span class="mi">12235</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;song&quot;</span> <span class="p">:</span> <span class="s2">&quot;Thriller&quot;</span><span class="p">,</span> <span class="s2">&quot;artist&quot;</span><span class="p">:</span> <span class="s2">&quot;Michael Jackson&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;album&quot;</span><span class="p">:</span> <span class="s2">&quot;MJ greatest hits&quot;</span><span class="p">,</span> <span class="s2">&quot;lastPlayed&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-08-24&quot;</span><span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span> <span class="s2">&quot;content_id&quot;</span><span class="p">:</span> <span class="mi">12452</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;song&quot;</span> <span class="p">:</span> <span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="s2">&quot;artist&quot;</span><span class="p">:</span> <span class="s2">&quot;Michael Jackson&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;album&quot;</span><span class="p">:</span> <span class="s2">&quot;MJ greatest hits&quot;</span><span class="p">,</span> <span class="s2">&quot;lastPlayed&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-09-01&quot;</span><span class="p">}</span> <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="o">...</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="p">{</span> <span class="s2">&quot;content_id&quot;</span><span class="p">:</span> <span class="mi">525</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;street&quot;</span><span class="p">:</span> <span class="s2">&quot;Maisonneuve&quot;</span><span class="p">,</span> <span class="s2">&quot;ShopName&quot;</span><span class="p">:</span> <span class="s2">&quot;Starbucks&quot;</span><span class="p">,</span> <span class="s2">&quot;opened24h&quot;</span><span class="p">:</span> <span class="mi">1</span> <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="p">{</span> <span class="s2">&quot;content_id&quot;</span><span class="p">:</span> <span class="mi">526</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;street&quot;</span><span class="p">:</span> <span class="s2">&quot;Sherbook&quot;</span><span class="p">,</span> <span class="s2">&quot;ShopName&quot;</span><span class="p">:</span> <span class="s2">&quot;Cafe Express&quot;</span><span class="p">,</span> <span class="s2">&quot;opened24h&quot;</span><span class="p">:</span><span class="mi">0</span> <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="o">...</span> <span class="p">]</span>
+</pre></div>
+</div>
+<p>The actual key names (<code class="docutils literal notranslate"><span class="pre">&quot;song&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;street&quot;</span></code>, …) in the
+<code class="docutils literal notranslate"><span class="pre">&quot;content&quot;</span></code> object depend on the command sent to on the server.  The
+structured_content key in the DCC configuration maps these names to
+the names in the COP file.</p>
+<p>An example will make this clear. Below is a DCC configuration for
+first and last names. In the COP file, the columns have names in all caps
+while the server command expects key names in all lower case.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;dynamic_content_consumer&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CONTACTS&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Contact_ID&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Company_Ortho&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+    <span class="p">},{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PhoneTypes_Ortho&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string_list&quot;</span>
+    <span class="p">}],</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;remote&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;DRAGON_NLU_DATA_UPLOAD_CMD&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;grammar_type&quot;</span><span class="p">:</span> <span class="s2">&quot;structured_content&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;structured_content&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;category&quot;</span> <span class="p">:</span> <span class="s2">&quot;contacts&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Contact_ID&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;fn&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ln&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Company_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ph&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PhoneTypes_Ortho&quot;</span>
+          <span class="p">}</span>
+       <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;content&quot;</span></code> array in the <code class="docutils literal notranslate"><span class="pre">&quot;structured_content&quot;</span></code> config object
+links the name as expected by the server (<code class="docutils literal notranslate"><span class="pre">fn</span></code>), to the column name
+in the COP file (<code class="docutils literal notranslate"><span class="pre">FirstName_Ortho</span></code>).</p>
+<p><em>NOTE</em>: For the <code class="docutils literal notranslate"><span class="pre">NCS_UPLOAD_DATA_CMD</span></code> command, the configuration is
+slightly different. In this case, it is important to specify the mode.
+Additionally, the <code class="docutils literal notranslate"><span class="pre">&quot;grammar_type&quot;</span></code> key will get the value that is specified in
+the <code class="docutils literal notranslate"><span class="pre">&quot;category&quot;</span></code> key in the example above, and <code class="docutils literal notranslate"><span class="pre">&quot;category&quot;</span></code> key
+should be removed or empty.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;dynamic_content_consumer&quot;</span><span class="p">:</span> <span class="p">{</span>
+   <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CONTACTS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="p">[</span>
+       <span class="p">{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Contact_ID&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span>
+       <span class="p">},</span>
+       <span class="p">{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+       <span class="p">},</span>
+       <span class="p">{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+       <span class="p">},</span>
+       <span class="p">{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Company_Ortho&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+       <span class="p">},</span>
+       <span class="p">{</span>
+         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PhoneTypes_Ortho&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string_list&quot;</span>
+       <span class="p">}</span>
+     <span class="p">],</span>
+   <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;remote&quot;</span><span class="p">,</span>
+   <span class="s2">&quot;remote&quot;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s2">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;csHttp&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NCS_UPLOAD_DATA_CMD&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;UPLOADER_MODE_NCS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;grammar_type&quot;</span><span class="p">:</span> <span class="s2">&quot;contacts&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;contacts&quot;</span><span class="p">:</span> <span class="p">{</span>
+       <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Contact_ID&quot;</span><span class="p">,</span>
+       <span class="s2">&quot;content&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;fn&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstName_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ln&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;LastName_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Company_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ph&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PhoneTypes_Ortho&quot;</span>
+          <span class="p">}</span>
+        <span class="p">}]</span>
+     <span class="p">}</span>
+   <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="file-formats">
+<h2>File formats</h2>
+<div class="section" id="cop-files">
+<span id="cop-file"></span><span id="index-1"></span><h3>COP files</h3>
+<p>The COP file definition can be found here <a class="reference download internal" download="" href="../../_downloads/4561c10c0f8e7a9fa1afdc6817eadafa/FileFormat_COP.pdf"><code class="xref download docutils literal notranslate"><span class="pre">FileFormat_COP.pdf</span></code></a>.</p>
+</div>
+<div class="section" id="hrl-files">
+<span id="hrl-file"></span><h3>HRL files</h3>
+<p>The ‘hash reference list’ (hrl) files describe a list of utterances, the speakers of those utterances, the gender of those speakers and what the speakers have said.
+The files can contain more information; for example, whether the reference word sequence has been validated, what the start and end times of the words in the reference word sequence are, etc.</p>
+<p>For that purpose, you should create a file with extension .hrl that has the syntax that is described below.</p>
+<p>Here is a fragment of such a file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#head;hrl;2.0;utf-16</span>
+<span class="c1">#ref#speechfile#speaker#gender#reference word sequence</span>
+<span class="n">head</span>
+<span class="n">ref</span><span class="c1">#sound1.wav#spk1#male#three six five two</span>
+<span class="n">ref</span><span class="c1">#sound2.wav#spk2#male#four two one eight</span>
+<span class="n">ref</span><span class="c1">#sound3.wav#spk3#female#one five seven</span>
+<span class="n">ref</span><span class="c1">#sound4.wav#spk4#female#two five four</span>
+</pre></div>
+</div>
+<p>The first line of the file always starts with <em>#head;hrl;&lt;version&gt;;&lt;encoding&gt;</em>. The current version number is 2.0. Different encodings are supported.</p>
+<p>We recommend to use an Unicode encoding for your hrl files, and, if you create the hrl file in an editor, use an editor that includes a correct Unicode mark in the beginning of the file.</p>
+<p>Note that if the encoding is utf-16, the file must start with a byte order mark. This byte order marks allows the tools to figure out whether the file uses little-endian or big-endian byte order.</p>
+<p>The second line specifies the format of the reference lines. Each reference line starts with <em>ref</em> and contains information that is specific to one particular speech utterance.
+In this example each reference has 4 fields.</p>
+<p>“speechfile” - The relative path to a speech file.</p>
+<p>The Batch Tool will derive the absolute path to a speech file by concatenating a value of “speechfile” to the value of “sound_dir”.</p>
+<p>The supported audio file formats are listed below and configured by including their extentions:</p>
+<ul class="simple">
+<li>pcm: raw pcm, linear, mono, 16000 Hz, 16 bit Intel (LSB first in the file, also known as ‘little endian’)</li>
+<li>pcmswap: raw pcm, linear, mono, 16000 Hz, 16 bit Motorola (MSB first in the file, also known as ‘big endian’)</li>
+<li>wav: Microsoft wave: Windows PCM, mono, 16000 Hz, 16 bit Intel</li>
+<li>nist: soundfiles with an NIST header. At least the following format will work: linear pcm, mono, 16000 Hz, 16 bit Intel. “Shorten” decompression has been disabled.</li>
+</ul>
+<p>“speaker” - Name of the speaker. This may just as well be any alfa-numeric speaker identification</p>
+<p>“gender” - the gender of the speaker. Following genders are available:
+- unknown
+- male
+- female
+- child (i.e. boy or girl)
+- boy
+- girl</p>
+<p>“reference word sequence” - A sentence describing what the speaker has said in that utterance.</p>
+<p>A number of special characters must be escaped when they are used in value fields and should be interpreted as literal characters instead of serving a special purpose.
+The field separator #, as well as the escape character itself, must be escaped using the escape symbol in all value fields.
+Also the carriage return and new-line must be escaped as r and n respectively when used in value fields.
+Also the symbol ; must be escaped because it serves as second level separator ; within fields that represent a list of items of the same type.</p>
+<p>The speechfile, speaker and reference word sequence fields are the only mandatory fields for an hrl that can serve as input for the Batch Tool.</p>
+</div>
+<div class="section" id="match-file">
+<span id="id1"></span><h3>Match file</h3>
+<p>A ‘match’ (.res) file contains information about a recognition result.
+It is produced by the batch tool, and used as input to a match file parser.</p>
+<div class="section" id="formatting-elements">
+<h4>Formatting elements</h4>
+<p>The file consists of a header specifying the different record types, and a body containing instances of these record types, which must conform to the definition in the header.
+Header records start with a ‘#’, followed by the record name, and all field names, separated by ‘#’. Each ‘#’ inside field value (i.e. non-separator) will be replaced by ‘#’, so that it is not treated as a separator.
+Field names starting with a ‘;’ indicate that the field is a ‘;’-separated array, rather than a single value.</p>
+<p>A number of special characters must be escaped when they are used in value fields and should be interpreted as literal characters instead of serving a special purpose.
+The field separator ‘#’, as well as the escape character ‘’ itself, must be escaped using the escape ‘’ symbol in all value fields.
+Also the carriage return and new-line must be escaped as r and n respectively when used in value fields.
+Also the symbol ‘;’ must be escaped because it serves as second level separator ‘;’ within fields that represent a list of items of the same type.</p>
+</div>
+<div class="section" id="header">
+<h4>Header</h4>
+<p>The file starts with a header describing the further contents. Here is the full ‘match’ header:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#head;res;1.0;utf-8#soundFiledir#hrl filepath</span>
+<span class="c1">#hyp#rank#;hypothesis#confidence</span>
+<span class="c1">#res#json</span>
+<span class="c1">#ref#speechfile#speaker#reference word sequence#number of hypotheses</span>
+<span class="n">head</span><span class="c1">#unspecified#unspecified</span>
+</pre></div>
+</div>
+<p>The first line of the file always starts with <em>#head;res;&lt;version&gt;;&lt;encoding&gt;</em>. The current version number is 1.0. Different encodings are supported.</p>
+<p>We recommend to use an Unicode encoding for your hrl files, and, if you create the hrl file in an editor, use an editor that includes a correct
+Unicode mark in the beginning of the file.</p>
+<p>Note that if the encoding is utf-16, the file must start with a byte order mark. This byte order marks allows the tools to figure out whether the file uses little-endian or big-endian byte order.</p>
+<p>The last line of the example header is the ‘head’ instance. Each match can only have one such head instance, which must immediately follow the definition part of the header.</p>
+</div>
+<div class="section" id="reference-ref-records">
+<h4>Reference (‘ref’) records</h4>
+<p>Reference (‘ref’) records have the following definition:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#ref#speechfile#speaker#reference word sequence#number of hypotheses#&lt;extra columns&gt;</span>
+</pre></div>
+</div>
+<p>An example ref record instance is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ref</span><span class="c1">#call_nancy_brooks.pcm#spk1#call nancy brooks#3#male</span>
+</pre></div>
+</div>
+<p>“speechfile” - The relative path to a speech file.</p>
+<p>The Batch Tool will derive the absolute path to a speech file by concatenating a value of “speechfile” to the value of “sound_dir”.</p>
+<p>The supported audio file formats are listed below and configured by including their extentions:</p>
+<ul class="simple">
+<li>pcm: raw pcm, linear, mono, 16000 Hz, 16 bit Intel (LSB first in the file, also known as ‘little endian’)</li>
+<li>pcmswap: raw pcm, linear, mono, 16000 Hz, 16 bit Motorola (MSB first in the file, also known as ‘big endian’)</li>
+<li>wav: Microsoft wave: Windows PCM, mono, 16000 Hz, 16 bit Intel</li>
+<li>nist: soundfiles with an NIST header. At least the following format will work: linear pcm, mono, 16000 Hz, 16 bit Intel. “Shorten” decompression has been disabled.</li>
+</ul>
+<p>“speaker” - Name of the speaker. This may just as well be any alfa-numeric speaker identification.</p>
+<p>“reference word sequence” - A sentence describing what the speaker has said in that utterance.</p>
+<p>“number of hypotheses” - The number of hypotheses of an ASR result.</p>
+<p>“&lt;extra columns&gt;” - put the other columns from the reference line from hrl file here. for example:</p>
+<blockquote>
+<div>#ref#speechfile#speaker#reference word sequence#number of hypotheses#gender</div></blockquote>
+</div>
+<div class="section" id="asr-hypothesis-hyp-records">
+<h4>ASR Hypothesis (‘hyp’) records</h4>
+<p>ASR hypothesis (‘hyp’) records have the following definition:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#hyp#rank#;hypothesis#confidence</span>
+</pre></div>
+</div>
+<p>An example hyp record instance is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hyp</span><span class="c1">#0#dial;mom;cell#5075</span>
+</pre></div>
+</div>
+<p>A number of ‘hyp’ records following one ‘ref’ record forms an (ASR) n-best list.</p>
+<p>“rank” - The rank number in the ASR n-best list.</p>
+<p>“;hypothesis” - A ‘;’-separated list of tokens forming the ASR hypothesis.</p>
+<p>“confidence” - The ASR confidence for this hypothesis.</p>
+</div>
+<div class="section" id="res-res-json-records">
+<h4>Res (‘res’) json records</h4>
+<p>Res json records have recognition json results, including ASR and NLU results,
+as well as the latency json.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">References</a><ul>
+<li><a class="reference internal" href="#json-configuration-reference">JSON Configuration reference</a><ul>
+<li><a class="reference internal" href="#cloud-services">Cloud services</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cloud-uploads-structured-content">Cloud uploads: structured content</a></li>
+<li><a class="reference internal" href="#file-formats">File formats</a><ul>
+<li><a class="reference internal" href="#cop-files">COP files</a></li>
+<li><a class="reference internal" href="#hrl-files">HRL files</a></li>
+<li><a class="reference internal" href="#match-file">Match file</a><ul>
+<li><a class="reference internal" href="#formatting-elements">Formatting elements</a></li>
+<li><a class="reference internal" href="#header">Header</a></li>
+<li><a class="reference internal" href="#reference-ref-records">Reference (‘ref’) records</a></li>
+<li><a class="reference internal" href="#asr-hypothesis-hyp-records">ASR Hypothesis (‘hyp’) records</a></li>
+<li><a class="reference internal" href="#res-res-json-records">Res (‘res’) json records</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tools_and_sample_code.html" title="previous chapter">Tools and Sample Code</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

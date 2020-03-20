@@ -1,0 +1,929 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Configuration</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Overview" href="prompter_configuration_api_ref.html" />
+    <link rel="prev" title="Types of the Prompter" href="prompter_intro.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration">
+<span id="id1"></span><h1>Configuration</h1>
+<p>The configuration of the Prompter component needs to be done in the form of <abbr title="JavaScript Object Notation">JSON</abbr> configurations.</p>
+<p>This chapter describes the <a class="reference internal" href="#json-configuration"><span class="std std-ref">JSON configuration</span></a> format and shows <a class="reference internal" href="#json-configuration-examples"><span class="std std-ref">JSON configuration examples</span></a>.</p>
+<div class="section" id="json-configuration">
+<span id="id2"></span><h2><abbr title="JavaScript Object Notation">JSON</abbr> Configuration</h2>
+<p>The <abbr title="JavaScript Object Notation">JSON</abbr> configuration located in the configuration directory defines one or more <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code>
+and <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> objects that can be of different types (<code class="docutils literal notranslate"><span class="pre">local</span></code> or <code class="docutils literal notranslate"><span class="pre">cloud</span></code>). A <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> object contains
+essential configuration to create an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> objects define Prompter scenarios that can be activated during the lifetime of an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance.
+Depending on the instantiated <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> type (<code class="docutils literal notranslate"><span class="pre">local</span></code> or <code class="docutils literal notranslate"><span class="pre">cloud</span></code>) there are further <abbr title="JavaScript Object Notation">JSON</abbr> objects required like e.g. <code class="docutils literal notranslate"><span class="pre">&quot;voice_config</span></code>”
+or <code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;</span></code>. All <abbr title="JavaScript Object Notation">JSON</abbr> objects can be held together in one single file or in multiple separate files.
+A <abbr title="JavaScript Object Notation">JSON</abbr> configuration file has the file name extension <code class="docutils literal notranslate"><span class="pre">.json</span></code>.</p>
+<p>All <abbr title="JavaScript Object Notation">JSON</abbr> files must contain a valid <code class="docutils literal notranslate"><span class="pre">version</span></code> property. The following sections give a formal specification
+of the <abbr title="JavaScript Object Notation">JSON</abbr> configuration format:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#itoplevelprompterconfig-the-top-level-configuration-of-the-prompter-component">ITopLevelPrompterConfig - The top-level configuration of the prompter component.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#iprompterconfig-the-configuration-of-the-iprompter-instance-s">IPrompterConfig - The configuration of the IPrompter instance(s).</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#ilocalprompter-the-configuration-of-the-local-iprompter-class">ILocalPrompter - The configuration of the local IPrompter class.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#icloudprompterconfig-the-configuration-of-the-cloud-iprompter-class">ICloudPrompterConfig - The configuration of the cloud IPrompter class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#iprompterglobalconfig-the-configuration-of-prompter-global-settings">IPrompterGlobalConfig - The configuration of prompter global settings.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#iprompterusecaseconfig-the-prompter-use-case-configuration">IPrompterUseCaseConfig - The prompter use case configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#ilocalusecase-the-configuration-of-the-local-prompter-usecase">ILocalUseCase - The configuration of the local prompter usecase.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#icloudusecase-the-configuration-of-the-cloud-prompter-usecase">ICloudUseCase - The configuration of the cloud prompter usecase.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#ivoiceconfig-the-prompter-voice-configuration">IVoiceConfig - The prompter voice configuration.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#ituningfile-the-prompter-tuning-file">ITuningFile - The prompter tuning file.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#iuserrule-the-user-rule">IUserRule - The user rule.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#iuserdictionary-the-user-dictionary">IUserDictionary - The user dictionary.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#iactivepromptdb-the-active-prompt-database">IActivePromptDb - The active prompt database.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#iprompttemplate-the-prompt-template">IPromptTemplate - The prompt template.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#icloudcommandconfig-the-cloud-command">ICloudCommandConfig - The cloud command.</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prompter_configuration_api_ref.html#ivoicedatapath-the-prompter-voice-data-path">IVoiceDataPath - The prompter voice data path.</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="json-configuration-examples">
+<span id="id3"></span><h2><abbr title="JavaScript Object Notation">JSON</abbr> Configuration Examples</h2>
+<p>A Prompter <abbr title="JavaScript Object Notation">JSON</abbr> configuration file may look like the below examples containing
+all mandatory <abbr title="JavaScript Object Notation">JSON</abbr> objects and properties needed for proper creation of a
+<code class="docutils literal notranslate"><span class="pre">local</span></code> or <code class="docutils literal notranslate"><span class="pre">cloud</span></code> type of an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code>.
+The configured instances from below examples are created by calling
+<code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_create</span></code> and passing the <code class="docutils literal notranslate"><span class="pre">name</span></code>
+of the correspondent <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> <abbr title="JavaScript Object Notation">JSON</abbr> object. During the lifetime of the <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code>
+its identity is permanently bound to the referenced <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> <abbr title="JavaScript Object Notation">JSON</abbr> configuration.
+I.e. it is not possible to activate a different <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> configuration after its creation.
+To use different <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> configurations at the same time, multiple <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code>
+instances have to be created per each <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> configuration.
+The <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> objects define configurations that are activatable during runtime.
+On an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> of a certain type (<code class="docutils literal notranslate"><span class="pre">local</span></code> / <code class="docutils literal notranslate"><span class="pre">cloud</span></code>) only those usecases are activatable
+that are of the same type. Usecases that are of a different type are ignored and out of the scope
+for this <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance.</p>
+<div class="section" id="iprompter-configured-as-local-instance">
+<h3>IPrompter Configured as “local” Instance</h3>
+<p>A <code class="docutils literal notranslate"><span class="pre">local</span></code> type of the configuration refers to an embedded instance of the <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> using the
+Cerence <abbr title="Text To Speech">TTS</abbr> Embedded engine. The <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> object must contain a reference to a <code class="docutils literal notranslate"><span class="pre">&quot;voice_data_path&quot;</span></code> object
+used to define paths related to a voice data installation which contains a certain set of so called “Cerence <abbr title="Text To Speech">TTS</abbr> Embedded voice packs”.
+The property <code class="docutils literal notranslate"><span class="pre">&quot;default_usecase&quot;</span></code> is optional and can be omitted. If omitted no usecase will be activated by default
+during creation of an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> and thus no prompts can be played instantly. For this
+case the <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> provides a method to activate any usecase at a later point (see section <a class="reference internal" href="prompter_intro.html#runtime-activation-of-a-usecase"><span class="std std-ref">Runtime Activation of a Usecase</span></a>).
+The <code class="docutils literal notranslate"><span class="pre">&quot;usecase&quot;</span></code> object contains a reference to a required <code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code> object that configures data like the voice, language,
+voice operating point, volume, speech, etc. The <code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code> is an object that is specific to a <code class="docutils literal notranslate"><span class="pre">local</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code>.</p>
+<div class="highlight-json notranslate" id="code-json-local-prompter-and-usecase"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Prompter 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;voice_data_path&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceDataPath&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;vocalizer_path&quot;</span><span class="p">:</span> <span class="s2">&quot;directory/with/language/data&quot;</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;prompter&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test_prompter&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;default_usecase&quot;</span><span class="p">:</span> <span class="s2">&quot;MyDefaultUsecase&quot;</span>
+      <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;voice_data_path&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceDataPath&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;usecase&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyDefaultUsecase&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;voice_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceConfiguration&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;voice_config&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceConfiguration&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;voice&quot;</span><span class="p">:</span> <span class="s2">&quot;myVoice&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;operating_point&quot;</span><span class="p">:</span> <span class="s2">&quot;myOperatingPoint&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="s2">&quot;enu&quot;</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The next example shows a more complex local usecase configuration which uses additional application-specific data like
+exception tuning files, text normalization rules, active prompt databases.</p>
+<div class="highlight-json notranslate" id="code-json-usecase-complex"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;usecase&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyDefaultUseCase&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;voice_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceConfig&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;active_prompt_domain&quot;</span><span class="p">:</span> <span class="s2">&quot;myActivePromptDomain&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;text_normalization_type&quot;</span><span class="p">:</span> <span class="s2">&quot;spell&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;enabled_markers&quot;</span><span class="p">:</span> <span class="s2">&quot;textunit,bookmark&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;tuning_files&quot;</span><span class="p">:</span> <span class="p">[{</span>
+            <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;myUserDicts/userdict.dcb&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span>
+          <span class="p">},</span> <span class="p">{</span>
+            <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;myUserDicts/userdictLangoverwriting.dcb&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;dict&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;dict&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;langoverwriting&quot;</span>
+            <span class="p">}</span>
+          <span class="p">},</span> <span class="p">{</span>
+            <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;myRuleSets/rules.txt&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;rule&quot;</span>
+          <span class="p">},</span> <span class="p">{</span>
+            <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;myActivePrompts/activeprompts.dat&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;apdb&quot;</span>
+          <span class="p">},</span> <span class="p">{</span>
+            <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;myPromptTemplates/prompttemplate.ptb&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;tmpl&quot;</span>
+          <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="iprompter-configured-as-cloud-instance">
+<span id="id4"></span><h3>IPrompter Configured as “cloud” Instance</h3>
+<p>A <code class="docutils literal notranslate"><span class="pre">cloud</span></code> type of the configuration refers to an <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instance using the <abbr title="Text To Speech">TTS</abbr> of the
+<abbr title="Nuance Cloud Services">NCS</abbr> remotely. The <code class="docutils literal notranslate"><span class="pre">&quot;prompter&quot;</span></code> object must reference a cloud services
+configuration using the <code class="docutils literal notranslate"><span class="pre">&quot;cloud_services_name&quot;</span></code> key.  That configuration defines all data necessary
+to establish a connection to a <abbr title="Text To Speech">TTS</abbr> cloud service.
+As the cloud services configuration is sharable with components other than the Prompter it must
+be defined in a separate <abbr title="JavaScript Object Notation">JSON</abbr> file labeled with <code class="docutils literal notranslate"><span class="pre">&quot;version&quot;:</span> <span class="pre">&quot;CloudServices</span> <span class="pre">1.0&quot;</span></code>.</p>
+<p>The defined <code class="docutils literal notranslate"><span class="pre">cloud</span></code> usecase may contain further runtime-activatable configurations.
+The usecase must at least reference the required <code class="docutils literal notranslate"><span class="pre">&quot;cloud_command&quot;</span></code> object
+that defines the <abbr title="Text To Speech">TTS</abbr> command to be executed remotely at the cloud service.
+The command consists at least of the <code class="docutils literal notranslate"><span class="pre">&quot;command&quot;</span></code> identifier and a <code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;</span></code> oject defining the
+command specific parameters (complying with the <code class="docutils literal notranslate"><span class="pre">Nuance</span> <span class="pre">Cloud</span> <span class="pre">Services</span> <span class="pre">HTTP</span> <span class="pre">Services</span> <span class="pre">2.0</span> <span class="pre">specification</span></code>)
+in <abbr title="JavaScript Object Notation">JSON</abbr> format.
+The <abbr title="JavaScript Object Notation">JSON</abbr> key/value pairs shown in the example below are mandatory. For the configuration of the voice it
+must define at least a <code class="docutils literal notranslate"><span class="pre">&quot;tts_voice&quot;</span></code> (if the voice does not matter, it is also sufficient to define
+e.g. <code class="docutils literal notranslate"><span class="pre">&quot;tts_language&quot;:</span> <span class="pre">&quot;eng-USA&quot;</span></code> only; the cloud will select a default voice of that language).</p>
+<div class="highlight-json notranslate" id="code-json-cloud-prompter-and-usecase"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Prompter 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;prompter&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test_cloudprompter&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;default_usecase&quot;</span><span class="p">:</span> <span class="s2">&quot;MyDefaultCloudUsecase&quot;</span>
+      <span class="s2">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudServices&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;usecase&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyDefaultCloudUsecase&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;cloud_command&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudCmd&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;cloud_command&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudCmd&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_TTS_CMD&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dictionary&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;tts_voice&quot;</span><span class="p">:</span> <span class="s2">&quot;Ava&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;locale&quot;</span><span class="p">:</span> <span class="s2">&quot;canada&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;application_name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyTtsApp&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;organization_id&quot;</span><span class="p">:</span> <span class="s2">&quot;NUANCE&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_OS&quot;</span><span class="p">:</span> <span class="s2">&quot;4.0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_network&quot;</span><span class="p">:</span> <span class="s2">&quot;wifi&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;audio_source&quot;</span><span class="p">:</span> <span class="s2">&quot;SpeakerAndMicrophone&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;+45.5086699,-73.5539925&gt;+/-99.00m&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;ui_langugage&quot;</span><span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_submodel&quot;</span><span class="p">:</span> <span class="s2">&quot;nmPhone2,1&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Separate <abbr title="JavaScript Object Notation">JSON</abbr> file with cloud configuration:</p>
+<div class="highlight-json notranslate" id="code-json-cloudservices-https"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;CloudServices 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;cloud_services&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudServices&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;http&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://some-valid-url.net:443/NmspServlet/&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_id&quot;</span><span class="p">:</span> <span class="s2">&quot;APPID123&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_key&quot;</span><span class="p">:</span> <span class="s2">&quot;ABCDEF0123456789&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;ssl_certificate_bundle&quot;</span><span class="p">:</span> <span class="s2">&quot;bundle.crt&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyTtsApp&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;app_language&quot;</span><span class="p">:</span> <span class="s2">&quot;eng-USA&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;carrier&quot;</span><span class="p">:</span> <span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;device_model&quot;</span><span class="p">:</span> <span class="s2">&quot;Android&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;uid&quot;</span><span class="p">:</span> <span class="s2">&quot;UIDTEST&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;input_audio_format&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;ENCODING_PCM_16BIT&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+        <span class="nt">&quot;samples_per_channel&quot;</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+        <span class="nt">&quot;channel_count&quot;</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;output_audio_format&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;encoding&quot;</span><span class="p">:</span> <span class="s2">&quot;ENCODING_PCM_16BIT&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="mi">16000</span><span class="p">,</span>
+        <span class="nt">&quot;samples_per_channel&quot;</span><span class="p">:</span> <span class="mi">1920</span><span class="p">,</span>
+        <span class="nt">&quot;channel_count&quot;</span><span class="p">:</span> <span class="mi">1</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="dynamic-modification-of-command-specific-parameters-vh-callback">
+<span id="id5"></span><h4>Dynamic Modification of Command-specific Parameters (vh_callback)</h4>
+<p>The command specific parameters defined in the value of the <code class="docutils literal notranslate"><span class="pre">&quot;dictionary&quot;</span></code> key can be dynamically modified with the <a class="reference external" href="../../asr5/json/callbacks.html">vh_callback</a> mechanism.
+The below <abbr title="JavaScript Object Notation">JSON</abbr> snippet contains <code class="docutils literal notranslate"><span class="pre">&quot;vh_callback&quot;</span></code> definitions allowing dynamic modifications of the <code class="docutils literal notranslate"><span class="pre">&quot;tts_voice&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;tts_text_genre&quot;</span></code> values.</p>
+<div class="highlight-json notranslate" id="code-json-cloud-prompter-and-usecase-vh-callback"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Prompter 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;prompter&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test_cloudprompter&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;default_usecase&quot;</span><span class="p">:</span> <span class="s2">&quot;MyDefaultCloudUsecase&quot;</span>
+      <span class="s2">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;cloud_services_name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudServices&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;usecase&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyDefaultCloudUsecase&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;cloud_command&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudCmd&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;cloud_command&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudCmd&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_TTS_CMD&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dictionary&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;tts_voice&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;vh_callback&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;modifiable_tts_voice&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;Ava&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;tts_text_genre&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;vh_callback&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;modifiable_tts_text_genre&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;normal&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;locale&quot;</span><span class="p">:</span> <span class="s2">&quot;canada&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;application_name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyTtsApp&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;organization_id&quot;</span><span class="p">:</span> <span class="s2">&quot;NUANCE&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_OS&quot;</span><span class="p">:</span> <span class="s2">&quot;4.0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_network&quot;</span><span class="p">:</span> <span class="s2">&quot;wifi&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;audio_source&quot;</span><span class="p">:</span> <span class="s2">&quot;SpeakerAndMicrophone&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;+45.5086699,-73.5539925&gt;+/-99.00m&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;ui_langugage&quot;</span><span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phone_submodel&quot;</span><span class="p">:</span> <span class="s2">&quot;nmPhone2,1&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>An application can modify the values of the keys that are configured as <code class="docutils literal notranslate"><span class="pre">&quot;vh_callback&quot;</span></code> as described in the <a class="reference external" href="../../asr5/json/callbacks.html">vh_callback</a> documentation.</p>
+</div>
+</div>
+<div class="section" id="organizing-of-multiple-objects">
+<h3>Organizing of Multiple Objects</h3>
+<p>Multiple <abbr title="JavaScript Object Notation">JSON</abbr> objects are held within lists. Some elements of a list can be of different types like
+the <code class="docutils literal notranslate"><span class="pre">usecase</span></code> or <code class="docutils literal notranslate"><span class="pre">prompter</span></code> elements (<code class="docutils literal notranslate"><span class="pre">local</span></code> or <code class="docutils literal notranslate"><span class="pre">cloud</span></code>). The below example shows a
+<abbr title="JavaScript Object Notation">JSON</abbr> configuration that defines both a <code class="docutils literal notranslate"><span class="pre">local</span></code> and a <code class="docutils literal notranslate"><span class="pre">cloud</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> and their
+correspondent usecases:</p>
+<div class="highlight-json notranslate" id="code-json-multiple-prompters-and-usecases-local-and-cloud"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Prompter 1.0&quot;</span><span class="p">,</span>
+
+  <span class="nt">&quot;voice_data_path&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceDataPath&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;vocalizer_path&quot;</span><span class="p">:</span> <span class="s2">&quot;directory/with/language/data&quot;</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;prompter&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test_prompter&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;...&quot;</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test_cloudprompter&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;...&quot;</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;usecase&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyLocalUsecase1&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;voice_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceConfig1&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyLocalUsecase2&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;voice_config&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceConfig2&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudUsecase1&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;cloud_command&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudCmd1&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudUsecase2&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;cloud_command&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudCmd2&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;voice_config&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceConfig1&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;...&quot;</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyVoiceConfig2&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;...&quot;</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+
+  <span class="nt">&quot;cloud_command&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudCmd1&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_TTS_CMD&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dictionary&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;tts_voice&quot;</span><span class="p">:</span> <span class="s2">&quot;Ava&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;...&quot;</span>
+      <span class="p">}</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;MyCloudCmd2&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;command&quot;</span><span class="p">:</span> <span class="s2">&quot;NVC_TTS_CMD&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dictionary&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;tts_voice&quot;</span><span class="p">:</span> <span class="s2">&quot;Samantha&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;...&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>With the above configuration different <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instances can be created and used.
+On the created <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> instances only usecases of the same type are activatable.</p>
+<div class="highlight-c notranslate" id="code-c-iprompter-activateusecase-different-instances"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">NUANCE_COMMON_OK</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompter</span> <span class="o">*</span><span class="n">test_prompter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">nuance_prompter_IPrompter</span> <span class="o">*</span><span class="n">test_cloudprompter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">...</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Assuming that local IPrompter instance named &quot;test_prompter&quot;</span>
+<span class="cm"> * and cloud IPrompter instance named &quot;test_cloudprompter&quot; are created.</span>
+<span class="cm"> */</span>
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_activateUseCase</span><span class="p">(</span><span class="n">test_prompter</span><span class="p">,</span> <span class="s">&quot;MyLocalUsecase1&quot;</span><span class="p">);</span>
+<span class="p">...</span>
+
+<span class="n">rc</span> <span class="o">=</span> <span class="n">nuance_prompter_IPrompter_activateUseCase</span><span class="p">(</span><span class="n">test_cloudprompter</span><span class="p">,</span> <span class="s">&quot;MyCloudUsecase2&quot;</span><span class="p">);</span>
+<span class="p">...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="control-sequences">
+<span id="id6"></span><h3>Control Sequences</h3>
+<p>A control sequence is a piece of text, that is not read out, but instead affects how other text is spoken, or that performs a specific task.
+Cerence <abbr title="Text To Speech">TTS</abbr> Embedded supports a proprietary syntax for control sequences and a number of control sequences that are described in chapter <code class="docutils literal notranslate"><span class="pre">&quot;Using</span> <span class="pre">control</span> <span class="pre">sequences&quot;</span></code>
+in the referenced <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation. While the complete set of control sequences can be used with the <code class="docutils literal notranslate"><span class="pre">local</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code>,
+certain control sequences work with the <code class="docutils literal notranslate"><span class="pre">cloud</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> only if referenced data (e.g. user rules, user dictionaries, active prompt databases, <abbr title="Waveform Audio File Format">WAV</abbr> files)
+are installed and can be accessed by the the <abbr title="Text To Speech">TTS</abbr> Cloud Services. Examples of such control sequences are listed below. Unless stated otherwise, the usage
+of them do not cause a prompt to return with an error if they reference inaccessible data:</p>
+<ul>
+<li><p class="first">Activating implicit matching for ActivePrompt domain (<em>Example: “&lt;ESC&gt;\domain=banking\Did you say your account number is 238773?”</em>).</p>
+</li>
+<li><p class="first">Marking a multi-word string for lookup in the user dictionary (<em>Example: “Use the &lt;ESC&gt;\mw\ IP address &lt;ESC&gt;\mw\ to connect.”</em>).</p>
+</li>
+<li><p class="first">Guiding text normalization with types, that are not part of the Cerence <abbr title="Text To Speech">TTS</abbr> Embedded built-in types <code class="docutils literal notranslate"><span class="pre">sms</span></code>, <code class="docutils literal notranslate"><span class="pre">address</span></code>, etc. (<em>Example: “&lt;ESC&gt;\tn=myNonBuiltInType\ Carlo, can u give me a lift 2 Helena’s house 2nite? David”</em>).</p>
+</li>
+<li><p class="first">Inserting an active prompt (<em>Example: “&lt;ESC&gt;\prompt=banking::confirm_account_number\ 238773?”</em>).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Can cause a prompt to terminate with an error if an inserted active prompt was not found due to missing database.</p>
+</div>
+</li>
+<li><p class="first">Inserting a digital audio recording (<em>Example: “&lt;ESC&gt;\audio=”beep.wav”&quot;</em>).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Causes a prompt to terminate with an error if an inserted audio recording was not found under the referred file path.</p>
+</div>
+</li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">cloud</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> does not support markers, therefore the following control sequence is considered as not applicable and causes a prompt to be terminated with an error:</p>
+<ul class="simple">
+<li>Inserting a bookmark (<em>Example: “This bookmark &lt;ESC&gt;\mrk=123\ marks a reference point.”</em>)</li>
+</ul>
+<div class="section" id="alternative-escape-sequence-for-cloud-iprompter">
+<h4>Alternative Escape Sequence for Cloud IPrompter</h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;</span></code> (ASCII 0x1B) character indicates a Cerence <abbr title="Text To Speech">TTS</abbr> Embedded control sequence. However, <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;</span></code> is not a valid
+character in <abbr title="Text To Speech">TTS</abbr> input texts sent to the Cerence Cloud <abbr title="Text To Speech">TTS</abbr>. The Cerence Cloud <abbr title="Text To Speech">TTS</abbr> supports an alternative escape sequence
+that is configured on the remote side and is by default <code class="docutils literal notranslate"><span class="pre">\\!</span></code> (ASCII 0x5C, 0x21).
+For convenience reasons, the <code class="docutils literal notranslate"><span class="pre">cloud</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> provides the possibility to use <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;</span></code> as escape sequence
+also within strings for the <code class="docutils literal notranslate"><span class="pre">cloud</span></code> TTS, so that the same input text format can be passed to both <code class="docutils literal notranslate"><span class="pre">local</span></code>
+and <code class="docutils literal notranslate"><span class="pre">cloud</span></code> instances. To achieve this, the <code class="docutils literal notranslate"><span class="pre">cloud</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> maps, by default, each <code class="docutils literal notranslate"><span class="pre">&lt;ESC&gt;</span></code> occurring
+in an input text for the cloud to the alternative control sequence <code class="docutils literal notranslate"><span class="pre">\\!</span></code>. This default mapping can be changed by setting
+the optional <abbr title="JavaScript Object Notation">JSON</abbr> parameter <code class="docutils literal notranslate"><span class="pre">esc_replacement</span></code>. The <abbr title="JavaScript Object Notation">JSON</abbr> snippet below shows a <code class="docutils literal notranslate"><span class="pre">cloud</span></code> <code class="docutils literal notranslate"><span class="pre">IPrompter</span></code> configuration setting
+the <code class="docutils literal notranslate"><span class="pre">esc_replacement</span></code> to <code class="docutils literal notranslate"><span class="pre">##</span></code>:</p>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;prompter&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;cloud&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CLOUD_PROMPTER&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;cloud&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;esc_replacement&quot;</span><span class="p">:</span> <span class="s2">&quot;##&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;...&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="multilingual-voice-configurations">
+<h3>Multilingual Voice Configurations</h3>
+<p>An increasing number of Cerence <abbr title="Text To Speech">TTS</abbr> Embedded voices has multilingual capabilities, i.e. they are able to read texts from other
+languages according to the rules of the foreign language.
+Multilingual voices have names ending with an <em>-ML</em>, like “Petra-ML”.
+The voice documentation lists all foreign languages that are supported by a certain operating point.</p>
+<p>To use the multilingual capabilities, the input text can either mark foreign fragments
+with a language tag <em>&lt;ESC&gt;\lang=&lt;lang&gt;\&lt;foreign fragments&gt;</em>.
+Or the automatic language identification (lid) of Cerence <abbr title="Text To Speech">TTS</abbr> Embedded can be used.</p>
+<p>For that purpose a specific fragment has to be marked like <em>&lt;ESC&gt;\lang=unknown\&lt;foreign fragments&gt;</em>.
+The <abbr title="Text To Speech">TTS</abbr> then decides which language this fragment could have and synthesizes it accordingly.
+For that decision the <abbr title="Text To Speech">TTS</abbr> uses the file <em>lid.dat</em> under <em>~\samples\data\vocalizer\common\speech\components</em>.</p>
+<p>The language identification can be controlled with the following parameters that can
+be set in the <code class="docutils literal notranslate"><span class="pre">&quot;voice_config&quot;</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;lidscope&quot;</span>
+<span class="s2">&quot;readmode&quot;</span>
+<span class="s2">&quot;lidmode&quot;</span>
+</pre></div>
+</div>
+<p>For more details about the multilingual voice handling see in the referenced <a class="reference internal" href="../SDK_Prompter_UserGuide.html#references-cerence-tts"><span class="std std-ref">Cerence TTS Embedded</span></a> documentation (chapter Multi-lingual voices).</p>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References</h2>
+<ul class="simple">
+<li><a class="reference external" href="../../asr5/json/callbacks.html">vh_callback</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Prompter_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Prompter_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuration</a><ul>
+<li><a class="reference internal" href="#json-configuration"><abbr title="JavaScript Object Notation">JSON</abbr> Configuration</a></li>
+<li><a class="reference internal" href="#json-configuration-examples"><abbr title="JavaScript Object Notation">JSON</abbr> Configuration Examples</a><ul>
+<li><a class="reference internal" href="#iprompter-configured-as-local-instance">IPrompter Configured as “local” Instance</a></li>
+<li><a class="reference internal" href="#iprompter-configured-as-cloud-instance">IPrompter Configured as “cloud” Instance</a><ul>
+<li><a class="reference internal" href="#dynamic-modification-of-command-specific-parameters-vh-callback">Dynamic Modification of Command-specific Parameters (vh_callback)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#organizing-of-multiple-objects">Organizing of Multiple Objects</a></li>
+<li><a class="reference internal" href="#control-sequences">Control Sequences</a><ul>
+<li><a class="reference internal" href="#alternative-escape-sequence-for-cloud-iprompter">Alternative Escape Sequence for Cloud IPrompter</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#multilingual-voice-configurations">Multilingual Voice Configurations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Prompter_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="prompter_intro.html" title="previous chapter">Types of the Prompter</a></li>
+      <li>Next: <a href="prompter_configuration_api_ref.html" title="next chapter">Overview</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/prompter_configuration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

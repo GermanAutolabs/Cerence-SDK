@@ -1,0 +1,680 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>NLU applications</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Remote applications" href="remote_applications.html" />
+    <link rel="prev" title="Recognition Results" href="results.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="nlu-applications">
+<span id="id1"></span><h1>NLU applications</h1>
+<div class="section" id="introduction">
+<h2>Introduction</h2>
+<p>NLU stands for “Natural Language Understanding”. This goes a step
+beyond “mere” ASR, in the sense that in addition to transcribing
+speech, it also attempts to assign a meaning to the transcribed
+speech.</p>
+<p>Cerence ASR contains a semantic processing module called “SEM3” (or
+“SEM v3”) that implements an NLU post-processor for ASR results. The
+SEM3 module itself produces new results, based on the ASR results,
+that include semantic information extracted from the ASR results.</p>
+<p>In SEM3, semantic information is modeled as “intents”, i.e. actions
+intended by the speaker, and slots that will contain values extracted
+from the user’s speech. Examples could be, for example, <code class="docutils literal notranslate"><span class="pre">Music.Play</span></code>
+with a song title or artist name, or <code class="docutils literal notranslate"><span class="pre">Music.Repeat</span></code> with a
+<code class="docutils literal notranslate"><span class="pre">current</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code> qualification. This allows the user’s intentions
+to be decoupled more from the user’s utterances than would be possible
+with the regular ASR transcriptions and tags that can be found in
+regular ASR results. This is especially relevant for non-BNF-based
+contexts, which allow more flexibility in recognizing the input
+speech, but where the ASR transcriptions will be less structured and
+show more variation.</p>
+<p>SEM3 contexts are created based on the context for which they will
+post-process the results, in conjunction with information about
+in-domain utterance versus out-of-domain utterances.</p>
+<p>There are many ways of creating SEM3 contexts. Most methods are only
+available through Cerence professional services. It is also possible
+to create semantic contexts from grammar-based contexts; this way is
+also accessible to CSDK customers, through the <code class="docutils literal notranslate"><span class="pre">sem3proccpl</span></code>
+tool. The image below shows how a SEM3 context is created from a
+BNF-based context:</p>
+<a class="reference internal image-reference" href="../../_images/nlu_buffer_creation.png"><img alt="../../_images/nlu_buffer_creation.png" class="align-center" src="../../_images/nlu_buffer_creation.png" style="width: 75%;" /></a>
+<p>First, the BNF grammar is compiled into a context, using the
+<code class="docutils literal notranslate"><span class="pre">grmcpl</span></code> tool. Then this context, its BNF source grammar(s), and the
+false acceptance information are used to create the SEM3 context.</p>
+</div>
+<div class="section" id="configuring-sem3-nlu-for-an-asr-application">
+<h2>Configuring SEM3 NLU for an ASR application</h2>
+<p>The JSON section below shows how to configure an NLU block in an ASR
+application. The NLU post-processors are defined in an <code class="docutils literal notranslate"><span class="pre">&quot;nlu&quot;</span></code>
+block, with type <code class="docutils literal notranslate"><span class="pre">&quot;sem3&quot;</span></code>. In the <code class="docutils literal notranslate"><span class="pre">&quot;app&quot;</span></code> block, the file name for
+the SEM3 context <code class="docutils literal notranslate"><span class="pre">.s3c</span></code> is specified:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;VoConHigh 5.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;YESNO&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;asr&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;SEARCH_YESNO&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;yesno_basic_enu.fcf&quot;</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;LH_SEARCH_PARAM_TSILENCE&quot;</span><span class="p">:</span> <span class="mi">150</span>
+          <span class="p">}</span>
+        <span class="p">}]</span>
+      <span class="p">}</span>
+    <span class="p">}],</span>
+    <span class="nt">&quot;nlu&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sem3&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;sem3&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;app&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;YESNO_APP&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;yesno_basic_enu.s3c&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The result of adding the NLU block will be, that each final ASR result
+is passed into the SEM3 module for post-processing. The SEM3 module
+will then produce an NLU result. Note that the ASR result is also
+provided to the system with the <code class="docutils literal notranslate"><span class="pre">&lt;IRecognizerListener&gt;.onResult()</span></code>
+callback, so the system will receive both the ASR result, and the NLU
+result that is based on this ASR result, through the
+<code class="docutils literal notranslate"><span class="pre">&lt;IRecognizerListener&gt;.onResult()</span></code> callback funtion. They will be
+reported in separate, independent calls to the callback though. Note
+also that partial ASR results are not post-processed by the SEM3 module.</p>
+</div>
+<div class="section" id="simple-example-yes-no">
+<h2>Simple example: yes/no</h2>
+<p>Consider the act of accepting or declining a choice. In addition to
+simply saying “yes” or “no”, a speaker could instead also say “sure”,
+“of course”, “confirmed”, or rather “never”, “denied”, etc. A simple
+grammar to model this could look like this:</p>
+<div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span>#BNF+EMV2.1;
+
+!grammar &quot;yesno&quot;;
+
+!start <span class="p">&lt;</span><span class="nc">yes_or_no</span><span class="p">&gt;</span>;
+
+<span class="p">&lt;</span><span class="nc">yes_or_no</span><span class="p">&gt;</span>:
+    yes [indeed] | right | ok | sure | for real | perfect | confirmed
+  | correct | yes please | positive | affirmative | [yes] I will | true
+
+  | no [please don&#39;t|thanks|I don&#39;t want that] | [preferably] not
+  | denied | false | negative | [no] forget it;
+</pre></div>
+</div>
+<p>However, in order to deduce which one of “yes” or “no” the speaker
+meant, the application will have to check the ASR result and compare
+the transcribed result with the words and phrases in the grammar. This
+is extra work, and especially if more than one language should be
+supported, this becomes burdensome.</p>
+<p>A slight improvement can be made by splitting the “yes” and “no” parts
+of the grammar:</p>
+<div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span>#BNF+EMV2.1;
+
+!grammar &quot;yesno&quot;;
+
+!start <span class="p">&lt;</span><span class="nc">yes</span><span class="p">&gt;</span>;
+!start <span class="p">&lt;</span><span class="nc">no</span><span class="p">&gt;</span>;
+
+<span class="p">&lt;</span><span class="nc">yes</span><span class="p">&gt;</span>:
+    yes [indeed] | right | ok | sure | for real | perfect | confirmed
+  | correct | yes please | positive | affirmative | [yes] I will | true;
+
+<span class="p">&lt;</span><span class="nc">no</span><span class="p">&gt;</span>:
+    no [please don&#39;t|thanks|I don&#39;t want that] | [preferably] not
+  | denied | false | negative | [no] forget it;
+</pre></div>
+</div>
+<p>The split in two (start) rules makes it possible to check in the ASR
+result which start rule was used, to know whether the speaker said a
+“yes” expression or a “no” expression. However, this approach does not
+make it possible to pass additional information into the recognition result.</p>
+<p>By introducing some additional syntax, we can make it possible to
+attach key-value pairs to a successfully applied recognition rule:</p>
+<div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span>#BNF+EMV2.1;
+
+!grammar &quot;yesno&quot;;
+
+!start <span class="p">&lt;</span><span class="nc">no</span><span class="p">&gt;</span>;
+!start <span class="p">&lt;</span><span class="nc">yes</span><span class="p">&gt;</span>;
+
+<span class="p">&lt;</span><span class="nc">yes</span><span class="p">&gt;</span>:
+(
+    yes [indeed] | right | ok | sure | for real | perfect | confirmed
+  | correct | yes please | positive | affirmative | [yes] I will | true
+) { concept_name = &quot;yes_PHRASE&quot; };
+
+<span class="p">&lt;</span><span class="nc">no</span><span class="p">&gt;</span>:
+(
+    no [please don&#39;t|thanks|I don&#39;t want that] | [preferably] not
+  | denied | false | negative | [no] forget it
+) { concept_name = &quot;no_PHRASE&quot; };
+</pre></div>
+</div>
+<p>In this example, if the recognizer finds a match with the <code class="docutils literal notranslate"><span class="pre">&lt;yes&gt;</span></code>
+rule, it will “attach” the key-value pair
+<code class="docutils literal notranslate"><span class="pre">concept_name=&quot;yes_PHRASE&quot;</span></code> to the <code class="docutils literal notranslate"><span class="pre">&lt;yes&gt;</span></code> non-terminal, and
+“percolate” it up into the NLU result (for now, ignore the
+<code class="docutils literal notranslate"><span class="pre">&quot;__PARSER_RETURNED_NO_TOPIC__&quot;</span></code> bit):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;SemanticResult&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;results&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;appName&quot;</span><span class="p">:</span> <span class="s2">&quot;yesnoApp&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;probability&quot;</span><span class="p">:</span> <span class="mi">9713</span><span class="p">,</span>
+    <span class="nt">&quot;interpretations&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;e9733f9d-66b9-4831-b172-4e00123b24dc&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;probability&quot;</span><span class="p">:</span> <span class="mi">9713</span><span class="p">,</span>
+      <span class="nt">&quot;representation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;__PARSER_RETURNED_NO_TOPIC__&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;concept&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;topic&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;roles&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;concept_name&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;yes_PHRASE&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;concept_name&quot;</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>As you can see in this NLU result, the <code class="docutils literal notranslate"><span class="pre">concept_name</span></code> key as
+specified in the BNF grammar, comes back as a <code class="docutils literal notranslate"><span class="pre">role</span></code>, with the value
+<code class="docutils literal notranslate"><span class="pre">yes_PHRASE</span></code>, and the specification that for the recognizer,
+<code class="docutils literal notranslate"><span class="pre">concept_name</span></code> is a slot name (in the <code class="docutils literal notranslate"><span class="pre">extraContent</span></code> block).</p>
+<p>We can further improve on the above BNF grammar and its SEM3 features,
+by extracting the actual words and phrases into separate rules (and
+even separate BNF files, to make the core BNF language independent),
+and by manipulating how the key-value pairs are propagated to the result.</p>
+<p>The following BNF grammar shows how to add new key-value pairs to the
+NLU result, and also how to actually add the ASR transcriptions to the
+NLU result as well:</p>
+<div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span>#BNF+EMV2.1;
+
+!grammar &quot;yesno&quot;;
+
+!start <span class="p">&lt;</span><span class="nc">no</span><span class="p">&gt;</span>;
+!start <span class="p">&lt;</span><span class="nc">yes</span><span class="p">&gt;</span>;
+
+<span class="p">&lt;</span><span class="nc">yes</span><span class="p">&gt;</span>:
+(
+    (<span class="p">&lt;</span><span class="nc">yes_PHRASE</span><span class="p">&gt;</span> {$tag})   { $tag.confirm=yes; $tag.nlutopic=&quot;General.Yes&quot; }
+) { $tag; _ortho=%tokens };
+
+<span class="p">&lt;</span><span class="nc">no</span><span class="p">&gt;</span>:
+(
+    (<span class="p">&lt;</span><span class="nc">no_PHRASE</span><span class="p">&gt;</span> {$tag})    { $tag.confirm=no; $tag.nlutopic=&quot;General.No&quot; }
+) { $tag; _ortho=%tokens };
+
+<span class="p">&lt;</span><span class="nc">yes_PHRASE</span><span class="p">&gt;</span>:
+(
+    yes [indeed] | right | ok | sure | for real | perfect | confirmed
+  | correct | yes please | positive | affirmative | [yes] I will | true
+) { concept_name= &quot;yes_PHRASE&quot; };
+
+<span class="p">&lt;</span><span class="nc">no_PHRASE</span><span class="p">&gt;</span>:
+(
+  no [please don&#39;t|thanks|I don&#39;t want that] | [preferably] not |
+  denied | false | negative | [no] forget it
+) { concept_name= &quot;no_PHRASE&quot; };
+</pre></div>
+</div>
+<p>The BNF rules for <code class="docutils literal notranslate"><span class="pre">&lt;yes&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">no</span></code> above are structured like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>(&lt;rule_name1&gt; {$tag_name1} ...) { &lt;tag_clause1&gt;; &lt;tag_clause2&gt; ...}
+</pre></div>
+</div>
+<p>The parts are as follows:</p>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">&lt;rule_name1&gt;</span></code> is the name of the sub-rule that has to matched
+successfully.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">$tag_name1</span></code> is the tag name that will contain the key-value
+dictionary information that is passed from the <code class="docutils literal notranslate"><span class="pre">&lt;rule_name1&gt;</span></code> to
+this rule, if the sub-rule matches successfully. This tag name can
+be used in the tag clauses that describe the key-value dictionary
+for this rule, that will in turn be passed “upwards” until the start
+rule is reached.</p>
+<p>Note that each component of a rule can be followed by a <code class="docutils literal notranslate"><span class="pre">{</span>
+<span class="pre">$tag_name</span> <span class="pre">}</span></code>  block.</p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">&lt;tag_clause1&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;tag_clause2&gt;</span></code> etc. These are a “;”-separated
+list that describe the contents of the key-value dictionary that
+should be attached to the match result of this rule, if the match is
+succesful. These clauses can contain references to tags from
+sub-rules used in this rule.</p>
+</li>
+</ul>
+<p>In the grammar above, the following actually consists of two embedded rules:</p>
+<div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nc">yes</span><span class="p">&gt;</span>:
+(
+    (<span class="p">&lt;</span><span class="nc">yes_PHRASE</span><span class="p">&gt;</span> {$tag})   { $tag.confirm=yes; $tag.nlutopic=&quot;General.Yes&quot; }
+) { $tag; _ortho=%tokens };
+</pre></div>
+</div>
+<p>can be rewritten like this:</p>
+<div class="highlight-bnf notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nc">yes_ADD_NLU_SLOTS</span><span class="p">&gt;</span>:
+    (<span class="p">&lt;</span><span class="nc">yes_PHRASE</span><span class="p">&gt;</span> {$tag})   { $tag.confirm=yes; $tag.nlutopic=&quot;General.Yes&quot; }
+
+<span class="p">&lt;</span><span class="nc">yes</span><span class="p">&gt;</span>:
+    (<span class="p">&lt;</span><span class="nc">yes_ADD_NLU_SLOTS</span><span class="p">&gt;</span> {$tag}) { $tag; _ortho=%tokens };
+</pre></div>
+</div>
+<p>where the first sub-rule adds the NLU key-value pairs to the rule, and
+the second one attaches the transcribed ASR tokens.</p>
+</div>
+<div class="section" id="sem3-contexts">
+<h2>SEM3 contexts</h2>
+<p>A compiled SEM3 context consists of a pipeline of annotators. Incoming
+results are stored as a common analysis structure (CAS). Each
+annotator then adds a number of annotations to the CAS, as the CAS
+travels though the pipeline</p>
+<p>A data receiver is an entity that can be part of an annotator, and
+that exposes a “hook” where additional, external data can be added.
+An annotator can have multiple data receivers.  To address a
+particular data receiver, a data path is used.  A data path, in turn,
+is a combination of a unique annotator identifier with a data receiver
+identifier.</p>
+<div class="section" id="data-path-syntax">
+<h3>Data Path Syntax</h3>
+<p>A particular data receiver of an annotator can be selected by making
+use of an XPath-like syntax:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;&lt;annotator ID&gt;/&lt;data receiver&gt;&quot;
+</pre></div>
+</div>
+<p>Note that the use of ‘/’ in annotator IDs is prohibited. In fact,
+annotator IDs are restricted to the following regular expression
+pattern:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[A-Za-z_][A-Za-z0-9_-]*
+</pre></div>
+</div>
+<p>That means it can have have <code class="docutils literal notranslate"><span class="pre">A</span></code> through <code class="docutils literal notranslate"><span class="pre">Z</span></code> (lower and upper
+case), digits, <code class="docutils literal notranslate"><span class="pre">-</span></code> and <code class="docutils literal notranslate"><span class="pre">_</span></code>. For the first character digits and
+<code class="docutils literal notranslate"><span class="pre">-</span></code> are not allowed. This restriction is introduced to avoid clashes
+with scripting engines like Lua where annotator Ids could be used as
+variables.</p>
+<p><strong>Example:</strong></p>
+<p>Given two data receivers in the same annotator. We can then use
+X-paths like <code class="docutils literal notranslate"><span class="pre">AnnotatorID/dataReceiverID1</span></code> and
+<code class="docutils literal notranslate"><span class="pre">AnnotatorID/dataReceiverID2</span></code> to address the receivers
+(<em>dataReceiverId1</em>, <em>dataReceiverId2</em>) within the annotator
+(<em>AnnotatorId</em>).</p>
+<p>The annotator itself can be the data receiver. In this case the X-path
+syntax looks as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;&lt;annotator ID&gt;&quot;
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-fm-data-at-runtime">
+<h3>Adding FM Data at runtime</h3>
+<p>In some cases, the FM data may become available after the
+application has been created. One can still add/remove the FM data
+at runtime by using the following services from IApplication API:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_addWithPath</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">pathsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">npathsList</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">configsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nconfigsList</span>
+<span class="p">);</span>
+<span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_addFilesWithPath</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span><span class="p">,</span>
+  <span class="n">LH_BOOL</span> <span class="n">isFilePath</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">pathsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">npathsList</span>
+<span class="p">);</span>
+<span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_remove</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>where the <code class="docutils literal notranslate"><span class="pre">type</span></code> should be <code class="docutils literal notranslate"><span class="pre">sem3_data</span></code> and the path is defined
+with the following scheme:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;|nlu|NLU_SEM3_FM_SIMPLE|app|FM_SIMPLE_SEM|additional_data|FM/TableContext&quot;</span>
+</pre></div>
+</div>
+<p>where the config is the new configuration for add or update.  The
+configuration shall be a JSON string, which the JSON structure shall
+follow the Cerence ASR JSON configuration schema
+(<code class="docutils literal notranslate"><span class="pre">ISem3AdditionalDataConfig</span></code>).</p>
+<p>The nlu configuration which receives the data files should look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;nlu&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;NLU_SEM3_FM_SIMPLE&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sem3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sem3&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FM_SIMPLE_SEM&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;fm_simple_v5.s3c&quot;</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+</pre></div>
+</div>
+<p>It is important to note that in order to find the “app” and the
+“additional_data” configs, they must have a name.  Beware that
+invoking nuance_asr5_IApplication_remove will result in all data under
+the same path being removed.</p>
+</div>
+<div class="section" id="dynamic-fm-data-update">
+<h3>Dynamic FM Data update</h3>
+<p>You can update dynamic FM data by calling
+<code class="docutils literal notranslate"><span class="pre">startDataPreparationFromCopFile</span></code>. The next recognition session will
+have different behavior, corresponding to the new data:</p>
+<ul>
+<li><p class="first">Case 1: data is in dccs_to_wait_for list</p>
+<p>The next recognition will</p>
+<blockquote>
+<div><ul class="simple">
+<li>Wait for this data file to be ready</li>
+<li>Remove old data and add new data to the SEM3 app</li>
+<li>Start the recognition</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Case 2: data is not in dccs_to_wait_for list</p>
+<p>The coming recognition will</p>
+<blockquote>
+<div><ul class="simple">
+<li>Pause this data update</li>
+<li>Then check if this data file is available, and if yes, remove old data
+and add new data to the SEM3 app.</li>
+<li>Start the recognition</li>
+<li>After this recognition, the data update that was paused will
+continue, and the new data will be added to the SEM3 app for the next
+recognition.</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="fm-data-configuration-fm-boosting">
+<h3>FM data configuration (FM boosting)</h3>
+<p>The FM data subset can be activated or deactived: you can add the
+activation/deactivation configuration string to the addtional data of a
+SEM3 app.</p>
+<p>The following configuration is an example to activate a city:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;APP_NAME&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;input&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;asr&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">[{</span>
+            <span class="nt">&quot;...&quot;</span>
+          <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="nt">&quot;nlu&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;NLU_SEM3_FM_SIMPLE_MULTIPLE_DATA&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;sem3&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;sem3&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;app&quot;</span><span class="p">:</span> <span class="p">[{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;SEM3CONTEXT_NAME&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;sem3context.s3c&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;additional_data&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;FM_TableContext&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;FM/TableContext&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;fm_context_1.zcf&quot;</span>
+                    <span class="p">}</span>
+                  <span class="p">}</span>
+                <span class="p">],</span>
+                <span class="nt">&quot;configuration&quot;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="nt">&quot;configuration_json_string&quot;</span><span class="p">:</span> <span class="s2">&quot;{\&quot;activate\&quot;: [{\&quot;city=Riverside\&quot;: 10000}],\&quot;version\&quot;: 1}&quot;</span>
+                <span class="p">}</span>
+              <span class="p">},{</span>
+                <span class="nt">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;FM/Fst4FmContext&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+                    <span class="nt">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+                      <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;fm_context_2.fcf&quot;</span>
+                    <span class="p">}</span>
+                  <span class="p">}</span>
+                <span class="p">]</span>
+              <span class="p">}</span>
+            <span class="p">]</span>
+          <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="json-format">
+<h4>JSON format</h4>
+<p>The JSON string for <code class="docutils literal notranslate"><span class="pre">&quot;configuration_json_string&quot;</span></code> has the following format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;activate&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;&lt;query 1&gt;&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">value</span> <span class="mi">1</span><span class="o">&gt;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;&lt;query 2&gt;&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">value</span> <span class="mi">2</span><span class="o">&gt;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;&lt;query N&gt;&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">value</span> <span class="n">N</span><span class="o">&gt;</span>
+  <span class="p">}],</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">version</span> <span class="n">number</span><span class="o">&gt;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">activate</span></code> array contains queries that are processed in the given
+order.  Each query encodes a database search, identifying the desired
+database subset.  An empty query addresses the entire database.</p>
+<p>The values contain numbers ranging from [0, 10000]. These numbers
+correspond to priority probabilities 0 to 1.  Values below 0.5
+penalize the selected database subset while values above 0.5 boost the
+selected subset.  A value of 0 means that the selected subset is
+deactivated.</p>
+<p>The version number is 1 for the current implementation.</p>
+</div>
+<div class="section" id="json-example">
+<h4>JSON example</h4>
+<p>The following example shows how only one city of the database is
+activated.  First, the entire database is deactivated and then the
+city with the identifier 0x1000 is activated.  The identifier of the
+Fuzzy Search Annotator is <code class="docutils literal notranslate"><span class="pre">FM</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;activate&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;city_id=0x1000&quot;</span><span class="p">:</span> <span class="mi">5000</span>
+  <span class="p">}],</span>
+  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="adding-fm-data-configuration-at-runtime">
+<h3>Adding FM data Configuration at runtime</h3>
+<p>In some cases, the FM data configuration may become available
+after the application has been created. One can still add/update
+the FM data at runtime by using the following services from the
+<code class="docutils literal notranslate"><span class="pre">IApplication</span></code> API:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_asr5_IApplication_addWithPath</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="nb">type</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="n">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="n">const</span> <span class="o">*</span><span class="n">pathsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">npathsList</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="n">const</span> <span class="o">*</span><span class="n">configsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nconfigsList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>where the <code class="docutils literal notranslate"><span class="pre">type</span></code> should be <code class="docutils literal notranslate"><span class="pre">sem3_data_configuration</span></code> and the path
+is defined with the following scheme:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;|nlu|NLU_SEM3_FM_SIMPLE_MULTIPLE_DATA|app|SEM3CONTEXT_NAME|additional_data|FM_TableContext&quot;</span>
+</pre></div>
+</div>
+<p>where the config is the new configuration for add or update.  The
+configuration shall be a JSON string, which the JSON structure shall
+follow the Cerence ASR JSON configuration schema
+(<code class="docutils literal notranslate"><span class="pre">ISem3AdditionalDataConfigurationConfig</span></code>).</p>
+<p>The nlu configuration which receives the data files should look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;configuration&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;configuration_json_string&quot;</span><span class="p">:</span> <span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">activate</span><span class="se">\&quot;</span><span class="s2">: [{</span><span class="se">\&quot;</span><span class="s2">city=Riverside</span><span class="se">\&quot;</span><span class="s2">: 10000}],</span><span class="se">\&quot;</span><span class="s2">version</span><span class="se">\&quot;</span><span class="s2">: 1}&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It is important to note that in order to find the “app” and the
+“additional_data” configs, they must have a name.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">NLU applications</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#configuring-sem3-nlu-for-an-asr-application">Configuring SEM3 NLU for an ASR application</a></li>
+<li><a class="reference internal" href="#simple-example-yes-no">Simple example: yes/no</a></li>
+<li><a class="reference internal" href="#sem3-contexts">SEM3 contexts</a><ul>
+<li><a class="reference internal" href="#data-path-syntax">Data Path Syntax</a></li>
+<li><a class="reference internal" href="#adding-fm-data-at-runtime">Adding FM Data at runtime</a></li>
+<li><a class="reference internal" href="#dynamic-fm-data-update">Dynamic FM Data update</a></li>
+<li><a class="reference internal" href="#fm-data-configuration-fm-boosting">FM data configuration (FM boosting)</a><ul>
+<li><a class="reference internal" href="#json-format">JSON format</a></li>
+<li><a class="reference internal" href="#json-example">JSON example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-fm-data-configuration-at-runtime">Adding FM data Configuration at runtime</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+  <li><a href="../chapters/using_the_csdk_ddfw.html">Using Cerence ASR</a><ul>
+      <li>Previous: <a href="results.html" title="previous chapter">Recognition Results</a></li>
+      <li>Next: <a href="remote_applications.html" title="next chapter">Remote applications</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

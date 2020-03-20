@@ -1,0 +1,735 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Overview</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Overview" href="audio_core_configuration_api_ref.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview</h1>
+<p>The general logging capabilities of the Cerence <abbr title="Software Development Kit">SDK</abbr> are described in the <a class="reference external" href="../../common/SDK_Common_UserGuide.html#logging">General Logging</a> chapter of the <cite>Common User’s Guide</cite>.
+In this chapter is dedicated to the audio logging capabilities of the <abbr title="Software Development Kit">SDK</abbr>’s audio framework components.</p>
+<p>The audio framework provides the possibility of audio data logging and audio data timing analysis at dedicated logging points. Both
+may be requested by Nuance to analyze audio issues.</p>
+</div>
+<div class="section" id="audio-data-logging">
+<h1>Audio Data Logging</h1>
+<div class="section" id="id1">
+<h2>Overview</h2>
+<p>To analyze audio issues it may be necessary to check the audio data stream passing the <abbr title="Software Development Kit">SDK</abbr>’s audio framework components. Therefore
+several logging points are provided that allow to log the audio data by usage of the <abbr title="Software Development Kit">SDK</abbr>’s logging system.</p>
+<p>All <a class="reference external" href="../SDK_Audio_UserGuide.html#id9">audio modules</a> provide audio data logging at dedicated logging points. In general there are three different types of audio
+data logging points:</p>
+<ul class="simple">
+<li><strong>Pad logging point</strong>: All audio modules have so called <cite>pads</cite> that are used to connect a module to another module in an audio
+scenario in order to stream audio data. All these connection pads provide the possibility to log the audio data that passes.</li>
+<li><strong>Internal logging point</strong>: Some audio modules have module internal logging points that denote important processing points
+within an audio module worth to have the possibility to log audio data. For instance, a <cite>Prompter</cite> audio module that encapsulates
+a <cite>Vocalizer</cite> text-to-speech synthesis core engine possesses an internal logging point. This allows to log the audio data that is
+delivered from this core engine before any further processing within the <cite>Prompter</cite> audio module takes place.</li>
+<li><strong>External logging point</strong>: Some audio modules have external logging points that denote transition points from a <abbr title="Software Development Kit">SDK</abbr> external
+implementation to an audio module. For instance, an <cite>Audio Input</cite> audio module uses an external audio adapter implementation to
+receive audio data from an external source (e.g. audio device). This audio data delivered from the external adapter implementation
+can be logged with activating the specific external logging point.</li>
+</ul>
+<p>Which logging point type is supported from which audio module can be seen in the survey given in <a class="reference internal" href="#audio-data-logging-points">Audio Data Logging Points</a>.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="../_images/audio_logging_approach.png"><img alt="../_images/audio_logging_approach.png" class="align-center" src="../_images/audio_logging_approach.png" style="width: 992.6px; height: 420.0px;" /></a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Audio data logging points of any type can be activated in the logger <abbr title="JavaScript Object Notation">JSON</abbr> configuration. For more details see <a class="reference internal" href="#activation-of-an-audio-data-logging-point">Activation Of An Audio Data Logging Point</a>.</p>
+</div>
+<div class="section" id="audio-data-logging-points">
+<h2>Audio Data Logging Points</h2>
+<div class="section" id="synoptic-table">
+<h3>Synoptic Table</h3>
+<p>The following table gives a brief overview of all audio modules and their available audio data logging points. For more details to a specific
+module see the linked user’s guide documents in the <cite>Audio Module</cite> column. A guidance how to obtain the <code class="docutils literal notranslate"><span class="pre">InstanceName</span></code> and <code class="docutils literal notranslate"><span class="pre">PadName</span></code> of the
+logging point name can be found in the <a class="reference internal" href="#finding-instance-and-pad-names">Finding Instance And Pad Names</a> chapter.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="36%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Audio Module</th>
+<th class="head">Logging Point Naming Schema</th>
+<th class="head">Logging Point Type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td rowspan="2"><a class="reference external" href="../../asr5/SDK_Asr5_UserGuide.html">Asr</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><a class="reference external" href="../audio_module_buffer/SDK_AudioBuffer_UserGuide.html">Audio Buffer</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><a class="reference external" href="../audio_module_decoder/SDK_AudioDecoder_UserGuide.html">Audio Decoder</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td rowspan="2"><a class="reference external" href="../audio_module_encoder/SDK_AudioEncoder_UserGuide.html">Audio Encoder</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="../audio_module_from_file/SDK_AudioFromFile_UserGuide.html">Audio From File</a></td>
+<td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><a class="reference external" href="../audio_module_input/SDK_AudioInput_UserGuide.html">Audio Input</a></td>
+<td>nuance.audio.AudioInput.<cite>&lt;InstanceName&gt;</cite></td>
+<td><strong>External</strong> logging point on delivery from external audio adapter.</td>
+</tr>
+<tr class="row-even"><td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><a class="reference external" href="../audio_module_output/SDK_AudioOutput_UserGuide.html">Audio Output</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td>nuance.audio.AudioOutput.<cite>&lt;InstanceName&gt;</cite></td>
+<td><strong>External</strong> logging point on delivery to external audio adapter.</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><a class="reference external" href="../audio_module_stream_distributor/SDK_AudioStreamDistributor_UserGuide.html">Audio Stream Distributor</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="../audio_module_to_file/SDK_AudioToFile_UserGuide.html">Audio To File</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="../../cloudservices/SDK_CloudServices_UserGuide.html">Cloud Commander</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><a class="reference external" href="../../prompter/SDK_Prompter_UserGuide.html">Prompter</a></td>
+<td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td>nuance.prompter.Vocalizer.<cite>&lt;InstanceName&gt;</cite></td>
+<td><strong>Internal</strong> logging point on delivery of Vocalizer core engine.</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><a class="reference external" href="../audio_module_src/SDK_SampleRateConverter_UserGuide.html">Sample Rate Converter</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><a class="reference external" href="../audio_module_sse/SDK_SpeechSignalEnhancement_UserGuide.html">Speech Signal Enhancement</a></td>
+<td>nuance.audio.SinkPad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Input pad</strong> logging point.</td>
+</tr>
+<tr class="row-even"><td>nuance.audio.SourcePad.<cite>&lt;InstanceName&gt;:&lt;PadName&gt;</cite></td>
+<td><strong>Output pad</strong> logging point.</td>
+</tr>
+</tbody>
+</table>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="finding-instance-and-pad-names">
+<h3>Finding Instance And Pad Names</h3>
+<p>This section shall serve as a guide how to find the correct <cite>InstanceName</cite> and <cite>PadName</cite> that is required to activate a specific
+audio data logging point.</p>
+<p><strong>Instance Names</strong></p>
+<p>In case an audio module is created explicitly the instance name that was given to the create function has to be used as <cite>InstanceName</cite>
+of the logging point. Otherwise, in case the audio module is implicitly created the correct instance name can be obtained from the
+corresponding audio module instance’s <abbr title="JavaScript Object Notation">JSON</abbr> configuration. The instance names of the audio modules can be also obtained from the
+corresponding audio scenario definition. For more details to explicit and implicit creation of audio modules see
+<a class="reference external" href="..../SDK_Audio_UserGuide.html#audio-module-creation-and-destruction">Audio Module Creation and Destruction</a> in the <cite>Audio User`s Guide</cite>.</p>
+<p><strong>Pad Names</strong></p>
+<p>The <cite>PadName</cite> of a logging point is optionally in case the specific audio module have only one input and/or output pad. This is
+as then the input and/or output pad name corresponds to the instance name of the audio module. Otherwise, when an audio module
+have more than one input and/or output the pad names are defined in the module’s <abbr title="JavaScript Object Notation">JSON</abbr> configuration.</p>
+<div class="section" id="example">
+<h4>Example</h4>
+<p>Having a look at the SDK’s prompting example.</p>
+<p>The audio configuration coming with it looks as follows:</p>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;AudioMgr 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;audio_scenario&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span>       <span class="s2">&quot;simplePromptingScenario&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;audiopaths&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="p">[</span><span class="s2">&quot;prompter&quot;</span><span class="p">,</span> <span class="s2">&quot;loudspeaker&quot;</span><span class="p">]</span> <span class="p">]</span>
+  <span class="p">}],</span>
+
+  <span class="nt">&quot;module_config&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;type&quot;</span><span class="p">:</span>                <span class="s2">&quot;AudioOutput&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span>                <span class="s2">&quot;loudspeaker&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;audio_format&quot;</span><span class="p">:</span>      <span class="p">{</span> <span class="nt">&quot;uses&quot;</span><span class="p">:</span> <span class="s2">&quot;22khz_1ch&quot;</span> <span class="p">}</span>
+  <span class="p">}],</span>
+
+  <span class="nt">&quot;audio_format&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;22khz_1ch&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;sample_rate&quot;</span><span class="p">:</span> <span class="mi">22050</span><span class="p">,</span>
+    <span class="nt">&quot;samples_per_channel&quot;</span><span class="p">:</span> <span class="mi">512</span><span class="p">,</span>
+    <span class="nt">&quot;channel_count&quot;</span><span class="p">:</span> <span class="mi">1</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The logger.json extended with the audio data logging point for the <cite>Audio Output</cite> audio module instance named <code class="docutils literal notranslate"><span class="pre">loudspeaker</span></code> looks as follows:</p>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;logger&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;text_buffer_entries&quot;</span><span class="p">:</span> <span class="mi">1000000</span><span class="p">,</span>
+    <span class="nt">&quot;data_buffer_size_per_channel&quot;</span><span class="p">:</span><span class="mi">500000</span><span class="p">,</span>
+    <span class="nt">&quot;consumers&quot;</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;stdout Logger&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;stdout&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;not_modules&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;zones&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_FATAL|LOG_ERROR|LOG_WARNING|LOG_CORE_INFO|LOG_EXTERNAL_FUNC&quot;</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker_audio_output_data&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker_audio_output_data_%DATE_TIME%.pcm&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.audio.AudioOutput.loudspeaker&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;zones&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_DATA&quot;</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="via-audioconfig-json">
+<h4>Via Audioconfig.json</h4>
+<p>The following audio <abbr title="JavaScript Object Notation">JSON</abbr> configuration shows the audio module instance and pad names in the audio scenario definition that needs
+to be used for the audio data logging points marked in green. The yellow marked show where the instance and pad names of the implicitly
+started audio modules come from:</p>
+<a class="reference internal image-reference" href="../_images/audio_logging_names.png"><img alt="../_images/audio_logging_names.png" src="../_images/audio_logging_names.png" style="width: 554.0px; height: 498.0px;" /></a>
+</div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage</h2>
+<div class="section" id="activation-of-an-audio-data-logging-point">
+<h3>Activation Of An Audio Data Logging Point</h3>
+<p>An audio data logging point can be activated in the logging system’s <abbr title="JavaScript Object Notation">JSON</abbr> configuration by defining a corresponding logging consumer
+configuration. Usually a file logging consumer is used to write the audio data to a file. So this section describes the activation of
+an audio data logging point by the usage of a file logging consumer.</p>
+<p>To set up a file logging consumer that takes delivery of a specific audio data logging point, the logging point’s name has to be set
+as single logging module to the <code class="docutils literal notranslate"><span class="pre">modules</span></code> parameter. The names of all available logging points can be seen in the survey given in
+<a class="reference internal" href="#audio-data-logging-points">Audio Data Logging Points</a>. For instance, to set the output pad logging point of an <cite>Audio Input</cite> module instance named <code class="docutils literal notranslate"><span class="pre">microphone</span></code>
+the following <code class="docutils literal notranslate"><span class="pre">modules</span></code> configuration would be necessary:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;modules&quot;</span><span class="o">:</span> <span class="s">&quot;nuance.audio.SourcePad.microphone&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>The logging zones parameter <code class="docutils literal notranslate"><span class="pre">zones</span></code> has to be set to the single logging zone <code class="docutils literal notranslate"><span class="pre">LOG_DATA</span></code> to activate the data logging for this
+consumer in general:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;zones&quot;</span><span class="o">:</span> <span class="s">&quot;LOG_DATA&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>For all other file logging consumer configuration parameters see the <a class="reference external" href="../../common/SDK_Common_UserGuide.html#logging">General Logging</a> chapter of the <cite>Common User’s Guide</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>When activating audio data logging points the following should be noted:</p>
+<ul class="last simple">
+<li>Text and data logging may in principle not logged via one single logging consumer. So for text logging and data logging
+seperate logging consumers needs to be configured.</li>
+<li>Only one audio data logging point may be activated per logging consumer. So for each audio data logging point that
+needs to be activated an own logging consumer must be configured.</li>
+<li>It is not recommended to activate too much audio data logging points in parallel. Data logging requires additional resources
+in the terms of CPU, I/O and disk space. Therefore only the logging points really needed should be activated. In the most
+cases 1-3 logging points in parallel are sufficient.</li>
+<li>The logging system <abbr title="JavaScript Object Notation">JSON</abbr> configuration parameter <code class="docutils literal notranslate"><span class="pre">data_buffer_size_per_channel</span></code> should be set to a quite high value (e.g. 500000).
+This is recommended for audio data to avoid buffer overruns.</li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h4>Example</h4>
+<p>The following example shows how to activate the <strong>external</strong> and the <strong>output pad</strong> logging point of an <cite>Audio Input</cite> audio module instance
+named <code class="docutils literal notranslate"><span class="pre">microphone</span></code>. For each activated logging point an own file logging consumer is configured that takes delivery of a specific audio
+data logging point and that writes the received data in a separate file.
+Please be aware that the <cite>name</cite> config parameter needs to be unique for each log consumer.</p>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;logger&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;data_buffer_size_per_channel&quot;</span><span class="p">:</span><span class="mi">500000</span><span class="p">,</span>
+    <span class="nt">&quot;consumers&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;audio_input_external_logging_point&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;audio_input_external_logging_point_%DATE_TIME%.pcm&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.audio.AudioInput.microphone&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;zones&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_DATA&quot;</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;audio_input_output_pad_logging_point&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;audio_input_output_pad_logging_point_%DATE_TIME%.pcm&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.audio.SourcePad.microphone&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;zones&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_DATA&quot;</span>
+    <span class="p">}</span> <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="starting-and-stopping-of-audio-data-logging">
+<h3>Starting And Stopping Of Audio Data Logging</h3>
+<p>In case an audio data logging point was activated according to <a class="reference internal" href="#activation-of-an-audio-data-logging-point">Activation Of An Audio Data Logging Point</a>, data is logged in general
+whenever audio data passes the activated logging point at application runtime.</p>
+<p>In general audio data are sent in the audio framework as so called audio streams. An audio stream describes for instance a single audio
+prompt played out via the <cite>Prompter</cite> audio module and consists of 1 to n audio packets containing the audio data. Each audio stream
+is identified by a begin-of-stream (<cite>BOS</cite>) and an end-of-stream (<cite>EOS</cite>) indication. So the very first audio packet contains a <cite>BOS</cite> indication
+and the very last an <cite>EOS</cite> indication.</p>
+<p>An activated logging point starts the logging of audio data with receiving the <cite>BOS</cite> audio packet and stops it with the <cite>EOS</cite> audio packet.
+This means for a file logging consumer that takes delivery of this data that a logging file always contains only one single stream
+(e.g. one single prompt). In case a new stream is started it depends on the file logging consumer’s configuration if either the existing
+logging file is overwritten or a new logging file with date and time in its name is created. The existing logging file is overwritten when
+the file consumer configuration contains a <cite>static</cite> file name defined with parameter <code class="docutils literal notranslate"><span class="pre">output</span></code>, e.g.:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;output&quot;</span><span class="o">:</span> <span class="s">&quot;static_file_name.pcm&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Whereas a new logging file is created with each logged audio stream when the <code class="docutils literal notranslate"><span class="pre">output</span></code> parameter contains the <code class="docutils literal notranslate"><span class="pre">%DATE_TIME%</span></code> placeholder
+in the file name, e.g.:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;output&quot;</span><span class="o">:</span> <span class="s">&quot;dynamic_file_name_%DATE_TIME%.pcm&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Defining a static file name in the <code class="docutils literal notranslate"><span class="pre">output</span></code> <abbr title="JavaScript Object Notation">JSON</abbr> configuration of a file logging consumer leads to an overwrite of the
+existing logging file for each new audio stream. Whereas the usage of a dynamic file name with the <code class="docutils literal notranslate"><span class="pre">%DATE_TIME%</span></code> placeholder
+creates a new file for each stream which can lead to a high disk space consumption.</p>
+</div>
+<p>To sum up, the starting and stopping of audio data logging is controlled by audio streams that are sent through activated logging points.
+When a stream is sent depends on the audio modules that are connected in an audio scenario. For instance in a <cite>playback</cite> path containing
+a <cite>Prompter</cite> and an <cite>Audio Output</cite> audio module a stream is sent with each prompt that is played out with a call to the
+<code class="docutils literal notranslate"><span class="pre">nuance_prompter_IPrompter_playString</span></code> <abbr title="Application Programming Interface">API</abbr> function, e.g.:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="cm">/* play a text prompt -&gt; the very first audio package that is sent by the &#39;Prompter&#39; audio</span>
+<span class="cm">   module starts the audio data logging of an activated logging point in this module chain */</span>
+<span class="n">nuance_prompter_IPrompter_playString</span><span class="p">(</span><span class="n">prompter</span><span class="p">,</span> <span class="s">&quot;Hello&quot;</span><span class="p">,</span> <span class="n">promptListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">prompt</span><span class="p">);</span>
+
+<span class="cm">/* wait for completion of playback -&gt; the very last audio package that is sent by the &#39;Prompter&#39;</span>
+<span class="cm">   audio module stops the audio data logging of an activated logging point in this module chain,</span>
+<span class="cm">   which means for a file logging consumer to close the logging file after writing this last audio</span>
+<span class="cm">   data package */</span>
+<span class="n">nuance_prompter_IPrompt_waitForCompletion</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">status</span><span class="p">);</span>
+
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>Whereas in a <cite>capture</cite> path containing for instance an <cite>Audio Input</cite> and an <cite>Asr</cite> audio module a stream is
+started with a call to <code class="docutils literal notranslate"><span class="pre">nuance_asr_IRecognizer_start</span></code> and stopped with a call to <code class="docutils literal notranslate"><span class="pre">nuance_asr_IRecognition_stop</span></code> <abbr title="Application Programming Interface">API</abbr>
+function, e.g.:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="p">...</span>
+
+<span class="cm">/* start a speech recognizer -&gt; the very first audio package that is sent by the &#39;Audio Input&#39; audio</span>
+<span class="cm">   module starts the audio data logging of an activated logging point in this module chain */</span>
+<span class="n">nuance_asr_IRecognizer_start</span><span class="p">(</span><span class="n">recognizer</span><span class="p">,</span> <span class="n">useCase</span><span class="p">,</span> <span class="n">recogListener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">recognition</span><span class="p">);</span>
+
+<span class="cm">/* perform one or more recognitions */</span>
+
+<span class="cm">/* stop the speech recognizer -&gt; the very last audio package that is sent by the &#39;Audio Input&#39;</span>
+<span class="cm">   audio module stops the audio data logging of an activated logging point in this module chain,</span>
+<span class="cm">   which means for a file logging consumer to close the logging file after writing this last audio</span>
+<span class="cm">   data package */</span>
+<span class="n">nuance_asr_IRecognition_stop</span><span class="p">(</span><span class="n">recognizer</span><span class="p">);</span>
+
+<span class="p">...</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <cite>Asr</cite> audio module implements a continuous recognition concept where an <cite>endless</cite> recognition is performed
+and in-between results can be requested. So audio data logging in a <cite>capture</cite> path containing an <cite>Asr</cite> can lead to
+huge disk space consumption due to the audio data logging depending on the length the continuous recognition is active.</p>
+</div>
+</div>
+</div>
+<div class="section" id="data-format">
+<h2>Data Format</h2>
+<p>Audio data is logged as raw <abbr title="Pulse Code Modulation">PCM</abbr> data or raw encoded data.
+That means that no headers are attached.</p>
+<p>This chapter describes how to deal with files containing the logged audio data, how the files can be opened and played.</p>
+<div class="section" id="pcm">
+<h3>PCM</h3>
+<p>The <abbr title="Software Development Kit">SDK</abbr> uses signed 16bit <abbr title="Pulse Code Modulation">PCM</abbr> sample values only.</p>
+<p>To import a plain <abbr title="Pulse Code Modulation">PCM</abbr> file, for example in the commonly used tool <cite>audacity</cite>, do the following steps:</p>
+<blockquote>
+<div><ul class="simple">
+<li>go to File –&gt; Import –&gt; Raw Data</li>
+<li>select the file</li>
+<li>select “Signed 16-bit_PCM”</li>
+<li>select “Little-endian”</li>
+<li>select the amount of channels contained in the file (e.g. 1)</li>
+<li>leave start offset at 0 bytes</li>
+<li>leave amount to import at 100 %</li>
+<li>select the sample rate contained in the file (e.g. 22050)</li>
+</ul>
+</div></blockquote>
+<p>To ease handling, a wav header can easily be added to a <abbr title="Pulse Code Modulation">PCM</abbr> file using the tool SoX(Sound eXchange).
+For example: a 22050Hz log file with 1 channel needs the following parameters:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">sox</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">dither</span> <span class="o">-</span><span class="n">c</span> <span class="mi">1</span> <span class="o">-</span><span class="n">r</span> <span class="mi">22050</span> <span class="o">-</span><span class="n">b</span> <span class="mi">16</span> <span class="o">-</span><span class="n">t</span> <span class="n">raw</span> <span class="o">-</span><span class="n">e</span> <span class="kt">signed</span><span class="o">-</span><span class="n">integer</span> <span class="n">logged_data</span><span class="p">.</span><span class="n">pcm</span> <span class="n">logged_data</span><span class="p">.</span><span class="n">wav</span>
+</pre></div>
+</div>
+<p>Importing the wav file into <cite>audacity</cite> is more convenient now and requires the following steps:</p>
+<blockquote>
+<div><ul class="simple">
+<li>go to File –&gt; Import –&gt; Audio</li>
+<li>select the file</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="encoded">
+<h3>ENCODED</h3>
+<div class="section" id="ogg-opus">
+<h4>OGG Opus</h4>
+<p>OGG-Opus encoded files can be imported directly, for example in the commonly used tool <cite>audacity</cite>.</p>
+<p>The official file suffix for OGG-Opus encoded files is <cite>opus</cite>.</p>
+<p>The tool <cite>audacity</cite> requires the activation of the FFmpeg library to import those files.</p>
+<blockquote>
+<div><ul class="simple">
+<li>go to Edit –&gt; Preferences –&gt; Libraries</li>
+</ul>
+</div></blockquote>
+<p>Please be aware that FFmpeg, used by <cite>audacity</cite>, decodes all OGG-Opus files to a sample rate of 48000Hz.</p>
+<p>To fully inspect an OGG-Opus file there are other tools, for instance the tool <cite>opusinfo</cite>, which prints out
+the full information including the sampling rate.</p>
+</div>
+<div class="section" id="plain-opus">
+<h4>Plain Opus</h4>
+<p>Those files can not be read with public tools like <cite>audacity</cite>.</p>
+<p>In general it is not recommendet to use plain Opus at all.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="audio-data-timing-analysis-logging">
+<h1>Audio Data Timing Analysis Logging</h1>
+<div class="section" id="id3">
+<h2>Overview</h2>
+<p>To analyze audio issues it may be necessary to check the timing, indicating when the audio data is passing the <abbr title="Software Development Kit">SDK</abbr>’s audio framework components.
+Therefore several logging points are provided that allow to log the timing information by usage of the <abbr title="Software Development Kit">SDK</abbr>’s logging system.</p>
+<p>For the timing analysis logging points the same rules for logging point types, finding names and usage apply as for the audio data logging points.
+Therefore please have a look at chapter <a class="reference internal" href="#audio-data-logging">Audio Data Logging</a> for this information.</p>
+</div>
+<div class="section" id="id4">
+<h2>Usage</h2>
+<div class="section" id="activation-of-a-timing-analysis-logging">
+<h3>Activation Of A Timing Analysis Logging</h3>
+<p>The activation of a timing analyis logging is almost identical to the <a class="reference internal" href="#activation-of-an-audio-data-logging-point">Activation Of An Audio Data Logging Point</a>.</p>
+<p>The only difference is that the logging config parameter <code class="docutils literal notranslate"><span class="pre">zones</span></code> has to be set to the logging zone <code class="docutils literal notranslate"><span class="pre">LOG_TIMING_ANALYSIS</span></code>
+to activate the timing logging for this consumer in general:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="s">&quot;zones&quot;</span><span class="o">:</span> <span class="s">&quot;LOG_TIMING_ANALYSIS&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<div class="section" id="id5">
+<h4>Example</h4>
+<p>The following example shows how to activate the timing analysis logging of an <cite>Audio Output</cite> audio module instance
+named <code class="docutils literal notranslate"><span class="pre">loudspeaker</span></code>.</p>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;logger&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;data_buffer_size_per_channel&quot;</span><span class="p">:</span><span class="mi">500000</span><span class="p">,</span>
+    <span class="nt">&quot;consumers&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker_audio_output_timing&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker_audio_output_timing_%DATE_TIME%.log&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.audio.AudioOutput.loudspeaker&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;zones&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_TIMING_ANALYSIS&quot;</span>
+    <span class="p">}</span> <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The following example shows how to activate the timing analysis together with audio data logging of an <cite>Audio Output</cite> audio module instance
+named <code class="docutils literal notranslate"><span class="pre">loudspeaker</span></code> creating two dedicated files.
+Please be aware that the <cite>name</cite> config parameter needs to be unique for each log consumer.</p>
+<div class="highlight-json notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;logger&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;data_buffer_size_per_channel&quot;</span><span class="p">:</span><span class="mi">500000</span><span class="p">,</span>
+    <span class="nt">&quot;consumers&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker_audio_output_timing&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker_audio_output_timing_%DATE_TIME%.log&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.audio.AudioOutput.loudspeaker&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;zones&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_TIMING_ANALYSIS&quot;</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker_audio_output_data&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;loudspeaker_audio_output_data_%DATE_TIME%.pcm&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;modules&quot;</span><span class="p">:</span> <span class="s2">&quot;nuance.audio.AudioOutput.loudspeaker&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;zones&quot;</span><span class="p">:</span> <span class="s2">&quot;LOG_DATA&quot;</span>
+    <span class="p">}</span> <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="starting-and-stopping-of-timing-analysis-logging">
+<h3>Starting And Stopping Of Timing Analysis Logging</h3>
+<p>In case timing analysis logging was activated according to <a class="reference internal" href="#activation-of-a-timing-analysis-logging">Activation Of A Timing Analysis Logging</a>, timing information is logged in general
+whenever audio data passes the activated logging point.</p>
+<p>Activating the external timing analysis logging of the AudioInput or the AudioOutput will write a log message before and after each call to an
+audio adapter API function and in turn when an audio adapter calls a listener function implemented by the AudioInput respectively AudioOutput.</p>
+<p>The main focus of this adapter analysis is to prove that especially externally developed audio adapter implementations fulfill the severe requirement
+of short running function implementations. In case this requirement is not properly fulfilled by an adapter implementation the performance of
+other audio modules (e.g. SpeechSignalEnhancement, SampleRateConverter, ..) may be influenced in a negative way.</p>
+<p>To log timing information it is required that audio data is being captured and/or played, for more details please have a look
+at <a class="reference internal" href="#starting-and-stopping-of-audio-data-logging">Starting And Stopping Of Audio Data Logging</a>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="references">
+<h1>References</h1>
+<ul class="simple">
+<li><a class="reference external" href="../../common/SDK_Common_UserGuide.html#logging">General Logging</a></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Audio_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Audio_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a></li>
+<li><a class="reference internal" href="#audio-data-logging">Audio Data Logging</a><ul>
+<li><a class="reference internal" href="#id1">Overview</a></li>
+<li><a class="reference internal" href="#audio-data-logging-points">Audio Data Logging Points</a><ul>
+<li><a class="reference internal" href="#synoptic-table">Synoptic Table</a></li>
+<li><a class="reference internal" href="#finding-instance-and-pad-names">Finding Instance And Pad Names</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#via-audioconfig-json">Via Audioconfig.json</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#activation-of-an-audio-data-logging-point">Activation Of An Audio Data Logging Point</a><ul>
+<li><a class="reference internal" href="#id2">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#starting-and-stopping-of-audio-data-logging">Starting And Stopping Of Audio Data Logging</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-format">Data Format</a><ul>
+<li><a class="reference internal" href="#pcm">PCM</a></li>
+<li><a class="reference internal" href="#encoded">ENCODED</a><ul>
+<li><a class="reference internal" href="#ogg-opus">OGG Opus</a></li>
+<li><a class="reference internal" href="#plain-opus">Plain Opus</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#audio-data-timing-analysis-logging">Audio Data Timing Analysis Logging</a><ul>
+<li><a class="reference internal" href="#id3">Overview</a></li>
+<li><a class="reference internal" href="#id4">Usage</a><ul>
+<li><a class="reference internal" href="#activation-of-a-timing-analysis-logging">Activation Of A Timing Analysis Logging</a><ul>
+<li><a class="reference internal" href="#id5">Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#starting-and-stopping-of-timing-analysis-logging">Starting And Stopping Of Timing Analysis Logging</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Audio_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="audio_core_configuration_api_ref.html" title="previous chapter">Overview</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/audio_logging.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

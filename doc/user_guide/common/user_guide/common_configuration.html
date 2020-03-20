@@ -1,0 +1,1263 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Configuration Parameters</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="SDK Threads" href="csdk_threads.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <p id="configuration">Like any other component, the common component can be configured through JSON configuration files.
+The following section lists all available configuration keys.</p>
+<div class="section" id="configuration-parameters">
+<h1><a class="reference internal" href="#configuration-parameters">Configuration Parameters</a></h1>
+<div class="section" id="overview">
+<h2>Overview</h2>
+<p>The following is an overview of the structure of the JSON configuration files.</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>{ <a class="reference internal" href="#itoplevelcommonconfig">ITopLevelCommonConfig</a> }</dt>
+<dd><ul class="first last">
+<li>comment: String</li>
+<li>version: String</li>
+<li>label: String</li>
+<li><dl class="first docutils">
+<dt>logger: { <a class="reference internal" href="#iloggerconfig">ILoggerConfig</a> }</dt>
+<dd><ul class="first last">
+<li>text_buffer_entries: int</li>
+<li>data_buffer_size_per_channel: int</li>
+<li>log_WARNING_INFORMATION_on_ERROR: bool</li>
+<li><dl class="first docutils">
+<dt>text_filters: [ { <a class="reference internal" href="#iloggertextfilterconfig">ILoggerTextFilterConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>text: String</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>dlt: { <a class="reference internal" href="#idltconfig">IDltConfig</a> }</dt>
+<dd><ul class="first last">
+<li>app_id: String</li>
+<li>app_description: String</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>consumers: [ { <a class="reference internal" href="#iloggingconsumerconfig">ILoggingConsumerConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>output: String</li>
+<li>max_file_size: int</li>
+<li>max_files_number: int</li>
+<li>enable_backup_log: bool</li>
+<li>modules: String</li>
+<li>not_modules: String</li>
+<li>zones: String</li>
+<li>params: { <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> }</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>thread_parameters: [ { <a class="reference internal" href="#ithreadparametersconfig">IThreadParametersConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>priority: int</li>
+<li>policy: <a class="reference internal" href="#thread-sched">THREAD_SCHED</a></li>
+<li><dl class="first docutils">
+<dt>sporadic_scheduling_params: { <a class="reference internal" href="#ithreadparameterssporadicconfig">IThreadParametersSporadicConfig</a> }</dt>
+<dd><ul class="first last">
+<li>low_priority: int</li>
+<li>max_repl: int</li>
+<li>init_budget: int</li>
+<li>repl_period: int</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>adaptive_partitioning_params: { <a class="reference internal" href="#ithreadparametersadaptiveconfig">IThreadParametersAdaptiveConfig</a> }</dt>
+<dd><ul class="first last">
+<li>partition: String</li>
+<li>partition_id: int</li>
+<li>thread_critical: bool</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>runner_pool: { <a class="reference internal" href="#irunnerpoolconfig">IRunnerPoolConfig</a> }</dt>
+<dd><ul class="first last">
+<li>audio_task_queue_size: int</li>
+<li>audio_task_queue_inc_size: int</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>keyvaluepool_parameters: [ { <a class="reference internal" href="#ikeyvaluepoolparametersconfig">IKeyValuePoolParametersConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li><dl class="first docutils">
+<dt>key_list: [ { <a class="reference internal" href="#ikeyparametersconfig">IKeyParametersConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>value_type: <a class="reference internal" href="#key-type">KEY_TYPE</a></li>
+<li>min_value: String</li>
+<li>max_value: String</li>
+<li>default_value: String</li>
+<li>description: String</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>json_variables: [ { <a class="reference internal" href="#ivariablesconfig">IVariablesConfig</a> } ]</dt>
+<dd><ul class="first last">
+<li>name: String</li>
+<li>value: { <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> }</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="itoplevelcommonconfig-the-top-level-configuration-structure-of-the-common-component">
+<span id="itoplevelcommonconfig"></span><h2>ITopLevelCommonConfig - The top-level configuration structure of the common component.</h2>
+<p>The top-level configuration structure of the common component.</p>
+<p>This configuration class describes the top-level configuration structure in the Common namespace.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="36%" />
+<col width="6%" />
+<col width="36%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;comment&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>A general comment concerning this configuration object.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The version key, fixed to “Common 1.0”.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>Label describing the content / version of the file.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;logger&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iloggerconfig">ILoggerConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The top-level logger configuration.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;thread_parameters&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ithreadparametersconfig">IThreadParametersConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level thread parameters configuration.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;runner_pool&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#irunnerpoolconfig">IRunnerPoolConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The top-level runner pool configuration.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;keyvaluepool_parameters&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ikeyvaluepoolparametersconfig">IKeyValuePoolParametersConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>The top-level key value pool parameters configuration.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;json_variables&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ivariablesconfig">IVariablesConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no</td>
+<td>List of platform dependent variables.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="itoplevelcommonconfig-comment">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;comment&quot;</span></code>:</dt>
+<dd>A general comment concerning this configuration object.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcommonconfig-version">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;version&quot;</span></code>:</dt>
+<dd>The version key, fixed to “Common 1.0”.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcommonconfig-label">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;</span></code>:</dt>
+<dd>Label describing the content / version of the file.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcommonconfig-logger">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;logger&quot;</span></code>:</dt>
+<dd>The top-level logger configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcommonconfig-thread-parameters">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;thread_parameters&quot;</span></code>:</dt>
+<dd>The top-level thread parameters configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcommonconfig-runner-pool">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;runner_pool&quot;</span></code>:</dt>
+<dd>The top-level runner pool configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcommonconfig-keyvaluepool-parameters">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;keyvaluepool_parameters&quot;</span></code>:</dt>
+<dd>The top-level key value pool parameters configuration.</dd>
+</dl>
+<dl class="docutils" id="itoplevelcommonconfig-json-variables">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;json_variables&quot;</span></code>:</dt>
+<dd>List of platform dependent variables.</dd>
+</dl>
+</div>
+<div class="section" id="iloggerconfig-the-logger-configuration">
+<span id="iloggerconfig"></span><h2>ILoggerConfig - The logger configuration.</h2>
+<p>The logger configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="26%" />
+<col width="14%" />
+<col width="39%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;text_buffer_entries&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 1024</td>
+<td>The number of text messages to buffer</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;data_buffer_size_per_channel&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 16384</td>
+<td>The size of the buffer for binary log data</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;log_WARNING_INFORMATION_on_ERROR&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code></td>
+<td>no, default value is “false”</td>
+<td>Flag for including additional recent messages</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;text_filters&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iloggertextfilterconfig">ILoggerTextFilterConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>no, default value is &lt;empty&gt;</td>
+<td>The filters for excluding certain log messages</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;dlt&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#idltconfig">IDltConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The DLT (Diagnostic Log and Trace) definitions</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;consumers&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iloggingconsumerconfig">ILoggingConsumerConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>yes</td>
+<td>The logging consumer configurations (at least one consumer must be defined).</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iloggerconfig-text-buffer-entries">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;text_buffer_entries&quot;</span></code>:</dt>
+<dd><p class="first">The number of text messages to buffer</p>
+<p class="last">To decouple logging consumers from logging producers the size
+of the used buffers can be influenced by the parameter
+“text_buffer_entries” and
+“data_buffer_size_per_channel”. “text_buffer_entries” is not a
+size in bytes.  It just defines how many text messages are
+kept.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggerconfig-data-buffer-size-per-channel">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;data_buffer_size_per_channel&quot;</span></code>:</dt>
+<dd><p class="first">The size of the buffer for binary log data</p>
+<p class="last">“data_buffer_size_per_channel” specifies the size of the
+buffer for binary log data in bytes. Each consumer has its own
+buffer, i.e. if one slow consumer is causing a buffer overrun,
+this has no effect on other consumers.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggerconfig-log-warning-information-on-error">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;log_WARNING_INFORMATION_on_ERROR&quot;</span></code>:</dt>
+<dd><p class="first">Flag for including additional recent messages</p>
+<p class="last">If we have logging consumers for the zones LOG_FATAL and LOG_ERROR only, it’s
+sometimes hard to find the root cause of a bug, if the history of the
+logging for the zones LOG_WARNING and LOG_INFO is missing. To avoid this the
+parameter “log_WARNING_INFORMATION_on_ERROR” can be set, by this, recent
+messages got before and having the zone LOG_WARNING or INFO are logged
+additionally too after there was an LOG_ERROR or LOG_FATAL. Since logged lines
+do have a time stamp, sorting by time can be done by a post processor. To be
+able to-do so, the buffer used for text logging is kept always 2/3 filled.
+Then by getting an LOG_FATAL or LOG_ERROR, all text LOG_WARNING and LOG_INFO
+messages which happened before and which are still on the buffer are directly
+logged. Having the buffer 2/3 filled also if they have been processed by the
+thread who serves the consumers does not have an impact regarding a log buffer
+overrun. That’s because when there are new messages, at this time the are
+removed to keep the buffer 2/3 filled.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggerconfig-text-filters">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;text_filters&quot;</span></code>:</dt>
+<dd><p class="first">The filters for excluding certain log messages</p>
+<p class="last">The parameter “text_filter” can be used to filter out messages starting with a
+special text. A filter can be set to hide known issues for customers.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggerconfig-dlt">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;dlt&quot;</span></code>:</dt>
+<dd><p class="first">The DLT (Diagnostic Log and Trace) definitions</p>
+<p class="last">This key contains DLT-specific definitions which all DLT consumers use commonly.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggerconfig-consumers">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;consumers&quot;</span></code>:</dt>
+<dd>The logging consumer configurations (at least one consumer must be defined).</dd>
+</dl>
+</div>
+<div class="section" id="iloggertextfilterconfig-the-text-filter-configuration">
+<span id="iloggertextfilterconfig"></span><h2>ILoggerTextFilterConfig - The text filter configuration.</h2>
+<p>The text filter configuration.</p>
+<p>The ILoggerTextFilterConfig interface is used to represent the configuration of
+textual patterns that are used to exclude log messages from the log.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="24%" />
+<col width="8%" />
+<col width="48%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;text&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The text pattern for excluding log messages containing it.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iloggertextfilterconfig-text">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;text&quot;</span></code>:</dt>
+<dd>The text pattern for excluding log messages containing it.</dd>
+</dl>
+</div>
+<div class="section" id="iloggingconsumerconfig-the-logging-consumer-configuration">
+<span id="iloggingconsumerconfig"></span><h2>ILoggingConsumerConfig - The logging consumer configuration.</h2>
+<p>The logging consumer configuration.</p>
+<p>The ILoggingConsumerConfig interface is used to represent the configuration of log consumers, i.e.
+objects that receive log messages from the central logger singleton and store it in files etc.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="22%" />
+<col width="15%" />
+<col width="48%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the consumer.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;output&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The place to store the log output.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;max_file_size&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is -1</td>
+<td>Optional parameter given in bytes to limit the file system space used by the log files.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;max_files_number&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is -1</td>
+<td>Optional parameter to limit the number of log files which contain the placeholder.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;enable_backup_log&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code></td>
+<td>no, default value is “false”</td>
+<td>Optional parameter to keep log files from previous runs.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;modules&quot;:</span></code> </td>
+<td>String</td>
+<td>no, default value is &lt;empty&gt;</td>
+<td>The modules to log.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;not_modules&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The modules NOT to log (optional, default: “”).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The logging zones for which log output should be collected.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;params&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>Contains consumer params which are specific to the consumer type.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="iloggingconsumerconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The name of the consumer.</p>
+<p class="last">If user-defined log consumers are registered at the runtime API (not supported in CDFW), the <code class="docutils literal notranslate"><span class="pre">name</span></code> is used to
+identify the corresponding configuration entry for a registered consumer. Obviously this name must be unique.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggingconsumerconfig-output">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;output&quot;</span></code>:</dt>
+<dd><p class="first">The place to store the log output.</p>
+<p>If this attribute contains <code class="docutils literal notranslate"><span class="pre">stdout</span></code> or <code class="docutils literal notranslate"><span class="pre">stderr</span></code> the log messages are written to
+standard output / error.</p>
+<p>If it contains <code class="docutils literal notranslate"><span class="pre">TRACECLIENT:</span></code> followed by a file path, the log messages are written to
+an external Trace Client.</p>
+<p>If it contains <code class="docutils literal notranslate"><span class="pre">DLT</span></code> the log messages are written to DLT (Diagnostic Log and Trace).</p>
+<p>If it contains <code class="docutils literal notranslate"><span class="pre">SOCKET</span></code> the log messages are written to the connected client over the
+TCP/IP socket. This type of the output configuration has to be defined in the following format:</p>
+<p><code class="docutils literal notranslate"><span class="pre">SOCKET:port='server</span> <span class="pre">port';buffer='size</span> <span class="pre">in</span> <span class="pre">bytes'</span></code>.</p>
+<p>Parameter <code class="docutils literal notranslate"><span class="pre">port</span></code> is required and it contains the port number that the socket log consumer will use to create
+server socket and wait for the client connection. Only one client connection at a time is supported.
+Parameter <code class="docutils literal notranslate"><span class="pre">buffer</span></code> is optional and it specifies the size in bytes the socket log consumer will use to buffer
+the messages (or data). If buffer of size 0 is configured then no buffering will take place; instead
+logged content is sent directly to the socket if a connection is present. The default value for the
+buffer size is 16384 bytes.</p>
+<p>If it contains <code class="docutils literal notranslate"><span class="pre">PLUGIN:</span></code> followed by a plugin’s shared library file name, the log messages are
+written to an external plugin logging consumer implementation. The file name may contain an absolute
+(i.e. starting with <code class="docutils literal notranslate"><span class="pre">/</span></code> or <code class="docutils literal notranslate"><span class="pre">[A-Za-z]:[/]</span></code>), a relative or none path information. In the
+latter two cases the platform specific search strategy (e.g. <code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code> on Linux) is used.
+In case a file name does not contain a platform specific shared object prefix (e.g. <code class="docutils literal notranslate"><span class="pre">lib</span></code>)
+or extension (e.g. <code class="docutils literal notranslate"><span class="pre">.so</span></code>), it is automatically added. Examples:</p>
+<ul class="simple">
+<li>full qualified plugin file name: <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;:</span> <span class="pre">&quot;PLUGIN:/usr/lib/lib_plugin_log_consumer.so&quot;</span></code></li>
+<li>full qualified plugin file name without shared library prefix and extension: <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;:</span> <span class="pre">&quot;PLUGIN:/usr/lib/plugin_log_consumer&quot;</span></code></li>
+<li>without path information, using search strategy of platform, e.g. LD_LIBRARY_PATH on Linux: <code class="docutils literal notranslate"><span class="pre">&quot;output&quot;:</span> <span class="pre">&quot;PLUGIN:pluggable_file_consumer&quot;</span></code></li>
+</ul>
+<p>In case more than one instance of the same plugin library is configured the <code class="docutils literal notranslate"><span class="pre">name</span></code> configuration
+parameter must be each unique.</p>
+<p>If none of these patterns match, <code class="docutils literal notranslate"><span class="pre">output</span></code> is interpreted as a file path. The file path can contain
+an absolute path to the file, or a path relative to the JSON configuration directory. To be able to avoid
+that files are overwritten, the file name can be extended with the following placeholders:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">%DATE_TIME%</span></code> is replaced by a time stamp that contains the current date and time (format: YYYY-MM-DD_HH-MM-SS). This is the file creation time.</li>
+<li><code class="docutils literal notranslate"><span class="pre">%TIME_MS%</span></code> is replaced by a time stamp that contains the current time since the process started (format: HH-MM-SS-MS). This is the time stamp of the 1rst entry written into the file.</li>
+</ul>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">output</span></code> parameter is optional. If it is omitted, the framework does not create a log consumer
+automatically, but the user can add a consumer implementation at runtime, using <code class="docutils literal notranslate"><span class="pre">ILogging.addConsumer()</span></code>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggingconsumerconfig-max-file-size">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;max_file_size&quot;</span></code>:</dt>
+<dd><p class="first">Optional parameter given in bytes to limit the file system space used by the log files.</p>
+<p>Default value for this parameter is -1 meaning no size limitations. When the parameter “max_file_size” is set to
+the value greater then zero SDK (Logger module) will first verify the logging zone types that are configured for
+this file. If log zone is configured to “LOG_DATA” then the file is handled like a ring buffer where the logging
+module seeks to the beginning of the file when the size limit is reached and starts logging a new content from
+there.</p>
+<p class="last">If textual zone(s) are configured and the parameter “max_file_size” is set then SDK will use rotating log files
+mechanism to ensure that not more then defined maximal size is used on the file system for the logging. SDK
+currently uses up to 4 log files for the rotation and the maximal size per one file is computed as “max_file_size”
+value divided by 4. The reason for splitting up into several files is to avoid that large portions of the log history
+are lost when maximum file size is exceeded and the new log file has to be opened. Logger will always log current
+(most recent) content to the log file with the name defined with the “output” parameter. For example, let’s assume
+that the file name is “voconhigh.log”. When the computed size limit per one file is reached then the file is closed
+and renamed to have the extension “.1” after the original name, for example “voconhigh.log.1”. New logging continues
+to the newly opened file with the original name, f.i. “voconhigh.log”. When the next limit is reached, again new
+“voconhigh.log” is opened for the new logging and the previous log content is shifted like presented in the following
+scheme: “voconhigh.log” -&gt; “voconhigh.log.1” -&gt; “voconhigh.log.2” -&gt; “voconhigh.log.3”. As a result we always have at
+most 4 files that in-total occupy at most “max_file_size” of the file system space. For an easier analysis later one
+can concatenate these files manually or with some tool in a reverse order (.3-&gt;.2-&gt;.1-&gt;original file)
+and restore one log file that contains most recent “max_file_size” bytes of the logged content. If “max_file_size”
+value is configured to be below 64K bytes (65536) then SDK will set “max_file_size” parameter automatically to 65536
+bytes to prevent that rotation files contain too small fragments of the logged content. The value of “max_file_size”
+must not be set to greater than 2147483647.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggingconsumerconfig-max-files-number">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;max_files_number&quot;</span></code>:</dt>
+<dd><p class="first">Optional parameter to limit the number of log files which contain the placeholder.</p>
+<p class="last">Values in the range [-1,100] are possible. The default value for this parameter is -1 meaning no limitation of the
+number of log files. The value specifies the maximum number of log files which are kept on disk and which match the
+file name pattern defined with the “output” key. If the maximum number of files on disk is reached and a new log file
+is opened the oldest will be removed. Log files from previous startups are taken into account, i.e. they are kept on
+disk as long as the maximum is not exceeded. In combination with max_file_size the occupied disk space for this consumer
+will be limited to max_file_size * max_files_number.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggingconsumerconfig-enable-backup-log">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;enable_backup_log&quot;</span></code>:</dt>
+<dd><p class="first">Optional parameter to keep log files from previous runs.</p>
+<p>Default value for this parameter is “false” meaning an existing log from the former run will be deleted.</p>
+<p>If the value for this parameter is set to “true” the existing log on the file system will be continued on the last
+position. With that an overall log will be created for all former startups / sessions.</p>
+<p class="last">This configuration parameter can be used in combination with max_file_size, meaning that the overall log will be
+split into 4 log files of limited size.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggingconsumerconfig-modules">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;modules&quot;</span></code>:</dt>
+<dd><p class="first">The modules to log.</p>
+<p class="last">Logging information is collected only for the modules specified here. Use “|” as delimiter when listing multiple
+modules.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggingconsumerconfig-not-modules">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;not_modules&quot;</span></code>:</dt>
+<dd><p class="first">The modules NOT to log (optional, default: “”).</p>
+<p class="last">This value can be used to suppress the logging output of certain modules. Use “|” as delimiter when listing
+multiple modules.</p>
+</dd>
+</dl>
+<dl class="docutils" id="iloggingconsumerconfig-zones">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;zones&quot;</span></code>:</dt>
+<dd>The logging zones for which log output should be collected.</dd>
+</dl>
+<dl class="docutils" id="iloggingconsumerconfig-params">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;params&quot;</span></code>:</dt>
+<dd><p class="first">Contains consumer params which are specific to the consumer type.</p>
+<p>This JSON string key can be used to pass specific configuration parameters to a logging consumer. The string has to
+be in JSON format. The JSON format must follow a defined json structure which depends on the type of the logging
+consumer (e.g. DLT, PLUGIN). See the below list showing which logging consumers support the <code class="docutils literal notranslate"><span class="pre">params</span></code> key and
+where to find the corresponding json structure:</p>
+<ul class="last simple">
+<li><code class="docutils literal notranslate"><span class="pre">DLT</span></code>: Look at <code class="docutils literal notranslate"><span class="pre">IDltConsumerParamsConfig</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">PLUGIN</span></code>: Depends on the external plugin logging consumer implementation.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="idltconfig">
+<span id="idltconfig-the-dlt-diagnostic-log-and-trace-configuration"></span><h2>IDltConfig - The DLT (Diagnostic Log and Trace) configuration.</h2>
+<p>The DLT (Diagnostic Log and Trace) configuration.</p>
+<p>This configuration defines general DLT-specific keys that are commonly used by all DLT consumers.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="12%" />
+<col width="27%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;app_id&quot;:</span></code> </td>
+<td>String</td>
+<td>no, default value is “DD”</td>
+<td>The application ID is required to register once at the local DLT system. The maximum size of the ID string is 4 characters.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;app_description&quot;:</span></code> </td>
+<td>String</td>
+<td>no, default value is “Nuance Dragon Drive Framework|Speech|Nuance”</td>
+<td>The application description contains more textual details about the application registered once at the local DLT system.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="idltconfig-app-id">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_id&quot;</span></code>:</dt>
+<dd>The application ID is required to register once at the local DLT system. The maximum size of the ID string is 4 characters.</dd>
+</dl>
+<dl class="docutils" id="idltconfig-app-description">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;app_description&quot;</span></code>:</dt>
+<dd>The application description contains more textual details about the application registered once at the local DLT system.</dd>
+</dl>
+</div>
+<div class="section" id="ikeyvaluepoolparametersconfig-the-configuration-of-key-value-pool-parameters">
+<span id="ikeyvaluepoolparametersconfig"></span><h2>IKeyValuePoolParametersConfig - The configuration of key value pool parameters.</h2>
+<p>The configuration of key value pool parameters.</p>
+<p>This configuration class defines the parameters that can be used to configure the key value pools (referenced by name).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="28%" />
+<col width="6%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The key value pool name.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;key_list&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">[</span></code> <code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ikeyparametersconfig">IKeyParametersConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code> <code class="docutils literal notranslate"><span class="pre">]</span></code></td>
+<td>yes</td>
+<td>The keys allowed for usage with this pool along with their types, defaults and ranges.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ikeyvaluepoolparametersconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd>The key value pool name.</dd>
+</dl>
+<dl class="docutils" id="ikeyvaluepoolparametersconfig-key-list">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;key_list&quot;</span></code>:</dt>
+<dd>The keys allowed for usage with this pool along with their types, defaults and ranges.</dd>
+</dl>
+</div>
+<div class="section" id="ikeyparametersconfig-the-configuration-of-one-key-that-can-be-set-in-a-key-value-pool">
+<span id="ikeyparametersconfig"></span><h2>IKeyParametersConfig - The configuration of one key that can be set in a key value pool.</h2>
+<p>The configuration of one key that can be set in a key value pool.</p>
+<p>This configuration class defines the characteristics for one key of the keys supported in a key value pool. Be aware that even for integer typed values the value will be returned as string (but checks will be done that the string is a valid number).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="31%" />
+<col width="11%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The key name.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;value_type&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> KEY_TYPE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>yes</td>
+<td>The value type.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;min_value&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The minimum value.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;max_value&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The maximum value.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;default_value&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The default value as string.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;description&quot;:</span></code> </td>
+<td>String</td>
+<td>no</td>
+<td>The description of the key.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ikeyparametersconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd>The key name.</dd>
+</dl>
+<dl class="docutils" id="ikeyparametersconfig-value-type">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;value_type&quot;</span></code>:</dt>
+<dd><p class="first">The value type.</p>
+<blockquote class="last">
+<div><p id="key-type"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> KEY_TYPE <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+The type that the value for a specific key can take. .</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;string&quot;</span></code>: String typed value. May have a default value.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;int&quot;</span></code>: Integer typed value, may hav minimum value and/or maximum value as well as a default value.</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="ikeyparametersconfig-min-value">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;min_value&quot;</span></code>:</dt>
+<dd>The minimum value.</dd>
+</dl>
+<dl class="docutils" id="ikeyparametersconfig-max-value">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;max_value&quot;</span></code>:</dt>
+<dd>The maximum value.</dd>
+</dl>
+<dl class="docutils" id="ikeyparametersconfig-default-value">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;default_value&quot;</span></code>:</dt>
+<dd>The default value as string.</dd>
+</dl>
+<dl class="docutils" id="ikeyparametersconfig-description">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;description&quot;</span></code>:</dt>
+<dd>The description of the key.</dd>
+</dl>
+</div>
+<div class="section" id="ithreadparametersconfig-the-configuration-of-thread-parameters">
+<span id="ithreadparametersconfig"></span><h2>IThreadParametersConfig - The configuration of thread parameters.</h2>
+<p>The configuration of thread parameters.</p>
+<p>This configuration class defines the parameters that can be used to configure a specific thread (referenced by name).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="32%" />
+<col width="7%" />
+<col width="35%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The thread name.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;priority&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The thread priority.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;policy&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> THREAD_SCHED <code class="docutils literal notranslate"><span class="pre">&quot;</span></code></td>
+<td>yes</td>
+<td>The scheduling policy.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;sporadic_scheduling_params&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ithreadparameterssporadicconfig">IThreadParametersSporadicConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The parameters to configure Sporadic Scheduling</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;adaptive_partitioning_params&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#ithreadparametersadaptiveconfig">IThreadParametersAdaptiveConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>no</td>
+<td>The parameters to configure Adaptive partitioning.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ithreadparametersconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd><p class="first">The thread name.</p>
+<p class="last">The name <code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> has a special meaning, it is used to set default
+values for “priority” and “policy”. At the moment it is not possible to set default values for Sporadic Scheduling and
+adaptive partitioning parameters.
+Note: If the default for scheduling policy is set to <code class="docutils literal notranslate"><span class="pre">&quot;other&quot;</span></code> then the default for <code class="docutils literal notranslate"><span class="pre">&quot;priority&quot;</span></code> has to
+be set to 0 since this is currently the only supported value.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ithreadparametersconfig-priority">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;priority&quot;</span></code>:</dt>
+<dd><p class="first">The thread priority.</p>
+<p class="last">0 is the “normal” priority. Use positive numbers for high priority threads,
+negative numbers for less critical threads. The minimum/maximum priority is platform-dependent.
+Note: If scheduling policy is set to <code class="docutils literal notranslate"><span class="pre">&quot;other&quot;</span></code> then the priorities are implemented by setting a
+nice level. This means that negative values mean high priorities in this case.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ithreadparametersconfig-policy">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;policy&quot;</span></code>:</dt>
+<dd><p class="first">The scheduling policy.</p>
+<blockquote class="last">
+<div><p id="thread-sched"><code class="docutils literal notranslate"><span class="pre">&quot;</span></code> THREAD_SCHED <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>:
+The scheduling policy. Not all policies are available for all platforms.</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>: used on platforms unaware of scheduling policies</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;fifo&quot;</span></code>: First-in, first-out: threads are queued in the order they arrive in the ready queue</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;rr&quot;</span></code>: fixed time per thread, scheduler cycles through them</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;sporadic&quot;</span></code>: Sporadic Scheduling, only available for QNX</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;batch&quot;</span></code>: batch scheduler, available for Linux and Android</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;other&quot;</span></code>: platform-specific scheduler</li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils" id="ithreadparametersconfig-sporadic-scheduling-params">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;sporadic_scheduling_params&quot;</span></code>:</dt>
+<dd>The parameters to configure Sporadic Scheduling</dd>
+</dl>
+<dl class="docutils" id="ithreadparametersconfig-adaptive-partitioning-params">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;adaptive_partitioning_params&quot;</span></code>:</dt>
+<dd>The parameters to configure Adaptive partitioning.</dd>
+</dl>
+</div>
+<div class="section" id="ithreadparameterssporadicconfig-the-configuration-of-the-sporadic-scheduling-policy">
+<span id="ithreadparameterssporadicconfig"></span><h2>IThreadParametersSporadicConfig - The configuration of the Sporadic Scheduling policy.</h2>
+<p>The configuration of the Sporadic Scheduling policy.</p>
+<p>Parameters to configure Sporadic scheduling. For details see QNX documentation.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="27%" />
+<col width="9%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;low_priority&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The low priority.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;max_repl&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The maximum number of pending replenishments.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;init_budget&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The initial budget.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;repl_period&quot;:</span></code> </td>
+<td>int</td>
+<td>yes</td>
+<td>The replenishment period.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ithreadparameterssporadicconfig-low-priority">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;low_priority&quot;</span></code>:</dt>
+<dd><p class="first">The low priority.</p>
+<p>The priority level to which the thread will drop.
+The thread executes at this lower priority while in the background, and runs at normal priority while in the foreground.</p>
+<p class="last">For details see QNX documentation.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ithreadparameterssporadicconfig-max-repl">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;max_repl&quot;</span></code>:</dt>
+<dd><p class="first">The maximum number of pending replenishments.</p>
+<p>This value limits the number of replenishment operations that can take place,
+thereby bounding the amount of system overhead consumed by the Sporadic Scheduling policy.</p>
+<p class="last">For details see QNX documentation.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ithreadparameterssporadicconfig-init-budget">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;init_budget&quot;</span></code>:</dt>
+<dd><p class="first">The initial budget.</p>
+<p>The amount of time a thread is allowed to execute at its normal priority before being dropped to its low priority.</p>
+<p class="last">For details see QNX documentation.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ithreadparameterssporadicconfig-repl-period">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;repl_period&quot;</span></code>:</dt>
+<dd><p class="first">The replenishment period.</p>
+<p>The period of time during which a thread is allowed to consume its execution budget.
+To schedule replenishment operations, the POSIX implementation also uses this value as the offset from the time the thread becomes READY.</p>
+<p class="last">For details see QNX documentation.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="ithreadparametersadaptiveconfig-the-configuration-of-the-adaptive-partitioning-strategy">
+<span id="ithreadparametersadaptiveconfig"></span><h2>IThreadParametersAdaptiveConfig - The configuration of the Adaptive Partitioning strategy.</h2>
+<p>The configuration of the Adaptive Partitioning strategy.</p>
+<p>Parameters to configure Adaptive partitioning.
+For details see QNX documentation.</p>
+<p>Additional constraint: The following properties are mutually exclusively required: partition, partition_id</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="33%" />
+<col width="22%" />
+<col width="26%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;partition&quot;:</span></code> </td>
+<td>String</td>
+<td>see “Additional constraint”</td>
+<td>The partition name.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;partition_id&quot;:</span></code> </td>
+<td>int</td>
+<td>see “Additional constraint”</td>
+<td>The partition ID.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;thread_critical&quot;:</span></code> </td>
+<td>String, one of <code class="docutils literal notranslate"><span class="pre">&quot;true&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;false&quot;</span></code></td>
+<td>no</td>
+<td>The thread criticality flag.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ithreadparametersadaptiveconfig-partition">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;partition&quot;</span></code>:</dt>
+<dd><p class="first">The partition name.</p>
+<p class="last">Note: Either partition or partitionId has to be provided. If both are specified, name takes the precedence.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ithreadparametersadaptiveconfig-partition-id">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;partition_id&quot;</span></code>:</dt>
+<dd><p class="first">The partition ID.</p>
+<p class="last">Note: Either partition or partitionId has to be provided. If both are specified, name takes the precedence.</p>
+</dd>
+</dl>
+<dl class="docutils" id="ithreadparametersadaptiveconfig-thread-critical">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;thread_critical&quot;</span></code>:</dt>
+<dd><p class="first">The thread criticality flag.</p>
+<p class="last">A value of “true” means “critical”, “false” is “non-critical”.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="ivariablesconfig-variables-that-can-be-used-within-json-files">
+<span id="ivariablesconfig"></span><h2>IVariablesConfig - Variables that can be used within JSON files.</h2>
+<p>Variables that can be used within JSON files.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="27%" />
+<col width="9%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;:</span></code> </td>
+<td>String</td>
+<td>yes</td>
+<td>The name of the variable, used for referencing.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;value&quot;:</span></code> </td>
+<td><code class="docutils literal notranslate"><span class="pre">{</span></code> <a class="reference internal" href="#iuserjsonconfig">IUserJsonConfig</a> <code class="docutils literal notranslate"><span class="pre">}</span></code></td>
+<td>yes</td>
+<td>The value of the variable.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="ivariablesconfig-name">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>:</dt>
+<dd>The name of the variable, used for referencing.</dd>
+</dl>
+<dl class="docutils" id="ivariablesconfig-value">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;value&quot;</span></code>:</dt>
+<dd><p class="first">The value of the variable.</p>
+<p class="last">All locations in the JSON configuration files where
+this variable is used get resolved to this value.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="irunnerpoolconfig-runnerpool-configuration">
+<span id="irunnerpoolconfig"></span><h2>IRunnerPoolConfig - RunnerPool configuration.</h2>
+<p>RunnerPool configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="17%" />
+<col width="14%" />
+<col width="47%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;audio_task_queue_size&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 500</td>
+<td>The initial number of tasks the audio backbone runner can handle simultanously.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;audio_task_queue_inc_size&quot;:</span></code> </td>
+<td>int</td>
+<td>no, default value is 100</td>
+<td>The the number of tasks by that the task queue gets increased.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="irunnerpoolconfig-audio-task-queue-size">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;audio_task_queue_size&quot;</span></code>:</dt>
+<dd><p class="first">The initial number of tasks the audio backbone runner can handle simultanously.</p>
+<p class="last">The task queue of the audio backbone runner gets initialized with that size. If the size is reached
+the queue is automatically resized by audioTaskQueueIncSize.</p>
+</dd>
+</dl>
+<dl class="docutils" id="irunnerpoolconfig-audio-task-queue-inc-size">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;audio_task_queue_inc_size&quot;</span></code>:</dt>
+<dd><p class="first">The the number of tasks by that the task queue gets increased.</p>
+<p class="last">Each time the audio task queue runns full it gets increased by this value.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">
+<span id="iuserjsonconfig"></span><h2>IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</h2>
+<p>Defines a verbatim block of json that is used by VoCon High as is.</p>
+<p>This is for example used to pass json configuration block on to VoCon Hybrid that need to configured
+by users of Vocon High. The Connection Info object in ASR is an example of this.</p>
+<p>This object lists not specific attributes because any valid json object can be used here, so the number, types
+and names of attributes are not limited.</p>
+</div>
+<div class="section" id="idltconsumerparamsconfig">
+<span id="idltconsumerparamsconfig-the-configuration-to-define-dlt-specific-consumer-params"></span><h2>IDltConsumerParamsConfig - The configuration to define DLT-specific consumer params.</h2>
+<p>The configuration to define DLT-specific consumer params.</p>
+<p>This configuration interface may be used to define parameters which are used within a DLT logging consumer configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="21%" />
+<col width="27%" />
+<col width="31%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key Name</th>
+<th class="head">Value Type</th>
+<th class="head">Required?</th>
+<th class="head">Documentation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&quot;context_id&quot;:</span></code> </td>
+<td>String</td>
+<td>no, default value is “GCF”</td>
+<td>The context ID of the DLT consumer.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&quot;context_description&quot;:</span></code> </td>
+<td>String</td>
+<td>no, default value is “GCF log message”</td>
+<td>The context description of the DLT consumer.</td>
+</tr>
+</tbody>
+</table>
+<p>Details:</p>
+<dl class="docutils" id="idltconsumerparamsconfig-context-id">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;context_id&quot;</span></code>:</dt>
+<dd><p class="first">The context ID of the DLT consumer.</p>
+<p class="last">Each DLT consumer creates and registers a so-called “DLT context”.
+During the registration the ID must be provided. The ID string has the maximum size of 4 characters.
+When a DLT consumer sends a log message to the DLT system, the log message is tagged with the consumer’s ”    DLT context”.
+The “DLT context” may be helpful in the DLT viewer to identify messages coming from a certain DLT consumer</p>
+</dd>
+</dl>
+<dl class="docutils" id="idltconsumerparamsconfig-context-description">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;context_description&quot;</span></code>:</dt>
+<dd><p class="first">The context description of the DLT consumer.</p>
+<p class="last">The context description contains more textual details about the context registered at the local DLT system</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="defining-variables-in-json-configurations">
+<h1><a class="reference internal" href="#defining-variables-in-json-configurations">Defining Variables in JSON Configurations</a></h1>
+<p>The common JSON configuration offers the possibility to define variables.
+This can be used, for example, to accumulate all platform specific configuration parts in a single JSON file and keep all other
+configuration files generic. This can be achieved using the “variable” mechanism. The platform specific file needs to define an
+array named <code class="docutils literal notranslate"><span class="pre">&quot;json_variables&quot;</span></code>, that defines variables in a “name / value” scheme, where the <code class="docutils literal notranslate"><span class="pre">&quot;value&quot;</span></code> field can hold any valid JSON element.
+These variables can then be used in any other JSON file by referencing that variable: {“variable” : “var1”}. The whole object including
+the brackets will be replaced by the JSON element defined in the <code class="docutils literal notranslate"><span class="pre">&quot;value&quot;</span></code> field. The variable name needs to be a unique string.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;Common 1.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;json_variables&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;name&quot;</span>  <span class="p">:</span> <span class="s2">&quot;v_path&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;value&quot;</span> <span class="p">:</span> <span class="s2">&quot;./path/to/vocalizer&quot;</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="p">{</span>
+  <span class="s2">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;Prompter 1.0&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;prompter&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="n">name</span><span class="s2">&quot;: &quot;</span><span class="n">LocalPrompter</span><span class="s2">&quot;,</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;local&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;vocalizer_path&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;variable&quot;</span> <span class="p">:</span> <span class="s2">&quot;v_path&quot;</span><span class="p">}}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../SDK_Common_UserGuide.html">
+    <img class="logo" src="../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../SDK_Common_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuration Parameters</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#itoplevelcommonconfig-the-top-level-configuration-structure-of-the-common-component">ITopLevelCommonConfig - The top-level configuration structure of the common component.</a></li>
+<li><a class="reference internal" href="#iloggerconfig-the-logger-configuration">ILoggerConfig - The logger configuration.</a></li>
+<li><a class="reference internal" href="#iloggertextfilterconfig-the-text-filter-configuration">ILoggerTextFilterConfig - The text filter configuration.</a></li>
+<li><a class="reference internal" href="#iloggingconsumerconfig-the-logging-consumer-configuration">ILoggingConsumerConfig - The logging consumer configuration.</a></li>
+<li><a class="reference internal" href="#idltconfig">IDltConfig - The DLT (Diagnostic Log and Trace) configuration.</a></li>
+<li><a class="reference internal" href="#ikeyvaluepoolparametersconfig-the-configuration-of-key-value-pool-parameters">IKeyValuePoolParametersConfig - The configuration of key value pool parameters.</a></li>
+<li><a class="reference internal" href="#ikeyparametersconfig-the-configuration-of-one-key-that-can-be-set-in-a-key-value-pool">IKeyParametersConfig - The configuration of one key that can be set in a key value pool.</a></li>
+<li><a class="reference internal" href="#ithreadparametersconfig-the-configuration-of-thread-parameters">IThreadParametersConfig - The configuration of thread parameters.</a></li>
+<li><a class="reference internal" href="#ithreadparameterssporadicconfig-the-configuration-of-the-sporadic-scheduling-policy">IThreadParametersSporadicConfig - The configuration of the Sporadic Scheduling policy.</a></li>
+<li><a class="reference internal" href="#ithreadparametersadaptiveconfig-the-configuration-of-the-adaptive-partitioning-strategy">IThreadParametersAdaptiveConfig - The configuration of the Adaptive Partitioning strategy.</a></li>
+<li><a class="reference internal" href="#ivariablesconfig-variables-that-can-be-used-within-json-files">IVariablesConfig - Variables that can be used within JSON files.</a></li>
+<li><a class="reference internal" href="#irunnerpoolconfig-runnerpool-configuration">IRunnerPoolConfig - RunnerPool configuration.</a></li>
+<li><a class="reference internal" href="#iuserjsonconfig-defines-a-verbatim-block-of-json-that-is-used-by-vocon-high-as-is">IUserJsonConfig - Defines a verbatim block of json that is used by VoCon High as is.</a></li>
+<li><a class="reference internal" href="#idltconsumerparamsconfig">IDltConsumerParamsConfig - The configuration to define DLT-specific consumer params.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defining-variables-in-json-configurations">Defining Variables in JSON Configurations</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../SDK_Common_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="csdk_threads.html" title="previous chapter">SDK Threads</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/user_guide/common_configuration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

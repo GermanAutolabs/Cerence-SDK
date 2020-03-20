@@ -1,0 +1,977 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Advanced topics</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tools and Sample Code" href="tools_and_sample_code.html" />
+    <link rel="prev" title="Examples" href="examples.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="advanced-topics">
+<h1>Advanced topics</h1>
+<div class="section" id="semantic-result-unfolding">
+<span id="sem3-result-unfolding"></span><h2>Semantic result unfolding</h2>
+<p>Like ASR results, SEM3 results are JSON data structures. These
+structures can become very large, which can make them difficult to
+handle.</p>
+<p>By default, when the SEM3 module returns a result, the whole result
+will be converted into JSON and returned to system. It is however
+possible to install a so-called “result unfolding script” that
+customizes which parts of the SEM3 result are included in the JSON
+result that is returned to the system. The script must be written in Lua.</p>
+<p>In contrast to earlier VoCon versions, in Cerence ASR the SEM3 result
+unfolding script must be configured (using the
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IRecognizer_setSem3UnfoldingScript</span></code> API call) before
+the ASR application are configured.</p>
+<div class="section" id="api-to-pass-lua-script-to-the-sem3-engine">
+<h3>API to pass Lua script to the sem3 engine.</h3>
+<p>The following API call allows the user to set the unfolding script:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">nuance</span><span class="o">::</span><span class="n">common</span><span class="o">::</span><span class="n">ResultCode</span> <span class="n">IRecognizer</span><span class="o">::</span><span class="n">setSem3UnfoldingScript</span><span class="p">(</span><span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">scriptString</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">To set an unfolding script for a set of application this API must be
+invoked before <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">IAsrManager::setApplications()</span></code>.</p>
+</div>
+<p>The argument <code class="docutils literal notranslate"><span class="pre">scriptString</span></code> must contain a valid Lua script. The
+functions that can be used in the Lua script are described in the
+section <a class="reference internal" href="#lua-api">Lua API</a>. It is also can be empty or <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, in which case
+the default behavior is the same as a call to <code class="docutils literal notranslate"><span class="pre">unfoldAll</span></code>.</p>
+</div>
+<div class="section" id="example-of-an-unfolding-script">
+<h3>Example of an unfolding script</h3>
+<p>The Lua script must have a function named <code class="docutils literal notranslate"><span class="pre">unfold</span></code> with one
+argument, the <a class="reference internal" href="#semanticresult">SemanticResult</a>:</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="kr">function</span> <span class="nf">unfold</span><span class="p">(</span><span class="n">semanticResult</span><span class="p">)</span>
+  <span class="c1">-- add your code to unfold the semanticResult</span>
+  <span class="kd">local</span> <span class="n">nbrAlternatives</span> <span class="o">=</span> <span class="n">semanticResult</span><span class="p">:</span><span class="n">unfold</span><span class="p">({</span><span class="s1">&#39;Domain&#39;</span><span class="p">,</span> <span class="s1">&#39;Topic&#39;</span><span class="p">},</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="kr">for</span> <span class="n">alternative</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbrAlternatives</span><span class="p">,</span> <span class="mi">1</span> <span class="kr">do</span>
+      <span class="kd">local</span> <span class="n">node</span> <span class="o">=</span> <span class="n">semanticResult</span><span class="p">:</span><span class="n">createAlternative</span><span class="p">(</span><span class="n">alternative</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+      <span class="n">node</span><span class="p">:</span><span class="n">unfold</span><span class="p">({</span><span class="s1">&#39;musicContentType&#39;</span><span class="p">},</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="kr">end</span>
+<span class="kr">end</span>
+</pre></div>
+</div>
+<p>In this example, at first the result will be unfolded on domain and
+topic. The <code class="docutils literal notranslate"><span class="pre">semanticResult:unfold</span></code> function takes 3 arguments: the
+field names to unfold, the maximum number of alternatives to include,
+and the minimum probability that an alternative must have, in order to
+be included. In this case, the one alternative is unfolded, with no
+criterion on the probability.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">for</span></code> loop will walk the alternatives, create nodes for them in
+the result (<code class="docutils literal notranslate"><span class="pre">createAlternative</span></code>, the argument is the index of the
+alternative to create). In each alternative, the <code class="docutils literal notranslate"><span class="pre">musicContentType</span></code>
+node is unfolded.</p>
+<p>It is important to remember that unfolding a specific field requires
+its parent node to be unfolded first. Failing to do that will produce
+invalid results.  As an example, unfolding a ‘Topic’ field without
+unfolding a ‘Domain’ will produce an empty result array.</p>
+<p>In case there is an error in the Lua script, the error message is
+logged and an empty result is generated.  Applications should enable
+the log event <code class="docutils literal notranslate"><span class="pre">LH_SEM3_LOGEVT_EXCEPTION</span></code> to get the error messages.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>The following script will unfold two nodes, <code class="docutils literal notranslate"><span class="pre">nlutopic</span></code> and <code class="docutils literal notranslate"><span class="pre">_ortho</span></code>:</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="kr">function</span> <span class="nf">unfold</span><span class="p">(</span><span class="n">semanticResult</span><span class="p">)</span>
+  <span class="kd">local</span> <span class="n">nbrAlternatives</span> <span class="o">=</span> <span class="n">semanticResult</span><span class="p">:</span><span class="n">unfold</span><span class="p">({</span><span class="s1">&#39;Domain&#39;</span><span class="p">,</span><span class="s1">&#39;Topic&#39;</span><span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+  <span class="kr">for</span> <span class="n">alternative</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbrAlternatives</span><span class="p">,</span> <span class="mi">1</span> <span class="kr">do</span>
+      <span class="kd">local</span> <span class="n">node</span> <span class="o">=</span> <span class="n">semanticResult</span><span class="p">:</span><span class="n">createAlternative</span><span class="p">(</span><span class="n">alternative</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">node</span><span class="p">:</span><span class="n">unfold</span><span class="p">({</span><span class="s1">&#39;nlutopic&#39;</span><span class="p">,</span><span class="s1">&#39;_ortho&#39;</span><span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="kr">end</span>
+<span class="kr">end</span>
+</pre></div>
+</div>
+<p>This produces the following result:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;SemanticResult&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;versions&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;...&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;results&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;appName&quot;</span><span class="p">:</span> <span class="s2">&quot;yesnoApp&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;probability&quot;</span><span class="p">:</span> <span class="mi">9713</span><span class="p">,</span>
+    <span class="nt">&quot;interpretations&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;417b8577-859a-43af-bc09-8698e736e407&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;probability&quot;</span><span class="p">:</span> <span class="mi">9713</span><span class="p">,</span>
+      <span class="nt">&quot;representation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;concept&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;topic&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;roles&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;_ortho&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;affirmative&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;_ortho&quot;</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">},</span>
+          <span class="nt">&quot;nlutopic&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;General.Yes&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;nlutopic&quot;</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">node:unfold</span></code> several times in sequence will result in only
+the last call having an effect on the resulting unfolding:</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="kr">function</span> <span class="nf">unfold</span><span class="p">(</span><span class="n">semanticResult</span><span class="p">)</span>
+  <span class="kd">local</span> <span class="n">nbrAlternatives</span> <span class="o">=</span> <span class="n">semanticResult</span><span class="p">:</span><span class="n">unfold</span><span class="p">({</span><span class="s1">&#39;Domain&#39;</span><span class="p">,</span><span class="s1">&#39;Topic&#39;</span><span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
+  <span class="kr">for</span> <span class="n">alternative</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbrAlternatives</span><span class="p">,</span> <span class="mi">1</span> <span class="kr">do</span>
+      <span class="kd">local</span> <span class="n">node</span> <span class="o">=</span> <span class="n">semanticResult</span><span class="p">:</span><span class="n">createAlternative</span><span class="p">(</span><span class="n">alternative</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+      <span class="n">node</span><span class="p">:</span><span class="n">unfold</span><span class="p">({</span><span class="s1">&#39;nlutopic&#39;</span><span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">node</span><span class="p">:</span><span class="n">unfold</span><span class="p">({</span><span class="s1">&#39;_ortho&#39;</span><span class="p">},</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="kr">end</span>
+<span class="kr">end</span>
+</pre></div>
+</div>
+<p>will yield the following result; note that the <code class="docutils literal notranslate"><span class="pre">nlutopic</span></code> slot is
+not unfolded:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;SemanticResult&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;versions&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;...&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;results&quot;</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="nt">&quot;appName&quot;</span><span class="p">:</span> <span class="s2">&quot;yesnoApp&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;probability&quot;</span><span class="p">:</span> <span class="mi">9713</span><span class="p">,</span>
+    <span class="nt">&quot;interpretations&quot;</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;ff04a28a-23ae-4ef5-b5c3-c754d7bd1956&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;probability&quot;</span><span class="p">:</span> <span class="mi">9713</span><span class="p">,</span>
+      <span class="nt">&quot;representation&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;concept&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;topic&quot;</span>
+          <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;roles&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;_ortho&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;affirmative&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;extraContent&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;VoCon&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;slotName&quot;</span><span class="p">:</span> <span class="s2">&quot;_ortho&quot;</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="lua-api">
+<h3>Lua API</h3>
+<div class="section" id="semanticresult">
+<h4>SemanticResult</h4>
+<p>Extends <a class="reference internal" href="#semanticresultnode">SemanticResultNode</a></p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">getFieldNames</span></code>:</p>
+<blockquote>
+<div><p>Get the list of field names that are available.  The full set of
+field names of the SemanticResult object. Each name can be used
+as an input argument for <code class="docutils literal notranslate"><span class="pre">semanticResultNode:Unfold()</span></code> to
+unfold the result on that field</p>
+<dl class="docutils">
+<dt>returns:</dt>
+<dd><code class="docutils literal notranslate"><span class="pre">fieldNames</span></code>: list of strings</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+</div>
+<div class="section" id="semanticresultnode">
+<h4>SemanticResultNode</h4>
+<p><code class="docutils literal notranslate"><span class="pre">unfold</span></code>:</p>
+<blockquote>
+<div><p>Unfold the current result node into a number of alternatives based
+on a specified set of field names.</p>
+<p>A semantic result node represents one possible outcome of the
+semantic post-processing for a set of fields of the semantic
+result.  With this operation we add more fields to the outcome. The
+consequence of adding more fields is that there can be new
+alternatives.  Since the number of new alternatives could be large
+you can limit it with the argument <code class="docutils literal notranslate"><span class="pre">limitNbrAlternatives</span></code>. The
+effectively added number of new alternatives is returned.</p>
+<p>DB-connected fields will only be unfolded, if they contain acoustic
+evidence. If they do, unfolding will result in separate sub-nodes
+for all matching DB values of the field in the attached DB rows. If
+a DB-connected field does not contain acoustic evidence, its value
+will be empty, and thus not influence the unfolding.</p>
+<p>The alternatives will be ranked by score.</p>
+<p>arguments:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">fieldNames</span></code>: list of strings</dt>
+<dd>The names of the fields to unfold upon.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">limitNbrAlternatives</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt>
+<dd>The maximum number of alternatives that should be created
+upon unfolding. If the value is 0, there will be no limit.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">minimumProbability</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt>
+<dd>The probability value which indicates the lowest probability
+of the created alternatives. If the value is 0, there will be
+no limit. If the value is bigger than 10000, there will be no
+alternatives created.</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>returns:</dt>
+<dd><code class="docutils literal notranslate"><span class="pre">nbrAlternatives</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></dd>
+</dl>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">unfoldAll</span></code>:</p>
+<blockquote>
+<div><p>Unfold the current result node into a number of alternatives based
+on all the remaining fields that have not yet been unfolded.</p>
+<p>A semantic result node represents one possible outcome of the
+semantic post-processing for a set of fields of the semantic
+result.  With this operation we add more fields to the outcome. The
+consequence of adding more fields is that there can be new
+alternatives.  Since the number of new alternatives could be large
+you can limit it with the argument <code class="docutils literal notranslate"><span class="pre">limitNbrAlternatives</span></code>.  The
+effectively added number of new alternatives is returned.</p>
+<p>DB-connected fields will only be unfolded, if they contain acoustic
+evidence. If they do, unfolding will result in separate sub-nodes
+for all matching DB values of the field in the attached DB rows. If
+a DB-connected field does not contain acoustic evidence, its value
+will be empty, and thus not influence the unfolding.</p>
+<p>The alternatives will be ranked by score.</p>
+<p>arguments:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">limitNbrAlternatives</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt>
+<dd>The maximum number of alternatives that should be created
+upon unfolding. If the value is 0, there will be no limit.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">minimumProbability</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt>
+<dd>The probability value which indicates the lowest probability
+of the created alternatives. If the value is 0, there will be
+no limit. If the value is bigger than 10000, there will be no
+alternatives created.</dd>
+</dl>
+</div></blockquote>
+<p>returns:</p>
+<blockquote>
+<div><code class="docutils literal notranslate"><span class="pre">nbrAlternatives</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">createAlternative</span></code>:</p>
+<blockquote>
+<div><p>Get the nth alternative for this unfolded part of the result.</p>
+<dl class="docutils">
+<dt>arguments:</dt>
+<dd><dl class="first last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">alternativeIndex</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt>
+<dd>0-based index of the alternative. The value should not exceed
+the alternative count returned by <code class="docutils literal notranslate"><span class="pre">unfold</span></code> / <code class="docutils literal notranslate"><span class="pre">unfoldAll</span></code>.</dd>
+</dl>
+</dd>
+<dt>returns:</dt>
+<dd><dl class="first last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">node</span></code>: <code class="docutils literal notranslate"><span class="pre">SemanticResultNode</span></code></dt>
+<dd>A semantic result node representing a result alternative
+which has been expanded further.</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">getStrings</span></code>:</p>
+<blockquote>
+<div><p>Get the string values of a given semantic field.</p>
+<p>If there is no field with the requested name or if the field value
+is an integer <code class="docutils literal notranslate"><span class="pre">nil</span></code> will be returned.</p>
+<dl class="docutils">
+<dt>arguments:</dt>
+<dd><dl class="first last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">fieldName</span></code>: string</dt>
+<dd>The name of a semantic field.</dd>
+</dl>
+</dd>
+<dt>returns:</dt>
+<dd><dl class="first last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">values</span></code>: list of strings</dt>
+<dd>The string values of the field. Will be nil if no field exist
+with the requested name or if the value is not a string.</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">getIntegers</span></code>:</p>
+<blockquote>
+<div><p>Get the integer values of a given semantic field.</p>
+<p>If there is no field with the requested name or if the field value
+is a string nil will be returned.</p>
+<dl class="docutils">
+<dt>arguments:</dt>
+<dd><dl class="first last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">fieldName</span></code>: <code class="docutils literal notranslate"><span class="pre">string</span></code></dt>
+<dd>The name of a semantic field.</dd>
+</dl>
+</dd>
+<dt>returns:</dt>
+<dd><dl class="first last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">values</span></code>: list of integers</dt>
+<dd>The integer values of the field. Will be nil if no field
+exist with the requested name or if the value is not a string.</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">getSpokenFieldNames</span></code>:</p>
+<blockquote>
+<div><p>Get the list of spoken field names that are available.</p>
+<p>The full set of spoken field names of this <code class="docutils literal notranslate"><span class="pre">SemanticResultNode</span></code>
+object. Each name can be used as an input argument for <code class="docutils literal notranslate"><span class="pre">unfold()</span></code>
+to unfold the result on that field.</p>
+<dl class="docutils">
+<dt>returns:</dt>
+<dd><dl class="first last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">values</span></code>: list of strings</dt>
+<dd>The list of strings with the spoken field names.</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">getNbrAttachedResults</span></code>:</p>
+<blockquote>
+<div><p>Returns the number of interpretations attached to the node.</p>
+<p>This function returns the number of interpretations attached to the
+node, in case of a database connected app (e.g. FuzzyMatch) the
+number of associated database rows.</p>
+<dl class="docutils">
+<dt>returns:</dt>
+<dd><dl class="first last docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">nbrAttachedResults</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt>
+<dd>The number of attached results.</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">getProbability</span></code>:</p>
+<blockquote>
+<div><p>Get the maximum probability of all result table rows attached to
+the semantic result node.</p>
+<p>If there is no field with the requested name, <code class="docutils literal notranslate"><span class="pre">nil</span></code> will be
+returned.</p>
+<p>returns:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">probability</span></code>: <code class="docutils literal notranslate"><span class="pre">int</span></code></dt>
+<dd>The probability of the semantic result node.</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="result-filtering">
+<h2>Result filtering</h2>
+<p>Cerence ASR provides a mechanism to add search filtering or SEM3
+filtering to a search configuration or an NLU configuration. You can
+preconfigure the filtering setup in a JSON file, or use the
+<code class="docutils literal notranslate"><span class="pre">&lt;IApplication&gt;.addWithPath()</span></code> API call to add filtering. Then,
+after the call to <code class="docutils literal notranslate"><span class="pre">&lt;IAsrManager&gt;.setApplications()</span></code>, filtering will
+take effect for subsequent recognitions.</p>
+<p>The following filtering types can be configured:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Activatable rules (for grammar-based search configurations)</li>
+<li>Field activation (for field search configurations)</li>
+<li>Weighted activation (for language model interpolation)</li>
+</ul>
+</div></blockquote>
+<div class="section" id="filtering-api">
+<h3>Filtering API</h3>
+<p>In the following document the C-API of the add filtering is described.
+There is also a Java-API that works in the same way.</p>
+<div class="section" id="addwithpath">
+<h4>addWithPath</h4>
+<p>Filters are added to search or NLU via the <code class="docutils literal notranslate"><span class="pre">addWithPath</span></code> API.  There
+are two types of filter, “search_filter” for ASR search filters, and
+“sem3_filter” for SEM3 filters.  the <code class="docutils literal notranslate"><span class="pre">&quot;config&quot;</span></code> is a JSON string,
+which must follow the ASR JSON configuration schema. For search
+filters, see <a class="reference internal" href="../external/configuration.html#isearchfilterconfig"><span class="std std-ref">ISearchFilterConfig - Json configuration for SearchFilterConfig.</span></a>, and for “sem3_filter”, see
+<a class="reference internal" href="../external/configuration.html#isem3filterconfig"><span class="std std-ref">ISem3FilterConfig - Sem3 filter configuration config</span></a>.</p>
+<p>For a “search_filter”, the path should be like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;|input|&lt;input name&gt;|search|&lt;search name&gt;&quot;</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>For a “sem3_filter”, its path should be like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;|nlu|&lt;nlu name&gt;&quot;</span>
+</pre></div>
+</div>
+<p>The “configsList” is optional. If provided, it must be a JSON string
+list, which the JSON structure shall follow the ASR JSON configuration
+schema.  For a “search_filter”, the JSON schema is ISearchFilterConfig
+For a “filter”, the JSON schema is ISem3FilterConfig</p>
+<p>Interface</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="n">nuance_asr5_IApplication_addWithPath</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="nb">type</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="n">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="n">const</span> <span class="o">*</span><span class="n">pathsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">npathsList</span><span class="p">,</span>
+  <span class="n">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="n">const</span> <span class="o">*</span><span class="n">configsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nconfigsList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="examples-of-filters">
+<h3>Examples of filters</h3>
+<div class="section" id="search-config-filter">
+<h4>Search Config filter</h4>
+<div class="section" id="activatable-rules">
+<h5>Activatable rules</h5>
+<p>Activation and deactivation on the search space (context) enables
+users to narrow down the search space based on the information on the
+application side (e.g. dialog mode).  ImmutableFstContext contains a
+set of rules which are active by default.</p>
+<p>Here are 2 exmples of Activatable rules search config filter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;search_filter&quot;</span> <span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;rule_based_deactivate_filter&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;rule_based&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;rule_based&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;activateAll&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;exception_rules&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;test_activation#name&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;test_activation#climate&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;test_activation#commands&quot;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="s2">&quot;search_filter&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;rule_based_activate_filter&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;rule_based&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;rule_based&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;deactivateAll&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;exception_rules&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">&quot;test_activation#name&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;test_activation#climate&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;test_activation#commands&quot;</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="field-activation">
+<h5>Field activation</h5>
+<p>Field activation and deactivation on the search space (context)
+enables users to narrow down a search space that is hierarchically
+structured in a sequence of fields.  The corresponding context buffer
+has to contain a set of configured field names which can be used for
+this type of activation.</p>
+<p>Here is an example of Field activation search config filter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;search_filter&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;field_activate_filter&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;field&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;set_start_stop&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;set_start_stop&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;state&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;stop&quot;</span><span class="p">:</span> <span class="s2">&quot;street&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;deactivateAll&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;add_start&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;add_start&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;street&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;deactivateAll&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;activate&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;activate&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;street&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;activate_from&quot;</span><span class="p">:</span> <span class="s2">&quot;city&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;user_ids&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="mi">200</span><span class="p">,</span>
+              <span class="mi">201</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="weighted-activation">
+<h5>Weighted activation</h5>
+<p>In language model (LM) interpolation, each LM can have a different
+weight.  The respective buffer section contains default weights, which
+can be used as-is.  However, it also gives the user the capability to
+modify these weights at runtime.</p>
+<p>If weight_based object is present in the configuration, the LM with
+“weight” will be loaded.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;search_filter&quot;</span> <span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;weight_based&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;weight_based&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;weights&quot;</span> <span class="p">:</span> <span class="p">[</span>
+      <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;messaging&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span> <span class="p">:</span> <span class="mi">7000</span> <span class="p">},</span>
+      <span class="p">{</span> <span class="s2">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ude&quot;</span>      <span class="p">,</span> <span class="s2">&quot;weight&quot;</span> <span class="p">:</span> <span class="mi">3000</span> <span class="p">}</span>
+    <span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note, that the <code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;weight&quot;</span></code> value pairs from the
+<code class="docutils literal notranslate"><span class="pre">&quot;weights&quot;</span></code> objects shall be used to set the weight of search
+filter.  The name values shall be the one which is set by the
+ngramctxcpl.py cmdl option rescoreLmNames The weight values shall be
+in value range 0..10000. Also, weights should sum up to 10000.</p>
+</div>
+</div>
+<div class="section" id="sem3-filters">
+<h4>SEM3 filters</h4>
+<p>A SEM3 filter has an optional <code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code> field, and a mandatory <code class="docutils literal notranslate"><span class="pre">&quot;json&quot;</span></code>
+field. The <code class="docutils literal notranslate"><span class="pre">&quot;json&quot;</span></code> field has the follow format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;topics&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;topic filter expression&gt;&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;&lt;version&gt;&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;filterType&quot;</span> <span class="p">:</span> <span class="s2">&quot;TopicDeactivation&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">&quot;&lt;topic</span> <span class="pre">filter</span> <span class="pre">expression&gt;&quot;</span></code> - this is a string containing a regular
+expression: topics of which the name matches this regular expression
+will be activated or deactivated. The “topic name” refers to the full
+topic name i.e. using the format App:Topic. The App part and the
+short topic name must be concatenated by a colon.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;&lt;version&gt;&quot;</span></code> - this is a string representing the version in the
+format “X.Y”. The current version is “1.1”.</li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;&lt;filterType&gt;&quot;</span></code> - this must be <em>TopicActivation</em> or <em>TopicDeactivation</em></li>
+</ul>
+<p>Below are 2 examples of SEM3 filters:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;DEACTIVATE_MUSIC_SIMPLE&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;topics&quot;</span> <span class="p">:</span> <span class="s2">&quot;_MusicSimple:.*&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;1.1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;filterType&quot;</span> <span class="p">:</span> <span class="s2">&quot;TopicDeactivation&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This filter will deactivate all topics of the <code class="docutils literal notranslate"><span class="pre">_MusicSimple</span></code> app.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;name&quot;</span> <span class="p">:</span> <span class="s2">&quot;ACTIVATE_MUSIC_SHUFFLEON_PREVIOUS&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;json&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;topics&quot;</span> <span class="p">:</span> <span class="s2">&quot;(_MusicSimple:Music\\.ShuffleOn|_MusicSimple:Music\\.Previous)&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;version&quot;</span> <span class="p">:</span> <span class="s2">&quot;1.1&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;filterType&quot;</span> <span class="p">:</span> <span class="s2">&quot;TopicActivation&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This filter will only activate topics <code class="docutils literal notranslate"><span class="pre">_MusicSimple:Music.ShuffleOn</span></code>
+and <code class="docutils literal notranslate"><span class="pre">_MusicSimple:Music.Previous</span></code>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="result-post-processors">
+<span id="post-processing"></span><h2>Result post-processors</h2>
+<p>It is possible to configure the ASR system to use custom result
+post-processors. These are plugins, must be provided as a library, and
+will be activated at runtime.</p>
+<p><em>NOTE: This functionality is not available for iOS platform</em></p>
+<p>To use a post-processor, you must first load and register the post
+processor library to the system, and secondly the post-processor has
+to be attached to an ASR application.</p>
+<div class="section" id="loading-and-registration-of-post-processor">
+<h3>Loading and registration of post processor</h3>
+<p>For registration of a PostProcessor there are two possible ways:</p>
+<p>A JSON configuration in <code class="docutils literal notranslate"><span class="pre">asr_manager</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;plugin&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;post_processor&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PP DLL name&quot;</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;liquid_config_file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;liquid_config.json&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A post-processor can be configured further as follows:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;postprocessor&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;postprocessorName&quot;</span>
+        <span class="s2">&quot;library_name&quot;</span><span class="p">:</span> <span class="s2">&quot;PP DLL name&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;start_rule&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;PostProcessor dependent configuration&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A post-processor can also be registered with an API call.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">ASR5_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IAsrManager_registerPlugin</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IAsrManager</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">pluginType</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">pluginName</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">configParam</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-a-post-processor-to-an-asr-application">
+<h3>Adding a post-processor to an ASR application</h3>
+<p>Adding a post-processor to an ASR application can be done in the JSON
+configuration of the ASR applicaton, or with an API call.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_asr5_IApplication_add</span>
+<span class="p">(</span>
+  <span class="n">nuance_asr5_IApplication</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">type</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">namesList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nnamesList</span><span class="p">,</span>
+  <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span> <span class="k">const</span> <span class="o">*</span><span class="n">configsList</span><span class="p">,</span> <span class="n">LH_S32</span> <span class="n">nconfigsList</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>If you use the API call to add the post-processor, its configuration
+has to be given as top-level configuration in a JSON file, or
+optionally as a character string with the parameter config.</p>
+</div>
+<div class="section" id="post-processor-configuration">
+<h3>Post-processor Configuration</h3>
+<p>The configuration of the post processor can be done in the top level
+configuration, or it can be nested inside the ASR application
+configuration</p>
+<p>For the top level configuration, the post processor has to be added to the
+application via an API call. Configuration is then done as follows:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;post_processor&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PP_NAME&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;source&quot;</span><span class="p">:</span> <span class="p">[</span>
+         <span class="s2">&quot;SLM#START&quot;</span>
+      <span class="p">],</span>
+      <span class="nt">&quot;library_name&quot;</span><span class="p">:</span> <span class="s2">&quot;nds_asr5_post_processor_plugin&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="nt">&quot;add_pp_json&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Nested configuration looks like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;application&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ASR_DOMAIN_STATIC_CNC_DUMMY_PP&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;input&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;asr&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;asr&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;search&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+                <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;CNC_CTX&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;static&quot;</span><span class="p">:</span> <span class="p">{</span>
+                   <span class="nt">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;modelm_small_fmt2.fcf&quot;</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;vocon_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                   <span class="nt">&quot;LH_SEARCH_PARAM_TSILENCE&quot;</span><span class="p">:</span> <span class="mi">150</span>
+                <span class="p">}</span>
+              <span class="p">}</span>
+            <span class="p">]</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">],</span>
+      <span class="nt">&quot;post_processor&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;PP_NAME&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;source&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="s2">&quot;SLM#START&quot;</span>
+        <span class="p">],</span>
+        <span class="nt">&quot;library_name&quot;</span><span class="p">:</span> <span class="s2">&quot;nds_asr5_post_processor_plugin&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;post processor dependen configuration&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="passing-information-from-the-system-to-a-post-processor">
+<h3>Passing information from the system to a post-processor</h3>
+<p>The post-processor can get information from the system at run
+time. This is achieved using a key value pool. The system needs to set
+the specific key and value first with <code class="xref cpp cpp-func docutils literal notranslate"><span class="pre">setKeyValue()</span></code>, and
+then the post-processor will fetch it when needed by processing.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">COMMON_C_EXPORT</span> <span class="n">nuance_common_ResultCode</span> <span class="nf">nuance_common_IKeyValuePool_setKeyValue</span>
+<span class="p">(</span>
+    <span class="n">nuance_common_IKeyValuePool</span> <span class="o">*</span><span class="n">instance</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span>
+    <span class="k">const</span> <span class="n">LH_CHAR</span> <span class="o">*</span><span class="n">paramValue</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="forward-post-processor-plugin-log-messages-to-the-cerence-asr-logger">
+<h3>Forward post-processor plugin log messages to the Cerence ASR logger</h3>
+<p>To activate log message forwarding ,there must be at least one log
+consumer listening to the post-processor module. This can be set in
+the logger config.</p>
+<p>If this is the case the PostProcessorLogger will receive log messages
+from the post-processor and send it to the Cerence ASR logger.</p>
+<p>The module name to set to log consumer has the following format:
+“nuance.asr5.&lt;PP_name&gt;”</p>
+</div>
+</div>
+<div class="section" id="implementing-a-custom-audio-input-adapter">
+<span id="custom-audio-input-adapter"></span><h2>Implementing a custom audio input adapter</h2>
+<p id="index-1">Audio input from microphone is highly platform-dependent. For this
+reason, the CSDK does not include a microphone audio input source that
+can be used out-of-the-box. Instead, a custom audio adapter will have
+to be implemented specifically for the target platform.</p>
+<p>The <a class="reference internal" href="tools_and_sample_code.html#one-shot-wuw-sample"><span class="std std-ref">one-shot wake-up-word SDK sample</span></a>
+includes an example of a custom audio source for the win32
+platform. The code is contained in 3 source files (in directory
+<code class="docutils literal notranslate"><span class="pre">csdk_v2\sample\win32\src</span></code>):</p>
+<ul>
+<li><p class="first"><strong>customInputAdapterFactory.c</strong></p>
+<p>The implementation of function
+<code class="docutils literal notranslate"><span class="pre">customAudioInputAdapterFactory_getAdapterType</span></code> declares that the
+custom input source will be known as <code class="docutils literal notranslate"><span class="pre">CUSTOM_AUDIO</span></code> to the Audio
+Manager.</p>
+<p>The implementation of function
+<code class="docutils literal notranslate"><span class="pre">customAudioInputAdapterFactory_createAudioInputAdapter</span></code> sets up a
+new audio input adapter, and initializes its internal data structures.</p>
+</li>
+<li><p class="first"><strong>customInputAdapter.c</strong></p>
+<p id="index-2">This file implements the callback functions for the
+IAudioInputAdapter interface, and controls the audio input thread.
+In the JSON configuration for the AudioInput module, the device name
+can be specified:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;adapter_type&quot;</span><span class="p">:</span> <span class="s2">&quot;CUSTOM_AUDIO&quot;</span><span class="p">,</span>
+<span class="s2">&quot;adapter_params&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;device_name&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>If no explicit device name is specified, <code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> is used.</p>
+</li>
+<li><p class="first"><strong>audioin.c</strong></p>
+<p>This file contains the code that runs in the audio input
+thread. This thread handles that actual audio input from the win32
+input device,</p>
+</li>
+</ul>
+</div>
+<div class="section" id="dynamic-content-consumers">
+<h2>Dynamic Content Consumers</h2>
+<p>If dynamic content consumers are specified in a search configuration,
+they need to be created.  A DCC can either be created as a data
+provider from one data source or as a data provider from multiple data
+sources.</p>
+<p>If being used as a data provider from one data source we use
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IDynamicContentConsumer_create</span></code> for creation.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nuance_asr5_IDynamicContentConsumer_create</span><span class="p">(</span><span class="n">asrManager</span><span class="p">,</span> <span class="s2">&quot;DCP_music&quot;</span><span class="p">,</span> <span class="n">listener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">musicConsumer</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If being used as a data provider from multiple data sources we use
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IDynamicContentConsumer_createFromSource</span></code> for creation.</p>
+<p>e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MyDynamicDataConsumerListener</span> <span class="n">listener</span> <span class="o">=</span> <span class="n">new</span> <span class="n">MyDynamicDataConsumerListener</span><span class="p">();</span>
+<span class="n">nuance_asr5_IDynamicContentConsumer_createFromSource</span><span class="p">(</span><span class="n">asrManager</span><span class="p">,</span> <span class="s2">&quot;DCP_music&quot;</span><span class="p">,</span> <span class="s2">&quot;myMusik&quot;</span><span class="p">,</span> <span class="n">listener</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">myMusicConsumer</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In the application configuration the <code class="docutils literal notranslate"><span class="pre">fromSource</span></code> content must be
+mentioned as the optional “source” value of the dynamic content
+configuration.</p>
+<p>The create functions do create a DCC object and also do load any
+persisted context so the Application can run on pre-prepared data.</p>
+<p>When a DCC is created, the user is notified with the number of the
+entries that are currently persisted for this DCC (“0” in case the DCC
+is created for the first time).  An event
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IDynamicContentConsumerListener_onEvent</span></code> is created
+with the “NUANCE_ASR5_DCC_WITH_N_ENTRIES” event type and with the
+message containing the number of entries.  Additionally an event
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IDynamicContentConsumerListener_onEvent</span></code> is created
+with the “NUANCE_ASR5_DCC_WITH_DCC_DATA_ID” event and with message
+containing the ID stored in EDBTableUpdateID tag of COP file (&lt;null&gt;
+in case the DCC was created for the first time).</p>
+<p>If the number of the entries cannot be obtained, it will be notified
+to the user as an event
+<code class="docutils literal notranslate"><span class="pre">nuance_asr5_IDynamicContentConsumerListener_onWarning</span></code> with the
+warning code “NUANCE_ASR5_DCC_ENTRY_COUNT_UNKNOWN”. This situation
+could happen for instance if not all of the persisted files are
+available.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../SDK_Asr5_UserGuide.html">
+    <img class="logo" src="../../_static/Cerence_Logo_H_black.jpg" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+  <h3><a href="../../SDK_Asr5_UserGuide.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Advanced topics</a><ul>
+<li><a class="reference internal" href="#semantic-result-unfolding">Semantic result unfolding</a><ul>
+<li><a class="reference internal" href="#api-to-pass-lua-script-to-the-sem3-engine">API to pass Lua script to the sem3 engine.</a></li>
+<li><a class="reference internal" href="#example-of-an-unfolding-script">Example of an unfolding script</a></li>
+<li><a class="reference internal" href="#lua-api">Lua API</a><ul>
+<li><a class="reference internal" href="#semanticresult">SemanticResult</a></li>
+<li><a class="reference internal" href="#semanticresultnode">SemanticResultNode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#result-filtering">Result filtering</a><ul>
+<li><a class="reference internal" href="#filtering-api">Filtering API</a><ul>
+<li><a class="reference internal" href="#addwithpath">addWithPath</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples-of-filters">Examples of filters</a><ul>
+<li><a class="reference internal" href="#search-config-filter">Search Config filter</a><ul>
+<li><a class="reference internal" href="#activatable-rules">Activatable rules</a></li>
+<li><a class="reference internal" href="#field-activation">Field activation</a></li>
+<li><a class="reference internal" href="#weighted-activation">Weighted activation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sem3-filters">SEM3 filters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#result-post-processors">Result post-processors</a><ul>
+<li><a class="reference internal" href="#loading-and-registration-of-post-processor">Loading and registration of post processor</a></li>
+<li><a class="reference internal" href="#adding-a-post-processor-to-an-asr-application">Adding a post-processor to an ASR application</a></li>
+<li><a class="reference internal" href="#post-processor-configuration">Post-processor Configuration</a></li>
+<li><a class="reference internal" href="#passing-information-from-the-system-to-a-post-processor">Passing information from the system to a post-processor</a></li>
+<li><a class="reference internal" href="#forward-post-processor-plugin-log-messages-to-the-cerence-asr-logger">Forward post-processor plugin log messages to the Cerence ASR logger</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementing-a-custom-audio-input-adapter">Implementing a custom audio input adapter</a></li>
+<li><a class="reference internal" href="#dynamic-content-consumers">Dynamic Content Consumers</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+<div id="index-of-terms-link" role="search">
+  <br>
+  <h3>Index of Terms</h3>
+  <ul>
+    <li>
+
+      <ul><li><a href="../../genindex.html">Index of terms</a></li></ul>
+    <li>
+  </ul>
+</div>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../SDK_Asr5_UserGuide.html">Documentation overview</a><ul>
+      <li>Previous: <a href="examples.html" title="previous chapter">Examples</a></li>
+      <li>Next: <a href="tools_and_sample_code.html" title="next chapter">Tools and Sample Code</a></li>
+  </ul></li>
+</ul>
+</div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Cerence, Inc.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
